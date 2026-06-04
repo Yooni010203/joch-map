@@ -3932,6 +3932,9 @@ function switchFloor(floor) {
             await loadFlrMarkersForFloor(floor);
             dbg('onComplete: editMode='+editMode+' wasEdit='+wasEditMode);
             setVis();
+          }
+        };
+        miniLoader.classList.remove('show');
       }
 
       currentModel = newM;
