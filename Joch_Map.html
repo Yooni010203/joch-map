@@ -3771,6 +3771,7 @@ function switchFloor(floor) {
   // 층 전환 중 에디터 툴바/배너 숨기기
   const wasEditMode = editMode;
   if (editMode) {
+    editMode = false; // 임시 비활성화
     document.getElementById('edit-toolbar').classList.remove('show');
     document.getElementById('edit-banner').classList.remove('show');
     document.getElementById('hdr').classList.remove('edit-mode');
@@ -3927,6 +3928,7 @@ function switchFloor(floor) {
       isLoading = false;
       // 에디터 툴바 복원
       if (wasEditMode) {
+        editMode = true;
         document.getElementById('edit-toolbar').classList.add('show');
         document.getElementById('edit-banner').classList.add('show');
         document.getElementById('hdr').classList.add('edit-mode');
