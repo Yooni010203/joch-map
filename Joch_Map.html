@@ -3768,6 +3768,14 @@ function switchFloor(floor) {
   const fromFloor = currentFloor;
   const oldModel  = currentModel;
 
+  // 층 전환 중 에디터 툴바/배너 숨기기
+  const wasEditMode = editMode;
+  if (editMode) {
+    document.getElementById('edit-toolbar').classList.remove('show');
+    document.getElementById('edit-banner').classList.remove('show');
+    document.getElementById('hdr').classList.remove('edit-mode');
+  }
+
   document.querySelectorAll('.floor-btn').forEach(b => b.disabled = true);
   stopBlink(); closePopup();
 
@@ -3814,6 +3822,9 @@ function switchFloor(floor) {
       }
 
       const newM = loaded[loaded.length - 1];
+
+      // 셰이더 미리 컴파일 (네트워크 느린 환경에서 뭉개짐 방지)
+      renderer.compile(scene, camera);
 
       // 카메라 설정 (최초 1회)
       if (!oldModel) {
@@ -3904,8 +3915,8 @@ function switchFloor(floor) {
       }
 
       currentModel = newM;
-      currentModelFloor = floor; // 실제 로드된 층 추적
-      _navOrigModelY = newM.position.y; // nav용 원래 Y 저장
+      currentModelFloor = floor;
+      _navOrigModelY = newM.position.y;
       currentFloor = floor;
       document.querySelectorAll('.floor-btn').forEach(b => {
         b.classList.toggle('active', parseInt(b.id.replace('fbtn-','').replace('mfbtn-','')) === floor);
@@ -3914,6 +3925,12 @@ function switchFloor(floor) {
       document.getElementById('ip-floor').textContent = FLOORS[floor].label;
       document.getElementById('ip-file').textContent  = FLOORS[floor].file.replace('model/','');
       isLoading = false;
+      // 에디터 툴바 복원
+      if (wasEditMode) {
+        document.getElementById('edit-toolbar').classList.add('show');
+        document.getElementById('edit-banner').classList.add('show');
+        document.getElementById('hdr').classList.add('edit-mode');
+      }
       if (!oldModel) {
         await clearBackups(floor);
         undoStack.length = 0;
