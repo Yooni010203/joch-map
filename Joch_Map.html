@@ -173,7 +173,8 @@ body.lowspec canvas{image-rendering:pixelated}
 #edit-modal.show{opacity:1;pointer-events:all}
 #edit-modal .modal-box{transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)}
 #edit-modal.show .modal-box{transform:translateY(0) scale(1)}
-.modal-box{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:20px;padding:28px;width:420px;max-width:95vw;box-shadow:var(--glass-shadow);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);display:flex;flex-direction:column;gap:16px}
+.modal-box{background:rgba(255,255,255,.82);border:1px solid var(--glass-border);border-radius:20px;padding:28px;width:420px;max-width:95vw;box-shadow:var(--glass-shadow);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);display:flex;flex-direction:column;gap:16px}
+body.dark .modal-box{background:rgba(20,24,38,.82)!important}
 .modal-title{font-size:1rem;font-weight:700;color:var(--text)}
 .modal-mid{font-family:'Orbitron',monospace;font-size:.7rem;color:var(--dim);font-weight:400;margin-left:6px}
 .mf{display:flex;flex-direction:column;gap:5px}
@@ -368,7 +369,7 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 
 <!-- 가이드 모달 -->
 <div id="guide-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;opacity:0;transition:opacity .18s" onclick="if(event.target===this)closeGuide()">
-  <div class="guide-box" style="background:var(--card);border-radius:16px;padding:28px;width:420px;max-width:92vw;max-height:80vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:16px;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)">
+  <div class="guide-box" style="background:rgba(255,255,255,.82);border-radius:16px;padding:28px;width:420px;max-width:92vw;max-height:80vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:16px;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)">
     <div style="font-size:1.1rem;font-weight:700;color:var(--text)">📖 사용 가이드</div>
     <div style="display:flex;flex-direction:column;gap:12px;font-size:.88rem;color:var(--dim);line-height:1.7">
       <div>
@@ -411,7 +412,7 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 
 <!-- 앱 정보 모달 -->
 <div id="appinfo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;opacity:0;transition:opacity .18s" onclick="if(event.target===this)closeAppInfo()">
-  <div class="appinfo-box" style="background:var(--card);border-radius:16px;padding:32px 28px;width:360px;max-width:92vw;box-shadow:0 16px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:16px;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)">
+  <div class="appinfo-box" style="background:rgba(255,255,255,.82);border-radius:16px;padding:32px 28px;width:360px;max-width:92vw;box-shadow:0 16px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:16px;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)">
     <div style="font-size:1.15rem;font-weight:700;color:var(--text)">ℹ️ 앱 정보</div>
     <div style="color:var(--dim);font-size:.92rem;line-height:1.7">
       <p style="margin:0;font-weight:700;color:var(--text)">조치원 중학교 지도 v1.0</p>
@@ -428,11 +429,16 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 </div>
 
 <div id="edit-toolbar">
+  <span id="edit-badge" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;background:var(--edit);color:#fff;font-size:.72rem;font-weight:700;flex-shrink:0;white-space:nowrap">
+    <span class="blink">●</span> 편집 모드
+  </span>
+  <span style="width:1px;height:20px;background:rgba(224,92,0,.3);margin:0 2px;flex-shrink:0"></span>
   <button class="tool-btn active" id="btn-draw">＋ 영역 그리기</button>
   <button class="tool-btn" id="btn-sel">▣ 선택</button>
   <button class="tool-btn" id="btn-resize">⤢ 크기 조절</button>
   <button class="tool-btn" id="btn-move">✥ 방 이동</button>
   <button class="tool-btn" id="btn-path">✏ 길 그리기</button>
+  <button class="tool-btn" id="btn-dot-edit">✦ 점 편집</button>
   <button class="tool-btn" id="btn-marker">📍 마커</button>
   <button class="tool-btn" id="btn-flrmarker">🔼 층이동 마커</button>
   <button class="tool-btn" id="btn-connect">🔗 마커-선 연결</button>
@@ -465,7 +471,7 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 
 <!-- 방 검색 모달 -->
 <div id="search-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:flex-start;justify-content:center;padding-top:80px;opacity:0;transition:opacity .18s" onclick="if(event.target===this)closeSearch()">
-  <div class="search-box" style="background:#fff;border-radius:16px;width:480px;max-width:92vw;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.18);transform:translateY(-12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1);overflow:hidden">
+  <div class="search-box" style="background:rgba(255,255,255,.9);border-radius:16px;width:480px;max-width:92vw;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.18);transform:translateY(-12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1);overflow:hidden">
     <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #eee">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077cc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
         <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
@@ -1737,6 +1743,23 @@ function updatePreviewLine(to) {
   pathPreviewLine = makeLineSeg(pathPoints[pathPoints.length - 1], to, true);
 }
 let selectedDot = null; // { path, dotIdx } - 선택된 점
+let _previewDot = null; // 미리보기 점 mesh
+
+function showPreviewDot(pt) {
+  if (!_previewDot) {
+    const geo = new THREE.SphereGeometry(PATH_DOT_R * 1.2, 10, 10);
+    const mat = new THREE.MeshBasicMaterial({ color: 0x00aaff, transparent: true, opacity: 0.45, depthTest: false });
+    _previewDot = new THREE.Mesh(geo, mat);
+    _previewDot.renderOrder = 1000;
+    scene.add(_previewDot);
+  }
+  // pt는 이미 바닥 좌표 (PATH_HEIGHT_OFFSET 제거됨), 표시용으로만 offset 추가
+  _previewDot.position.set(pt.x, pt.y + PATH_HEIGHT_OFFSET, pt.z);
+  _previewDot.visible = true;
+}
+function hidePreviewDot() {
+  if (_previewDot) _previewDot.visible = false;
+}
 
 // 기존 점 근처 클릭 감지
 function findExistingDotAt(pt) {
@@ -1797,18 +1820,20 @@ function deleteDotFromPath(path, dotIdx) {
 }
 
 // 선택된 점에서 분기 시작 (선택 툴 → 길그리기 툴로 전환 후 시작)
+let _branchFromDotEdit = false; // 분기 시작이 dot-edit에서 왔는지
+
 function startBranchFromDot(clickPt) {
   if (!selectedDot) return;
   const dot = selectedDot.path.dotMeshes[selectedDot.dotIdx];
   dot.material.color.set(0x888888);
   const startPt = new THREE.Vector3(dot.position.x, dot.position.y - PATH_HEIGHT_OFFSET, dot.position.z);
   selectedDot = null;
+  _branchFromDotEdit = (tool === 'dot-edit');
   setTool('path');
   pathDrawing   = true;
   pathPoints    = [startPt.clone()];
   pathDotMeshes = [];
   pathLines     = [];
-  // 클릭한 위치까지 첫 선분 즉시 추가 (pt가 있을 때만)
   if (clickPt && clickPt.distanceTo(startPt) > PATH_DOT_R * 2) {
     pathLines.push(makeLineSeg(startPt, clickPt, false));
     pathPoints.push(clickPt.clone());
@@ -1853,8 +1878,10 @@ function finalizePath() {
   savePathToServer(path);
   showToast('✅ 길이 저장되었습니다.');
   document.getElementById('edit-hint').textContent = '바닥을 클릭&드래그해 영역을 만드세요';
+  if (_branchFromDotEdit) { _branchFromDotEdit = false; setTool('dot-edit'); }
 }
 function setPathVis() {
+  console.log('setPathVis: editMode='+editMode+' paths='+paths.length);
   paths.forEach(p => {
     const show = editMode && p.floor === currentFloor;
     p.dotMeshes && p.dotMeshes.forEach(m => { m.visible = show; });
@@ -2132,6 +2159,53 @@ function findPathAtPointer(e) {
   return null;
 }
 
+// 선 위 클릭 시 세그먼트 인덱스와 투영점 반환
+function findSegmentAtPointer(e) {
+  rc.setFromCamera(ndc(e), camera);
+  rc.params.Line = rc.params.Line || {};
+  rc.params.Line.threshold = 0.3; // 선 감지 범위 확대
+  let best = null, bestDist = Infinity;
+  for (const path of paths) {
+    if (path.floor !== currentFloor) continue;
+    for (let i = 0; i < path.lines.length; i++) {
+      const hits = rc.intersectObject(path.lines[i], false);
+      if (hits.length > 0 && hits[0].distance < bestDist) {
+        bestDist = hits[0].distance;
+        // PATH_HEIGHT_OFFSET 제거해서 실제 바닥 좌표로
+        const pt = hits[0].point.clone();
+        pt.y -= PATH_HEIGHT_OFFSET;
+        best = { path, segIdx: i, point: pt };
+      }
+    }
+  }
+  return best;
+}
+
+async function insertPointOnSeg(path, segIdx, pt) {
+  // segIdx 위치(i → i+1 사이)에 pt 삽입
+  const insertIdx = segIdx + 1;
+  const newPt = [pt.x, pt.y, pt.z];
+  path.points.splice(insertIdx, 0, newPt);
+
+  // 기존 메시 전부 제거 후 재생성
+  path.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+  path.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+
+  const pts = path.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+  path.dotMeshes = pts.map(p => { const m = makeDotMesh(p); m.visible = editMode; return m; });
+  path.lines = [];
+  for (let i = 1; i < pts.length; i++) {
+    const seg = makeLineSeg(pts[i-1], pts[i], false);
+    seg.visible = editMode;
+    path.lines.push(seg);
+  }
+
+  // 선택 상태 유지
+  selectPath(path);
+  await savePathToServer(path);
+  showToast('✅ 점이 추가되었습니다.');
+}
+
 let selectedPath = null; // 현재 선택된 선
 
 function selectPath(path) {
@@ -2375,7 +2449,7 @@ function addZone(box, id, name, desc, tags, color) {
     color: color || '#0077cc',
     box:   box.clone(), mesh, line,
   };
-  mesh.visible = false; // setVis()에서 처리
+  mesh.visible = true;
   const initMat = zoneMat(color);
   initMat.opacity = 0.07;
   mesh.material = initMat;
@@ -2404,7 +2478,7 @@ function removeZone(z) {
 function setVis() {
   const navActive = secondaryFloor !== null;
   const navFloors = navActive ? secondaryModel.map(e => e.floor) : [];
-
+  console.log('setVis: editMode='+editMode+' zones='+zones.length+' currentFloor='+currentFloor);
   zones.forEach(z => {
     const show = navActive
       ? navFloors.includes(z.floor)
@@ -2834,11 +2908,13 @@ function showPasswordPrompt() {
 
 function toggleEdit() {
   editMode = !editMode;
+  console.log('toggleEdit: editMode='+editMode+' zones='+zones.length+' paths='+paths.length+' markers='+markers.length);
   document.getElementById('hdr').classList.toggle('edit-mode', editMode);
-  document.getElementById('edit-banner').classList.toggle('show', editMode);
+  document.getElementById('edit-banner')?.classList.toggle('show', editMode);
   document.getElementById('edit-toolbar').classList.toggle('show', editMode);
   if (!editMode) { cancelDraw(); cancelPathDraw(); selZ = null; closePopup(); deselectPath(); }
   setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
+  console.log('toggleEdit done: toolbar.show='+document.getElementById('edit-toolbar').classList.contains('show'));
   renderer.domElement.style.cursor = editMode ? 'crosshair' : 'default';
   orbit.mouseButtons = editMode
     ? { LEFT: THREE.MOUSE.PAN,    MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }
@@ -2848,12 +2924,14 @@ function toggleEdit() {
 window.setTool = function (t) {
   if (tool === 'path' && t !== 'path') cancelPathDraw();
   if (tool === 'connect' && t !== 'connect') cancelConnect();
+  if (t !== 'dot-edit') hidePreviewDot();
   tool = t;
   if (t === 'connect') startConnect();
-  document.getElementById('btn-draw').classList.toggle('active',   t === 'draw');
-  document.getElementById('btn-sel').classList.toggle('active',    t === 'select');
+  document.getElementById('btn-draw').classList.toggle('active',      t === 'draw');
+  document.getElementById('btn-sel').classList.toggle('active',       t === 'select');
   document.getElementById('btn-resize').classList.toggle('active',    t === 'resize');
   document.getElementById('btn-path').classList.toggle('active',      t === 'path');
+  document.getElementById('btn-dot-edit').classList.toggle('active',  t === 'dot-edit');
   document.getElementById('btn-marker').classList.toggle('active',    t === 'marker');
   document.getElementById('btn-flrmarker').classList.toggle('active', t === 'flrmarker');
   document.getElementById('btn-move').classList.toggle('active',      t === 'move');
@@ -3128,6 +3206,7 @@ window.__stopBlink = stopBlink;
    MODAL
 ════════════════════════════ */
 function openModal(z) {
+  console.log('openModal: z='+z.id+' edit-modal exists='+(!!document.getElementById('edit-modal')));
   modalZ = z;
   document.getElementById('m-mid').textContent   = '(' + z.id + ')';
   document.getElementById('m-name').value  = z.name  || '';
@@ -3136,8 +3215,9 @@ function openModal(z) {
   document.getElementById('m-color').value = z.color || '#0077cc';
   document.getElementById('m-cprev').style.background = z.color || '#0077cc';
   document.getElementById('btn-save-room').textContent = z.isNew ? '만들기' : '수정';
-  z.isNew = false; // 이후부터는 수정
+  z.isNew = false;
   document.getElementById('edit-modal').classList.add('show');
+  console.log('openModal done: show='+document.getElementById('edit-modal').classList.contains('show'));
 }
 window.closeModal = function () {
   document.getElementById('edit-modal').classList.remove('show'); modalZ = null;
@@ -3152,6 +3232,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-sel').addEventListener('click',         () => setTool('select'));
   document.getElementById('btn-resize').addEventListener('click',      () => setTool('resize'));
   document.getElementById('btn-path').addEventListener('click',        () => setTool('path'));
+  document.getElementById('btn-dot-edit').addEventListener('click',    () => setTool('dot-edit'));
   document.getElementById('btn-marker').addEventListener('click',      () => setTool('marker'));
   document.getElementById('btn-move').addEventListener('click',       () => setTool('move'));
   document.getElementById('btn-flrmarker').addEventListener('click',  () => setTool('flrmarker'));
@@ -3265,8 +3346,8 @@ el.addEventListener('pointerdown', e => {
     }
   }
 
-  // 선택된 점이 있을 때만 그 점 드래그 허용
-  if ((tool === 'select' || tool === 'resize') && selectedDot) {
+  // 점 드래그는 dot-edit 도구에서만 허용
+  if (tool === 'dot-edit' && selectedDot) {
     rc.setFromCamera(ndc(e), camera);
     const dotHits = rc.intersectObject(selectedDot.path.dotMeshes[selectedDot.dotIdx], false);
     if (dotHits.length > 0) {
@@ -3341,13 +3422,22 @@ el.addEventListener('pointermove', e => {
     const f = detectFace(selZ, e);
     el.style.cursor = f ? FACE_CURSOR[f] : 'default';
   } else if (tool === 'select' || tool === 'resize') {
-    // grab 커서는 선택된 점 위에서만
-    if (selectedDot) {
-      rc.setFromCamera(ndc(e), camera);
-      const dotHits = rc.intersectObject(selectedDot.path.dotMeshes[selectedDot.dotIdx], false);
-      el.style.cursor = dotHits.length > 0 ? 'grab' : 'default';
+    el.style.cursor = 'default';
+  } else if (tool === 'dot-edit') {
+    // 기존 점 위이면 grab, 선 위이면 미리보기 점
+    const dotHit = findDotAtPointer(e);
+    if (dotHit) {
+      hidePreviewDot();
+      el.style.cursor = 'grab';
     } else {
-      el.style.cursor = 'default';
+      const segHit = findSegmentAtPointer(e);
+      if (segHit) {
+        showPreviewDot(segHit.point);
+        el.style.cursor = 'crosshair';
+      } else {
+        hidePreviewDot();
+        el.style.cursor = 'default';
+      }
     }
   } else if (tool === 'path') {
     el.style.cursor = 'crosshair';
@@ -3362,6 +3452,7 @@ el.addEventListener('pointermove', e => {
 
 el.addEventListener('pointerup', async e => {
   if (e.button !== 0) { orbit.enabled = true; return; }
+  console.log('pointerup: editMode='+editMode+' tool='+tool+' pMoved='+pMoved+' drawing='+drawing+' resizing='+resizing+' moveZone='+(!!moveZone)+' markerDrag='+(!!markerDrag));
   if (drawing)  { endDraw();   return; }
   if (resizing) { endResize(); return; }
 
@@ -3442,6 +3533,69 @@ el.addEventListener('pointerup', async e => {
       return;
     }
     if (editMode && tool === 'path' && !pMoved) {
+      // 기존 선의 점 클릭 → 그 점에서 합치기
+      const existingDot = findDotAtPointer(e);
+      if (existingDot && pathDrawing) {
+        const targetPath = existingDot.path;
+        const targetIdx  = existingDot.dotIdx;
+        const dotPos = targetPath.dotMeshes[targetIdx].position;
+        const mergePt = new THREE.Vector3(dotPos.x, dotPos.y - PATH_HEIGHT_OFFSET, dotPos.z);
+
+        // 현재 그리던 선 마지막에 합칠 점까지 선분 추가
+        const last = pathPoints[pathPoints.length - 1];
+        if (mergePt.distanceTo(last) > PATH_DOT_R * 2) {
+          pathLines.push(makeLineSeg(last, mergePt, false));
+          pathPoints.push(mergePt.clone());
+          pathDotMeshes.push(makeDotMesh(mergePt));
+        }
+
+        // 새 선 저장
+        if (pathPoints.length >= 2) {
+          const newId = 'path_' + pathId++;
+          const newPath = { id: newId, floor: currentFloor,
+            points: pathPoints.map(p => p.toArray()),
+            dotMeshes: [...pathDotMeshes], lines: [...pathLines] };
+          paths.push(newPath);
+          setPathVis();
+          await savePathToServer(newPath);
+
+          // 기존 선과 새 선 합치기
+          const mergedPoints = [
+            ...targetPath.points.slice(0, targetIdx + 1),
+            ...newPath.points.slice(0, -1).reverse(), // 새 선을 뒤집어서 앞에 붙이기
+          ].concat(targetPath.points.slice(targetIdx + 1));
+
+          // 실제로는 targetPath에 새 점들을 삽입
+          const insertPts = newPath.points.slice(1, -1).reverse(); // 연결점 제외한 중간 점들
+          targetPath.points.splice(targetIdx + 1, 0, ...insertPts);
+
+          // targetPath 메시 재생성
+          targetPath.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+          targetPath.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+          const tPts = targetPath.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+          targetPath.dotMeshes = tPts.map(p => { const m = makeDotMesh(p); m.visible = editMode; return m; });
+          targetPath.lines = [];
+          for (let i = 1; i < tPts.length; i++) {
+            const s = makeLineSeg(tPts[i-1], tPts[i], false);
+            s.visible = editMode; targetPath.lines.push(s);
+          }
+
+          // 새로 만든 임시 선 제거
+          paths.splice(paths.indexOf(newPath), 1);
+          newPath.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+          newPath.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+
+          await savePathToServer(targetPath);
+          showToast('✅ 선이 합쳐졌습니다.');
+        }
+
+        pathDrawing = false; pathPoints = []; pathDotMeshes = []; pathLines = [];
+        if (pathPreviewLine) { scene.remove(pathPreviewLine); pathPreviewLine.geometry.dispose(); pathPreviewLine = null; }
+        if (_branchFromDotEdit) { _branchFromDotEdit = false; setTool('dot-edit'); }
+        document.getElementById('edit-hint').textContent = '바닥을 클릭&드래그해 영역을 만드세요';
+        return;
+      }
+
       const pt = pathGroundPt(e);
       if (pt) {
         if (!pathDrawing) startPathDraw();
@@ -3450,35 +3604,62 @@ el.addEventListener('pointerup', async e => {
       return;
     }
     if (editMode && (tool === 'select' || tool === 'resize' || tool === 'move') && !pMoved) {
-      // 0. 층이동 마커 클릭 확인
+      // 0. 층이동 마커 클릭
       const flrFound = findFlrMarkerAtPointer(e);
       if (flrFound) { openFlrMarkerModal(flrFound); return; }
 
-      // 0-1. 일반 마커 클릭 확인
+      // 0-1. 일반 마커 클릭
       const mFound = findMarkerAtPointer(e);
       if (mFound) { openMarkerModal(mFound); return; }
 
-      // 1. 점 클릭 우선 확인 (레이캐스트로 정확히)
-      const dotFound = findDotAtPointer(e);
-      if (dotFound) { selectDot(dotFound.path, dotFound.dotIdx); return; }
-
-      // 2. 선택된 점 있으면 → 분기 시작 (빈 곳 클릭)
-      if (selectedDot) {
-        const pt = pathGroundPt(e);
-        startBranchFromDot(pt || null);
-        return;
-      }
-
-      // 3. 선 클릭
-      const fp = findPathAtPointer(e);
-      if (fp) { deselectPath(); selectPath(fp); return; }
-
-      deselectDot(); deselectPath();
-
-      // 4. 영역 클릭
+      // 1. 영역 클릭 우선
       const hit = hitZone(e);
       if (hit) { selZ = hit; setVis(); startBlink(selZ); openModal(selZ); return; }
       selZ = null; setVis();
+
+      // 2. 선 클릭
+      const seg = findSegmentAtPointer(e);
+      if (seg) { deselectPath(); selectPath(seg.path); return; }
+
+      deselectDot(); deselectPath();
+    }
+
+    // 점 편집 도구
+    if (editMode && tool === 'dot-edit' && !pMoved) {
+      hidePreviewDot();
+      // 1. 기존 점 클릭 → 선택
+      const dotFound = findDotAtPointer(e);
+      if (dotFound) {
+        selectDot(dotFound.path, dotFound.dotIdx);
+        return;
+      }
+      // 2. 선 위 클릭 → 그 위치에 새 점 삽입
+      const segHit = findSegmentAtPointer(e);
+      if (segHit) {
+        const path = segHit.path;
+        const pt   = segHit.point;
+        const newPt = [pt.x, pt.y, pt.z];
+        path.points.splice(segHit.segIdx + 1, 0, newPt);
+        path.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+        path.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+        const pts2 = path.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+        path.dotMeshes = pts2.map(p => { const m = makeDotMesh(p); m.visible = true; return m; });
+        path.lines = [];
+        for (let i = 1; i < pts2.length; i++) {
+          const s = makeLineSeg(pts2[i-1], pts2[i], false);
+          s.visible = true; path.lines.push(s);
+        }
+        deselectDot();
+        await savePathToServer(path);
+        showToast('✅ 점이 추가되었습니다.');
+        return;
+      }
+      // 3. 빈 곳 클릭 → 선택된 점 있으면 분기, 없으면 해제
+      if (selectedDot) {
+        const pt = pathGroundPt(e);
+        if (pt) { startBranchFromDot(pt); return; }
+      }
+      deselectDot(); deselectPath();
     }
     if (!editMode) {
       const z = hitZone(e);
@@ -3772,7 +3953,7 @@ function switchFloor(floor) {
   if (editMode) {
     editMode = false;
     document.getElementById('edit-toolbar').classList.remove('show');
-    document.getElementById('edit-banner').classList.remove('show');
+    document.getElementById('edit-banner')?.classList.remove('show');
     document.getElementById('hdr').classList.remove('edit-mode');
   }
 
@@ -3929,7 +4110,7 @@ function switchFloor(floor) {
       if (wasEditMode) {
         editMode = true;
         document.getElementById('edit-toolbar').classList.add('show');
-        document.getElementById('edit-banner').classList.add('show');
+        document.getElementById('edit-banner')?.classList.add('show');
         document.getElementById('hdr').classList.add('edit-mode');
       }
       if (!oldModel) {
