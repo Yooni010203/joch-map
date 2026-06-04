@@ -1,0 +1,3974 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>조치원 중학교 지도</title>
+<link rel="icon" type="image/png" href="image/FBK.png"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Orbitron:wght@400;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Liquid Glass 변수 */
+:root{
+  --glass-bg: rgba(255,255,255,.04);
+  --glass-border: rgba(255,255,255,.4);
+  --glass-shadow: 0 8px 40px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.3);
+  --glass-blur: blur(32px) saturate(220%) brightness(1.05);
+  --glass-dark-bg: rgba(14,18,32,.15);
+  --glass-dark-border: rgba(255,255,255,.18);
+  --glass-dark-shadow: 0 8px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(0,0,0,.3);
+}
+:root{
+  --bg:#f0f4f8;--panel:rgba(255,255,255,.92);--accent:#0077cc;--accent2:#005fa3;
+  --text:#1a2340;--dim:#6b7a9f;--border:rgba(0,119,204,.18);--shadow:rgba(0,0,0,.10);
+  --card:#fff;--input-bg:#f8fafc;--edit:#e05c00;
+}
+/* 테마 전환 시 부드럽게 */
+body, header, #controls, #nav-panel, #room-popup, #app-menu,
+.modal-box, .pw-box, .appinfo-box, .guide-box, .search-box,
+.menu-item, .floor-btn, .btn, #edit-toolbar, #edit-banner{
+  transition: background-color .5s ease, color .5s ease, border-color .5s ease, box-shadow .5s ease;
+}
+body.dark{
+  --bg:#0d1117;--panel:rgba(16,20,32,.95);--accent:#4da6ff;--accent2:#2d8fe0;
+  --text:#e4eaf8;--dim:#8898bb;--border:rgba(77,166,255,.18);--shadow:rgba(0,0,0,.60);
+  --card:#161b27;--input-bg:#1e2436;
+}
+body.dark header{background:var(--glass-dark-bg);border-color:var(--glass-dark-border);box-shadow:var(--glass-dark-shadow)}
+body.dark header.edit-mode{background:rgba(30,18,10,.97)}
+body.dark #edit-toolbar{background:rgba(25,16,10,.95);border-color:rgba(224,92,0,.4)}
+body.dark #edit-banner{box-shadow:0 4px 16px rgba(224,92,0,.15)}
+body.dark .tool-btn{background:transparent}
+body.dark .tool-btn:hover{background:rgba(224,92,0,.18)}
+body.dark #edit-toolbar{background:rgba(40,20,5,.2)!important;border-color:rgba(224,92,0,.25)!important}
+body.dark .modal-box,body.dark .pw-box,body.dark .appinfo-box,body.dark .guide-box,body.dark .search-box{background:var(--card)!important;color:var(--text)!important}
+body.dark input,body.dark textarea,body.dark select{background:var(--input-bg)!important;color:var(--text)!important;border-color:var(--border)!important}
+body.dark #app-menu{background:var(--card)!important;border:1px solid var(--border)!important;box-shadow:0 8px 32px rgba(0,0,0,.5)!important}
+body.dark .menu-item{color:var(--text)!important}
+body.dark .menu-item:hover{background:rgba(77,166,255,.1)!important}
+body.dark #search-results>div,body.dark .nav-route-name{color:var(--text)!important}
+body.dark .nav-route-sub{color:var(--dim)!important}
+
+body.dark #controls{background:var(--glass-dark-bg)!important;border-color:var(--glass-dark-border)!important;box-shadow:var(--glass-dark-shadow)!important}
+body.dark #room-popup{background:var(--glass-dark-bg)!important;border-color:var(--glass-dark-border)!important;box-shadow:var(--glass-dark-shadow)!important}
+body.dark #app-menu{background:var(--glass-dark-bg)!important;border-color:var(--glass-dark-border)!important;box-shadow:var(--glass-dark-shadow)!important}
+body.dark #nav-panel{background:var(--glass-dark-bg)!important;border-color:var(--glass-dark-border)!important}
+body.dark .modal-box,body.dark .pw-box,body.dark .appinfo-box,body.dark .guide-box,body.dark .search-box{background:var(--glass-dark-bg)!important;border:1px solid var(--glass-dark-border)!important;box-shadow:var(--glass-dark-shadow)!important}
+body.dark .appinfo-box,body.dark .guide-box{backdrop-filter:blur(8px) saturate(150%)!important;-webkit-backdrop-filter:blur(8px) saturate(150%)!important}
+body.dark #edit-toolbar{background:rgba(40,20,10,.55)!important;border-color:rgba(224,92,0,.3)!important}
+body.dark .popup-name{color:var(--text)}
+body.dark .popup-tag{color:var(--dim)}
+body.dark .btn-primary{background:var(--accent)}
+body.dark #theme-toggle{background:rgba(77,166,255,.1);border-color:rgba(77,166,255,.2)}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;overflow:hidden}
+body:not(.dark)::before{
+  content:'';position:fixed;inset:0;z-index:-1;
+  background:linear-gradient(135deg,
+    rgba(255,220,220,.18) 0%,
+    rgba(255,240,200,.15) 15%,
+    rgba(220,255,220,.15) 30%,
+    rgba(200,240,255,.15) 45%,
+    rgba(220,210,255,.18) 60%,
+    rgba(255,210,240,.15) 75%,
+    rgba(255,225,210,.15) 90%,
+    rgba(255,220,220,.18) 100%
+  );
+  animation: rainbowShift 20s ease-in-out infinite;
+  pointer-events:none;
+}
+body.dark::before{
+  content:'';position:fixed;inset:0;z-index:-1;
+  background:linear-gradient(135deg,
+    rgba(60,10,10,.25) 0%,
+    rgba(60,40,5,.2) 15%,
+    rgba(5,40,20,.2) 30%,
+    rgba(5,30,60,.2) 45%,
+    rgba(20,10,60,.25) 60%,
+    rgba(50,5,40,.2) 75%,
+    rgba(55,20,5,.2) 90%,
+    rgba(60,10,10,.25) 100%
+  );
+  animation: rainbowShift 20s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes rainbowShift{
+  0%{filter:hue-rotate(0deg)}
+  50%{filter:hue-rotate(60deg)}
+  100%{filter:hue-rotate(0deg)}
+}
+#c{position:fixed;inset:0}
+canvas{display:block}
+header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:var(--glass-bg);border-bottom:1px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow);transition:background .5s,border-color .5s,box-shadow .5s}
+header.edit-mode{background:rgba(255,245,237,.97);border-bottom:2px solid var(--edit)}
+.logo-area{display:flex;align-items:center;gap:10px}
+.logo-link{display:block;line-height:0;text-decoration:none;transition:opacity .2s}
+.logo-link:hover{opacity:.7}
+.logo-img{height:36px;width:auto;object-fit:contain;border-radius:6px}
+.logo-label{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;letter-spacing:.12em;color:var(--accent)}
+.floor-selector{display:flex;gap:6px}
+.menu-item{display:block;width:100%;text-align:left;background:none;border:none;padding:10px 14px;border-radius:8px;font-size:.92rem;cursor:pointer;color:#1a2233;transition:background .12s}
+.menu-item:hover{background:rgba(0,119,204,.08)}
+.menu-item.active{color:#0077cc;font-weight:700}
+/* 저사양 모드 */
+body.lowspec *{animation:none!important}
+body.lowspec *:not(.theme-transitioning){transition:none!important}
+body.lowspec canvas{image-rendering:pixelated}
+.floor-btn{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.08em;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:5px 14px;background:transparent;cursor:pointer;transition:all .2s}
+.floor-btn:hover{background:rgba(0,119,204,.12)}
+.floor-btn.active{background:var(--accent);color:#fff}
+.floor-btn:disabled{opacity:.4;cursor:not-allowed}
+.floor-badge{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 12px;background:rgba(0,119,204,.07)}
+#edit-banner{display:none;position:fixed;top:65px;left:50%;transform:translateX(-50%);z-index:20;background:var(--edit);color:#fff;font-size:.78rem;font-weight:500;padding:7px 20px;border-radius:0 0 10px 10px;box-shadow:0 4px 16px rgba(224,92,0,.25);align-items:center;gap:10px}
+#edit-banner.show{display:flex}
+.blink{animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+#edit-toolbar{display:none;position:fixed;top:76px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(255,245,237,.15);border:1px solid rgba(224,92,0,.22);border-radius:50px;padding:4px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 4px 24px rgba(224,92,0,.10),inset 0 1px 0 rgba(255,255,255,.7);align-items:center;gap:2px;white-space:nowrap;max-width:calc(100vw - 32px);overflow-x:auto;scrollbar-width:none}
+#edit-toolbar::-webkit-scrollbar{display:none}
+#edit-toolbar.show{display:flex}
+.tool-btn{padding:6px 14px;border-radius:50px;border:none;background:transparent;color:var(--edit);cursor:pointer;font-size:.75rem;font-family:'Noto Sans KR',sans-serif;font-weight:600;transition:background .15s,color .15s;white-space:nowrap;flex-shrink:0}
+.tool-btn:hover{background:rgba(224,92,0,.12)}
+.tool-btn.active{background:var(--edit);color:#fff;box-shadow:0 2px 8px rgba(224,92,0,.35)}
+#edit-hint{font-size:.72rem;color:var(--dim);padding:6px 14px;white-space:nowrap;flex-shrink:0}
+#controls{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:20;display:flex;align-items:center;gap:10px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:50px;padding:10px 24px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--glass-shadow);white-space:nowrap;max-width:calc(100vw - 32px);overflow-x:auto;scrollbar-width:none}
+#controls::-webkit-scrollbar{display:none}
+.ctrl-hint{font-size:.72rem;color:var(--dim);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.key{background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:4px;padding:2px 8px;font-family:'Orbitron',monospace;font-size:.65rem;color:var(--accent);flex-shrink:0}
+.divider{width:1px;height:20px;background:var(--border);margin:0 4px;flex-shrink:0}
+@media(max-width:600px){
+  #controls{bottom:16px;padding:8px 16px;gap:6px;border-radius:20px}
+  .desktop-only{display:none!important}
+  #header-right{display:none!important}
+  #mobile-menu-btn{display:flex!important}
+  /* 모바일 메뉴: 팝업 형식 */
+  #app-menu{
+    top:52px!important;left:12px!important;right:12px!important;bottom:auto!important;
+    border-radius:16px!important;min-width:unset!important;
+    max-height:60vh;overflow-y:auto;
+  }
+  #room-popup{
+    min-width:unset!important;width:calc(100vw - 32px)!important;
+    max-width:calc(100vw - 32px)!important;
+  }
+}
+@media(min-width:601px){
+  .mobile-only{display:none!important}
+  #mobile-menu-btn{display:none!important}
+}
+#info-panel{position:fixed;top:50%;right:28px;transform:translateY(-50%);z-index:20;width:200px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px 18px;backdrop-filter:blur(16px);box-shadow:0 4px 20px var(--shadow);display:none;flex-direction:column;gap:16px}
+.info-section h3{font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:.12em;color:var(--accent);margin-bottom:8px;text-transform:uppercase}
+.info-row{display:flex;justify-content:space-between;font-size:.75rem;color:var(--dim);margin-bottom:4px}
+.info-row span:last-child{color:var(--text)}
+#room-popup{position:fixed;z-index:30;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:18px;padding:18px 20px;min-width:220px;max-width:300px;box-shadow:var(--glass-shadow);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);display:flex;flex-direction:column;gap:10px;opacity:0;pointer-events:none;transform:scale(.93);transition:opacity .18s ease,transform .18s ease}
+#room-popup.show{opacity:1;pointer-events:auto;transform:scale(1)}
+@keyframes popIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.popup-header{display:flex;align-items:center;justify-content:space-between}
+.popup-name{font-size:1rem;font-weight:700;color:var(--accent)}
+.popup-close{background:none;border:none;cursor:pointer;color:var(--dim);font-size:1.1rem;line-height:1;padding:2px 4px;border-radius:4px}
+.popup-close:hover{color:var(--text)}
+.popup-id{font-size:.7rem;color:var(--dim);font-family:'Orbitron',monospace}
+.popup-desc{font-size:.82rem;color:var(--text);line-height:1.6;white-space:pre-wrap}
+.popup-tags{display:flex;flex-wrap:wrap;gap:5px}
+.popup-tag{font-size:.68rem;padding:2px 9px;border-radius:20px;background:rgba(0,119,204,.1);color:var(--accent);border:1px solid rgba(0,119,204,.2)}
+#edit-modal{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.3);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#edit-modal.show{opacity:1;pointer-events:all}
+#edit-modal .modal-box{transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)}
+#edit-modal.show .modal-box{transform:translateY(0) scale(1)}
+.modal-box{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:20px;padding:28px;width:420px;max-width:95vw;box-shadow:var(--glass-shadow);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);display:flex;flex-direction:column;gap:16px}
+.modal-title{font-size:1rem;font-weight:700;color:var(--text)}
+.modal-mid{font-family:'Orbitron',monospace;font-size:.7rem;color:var(--dim);font-weight:400;margin-left:6px}
+.mf{display:flex;flex-direction:column;gap:5px}
+.mf label{font-size:.75rem;font-weight:500;color:var(--dim)}
+.mf input,.mf textarea{border:1px solid #d0d8e8;border-radius:8px;padding:8px 12px;font-size:.85rem;color:var(--text);font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s;background:#f8fafd}
+.mf input:focus,.mf textarea:focus{border-color:var(--accent);background:#fff}
+.mf textarea{resize:vertical;min-height:72px}
+.color-row{display:flex;align-items:center;gap:10px}
+.color-row input[type=color]{width:44px;height:36px;border:1px solid #d0d8e8;border-radius:8px;cursor:pointer;padding:2px;background:#f8fafd}
+.color-prev{flex:1;height:36px;border-radius:8px;opacity:.4;transition:background .2s}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.btn{padding:8px 20px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:500;font-family:'Noto Sans KR',sans-serif;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
+.btn-danger{background:#ffeeee;color:#cc2222;border:1px solid #ffcccc}.btn-danger:hover{background:#ffdddd}
+.btn-cancel{background:#f0f2f5;color:var(--dim)}.btn-cancel:hover{background:#e4e8ef}
+body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-cancel:hover{background:rgba(255,255,255,.08)}
+/* 미니 로딩바 */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);z-index:50;background:rgba(20,30,50,.65);color:#fff;font-size:.82rem;padding:10px 22px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid rgba(255,255,255,.15);box-shadow:0 4px 20px rgba(0,0,0,.2)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* 길 점 */
+.path-dot-label{position:fixed;z-index:15;width:10px;height:10px;border-radius:50%;background:#ff6600;border:2px solid #fff;transform:translate(-50%,-50%);pointer-events:none}
+#marker-modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s}
+#marker-modal.show{opacity:1;pointer-events:all}
+#marker-modal .modal-box{transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)}
+#marker-modal.show .modal-box{transform:translateY(0) scale(1)}
+#flrmarker-modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s}
+#flrmarker-modal.show{opacity:1;pointer-events:all}
+#flrmarker-modal .modal-box{transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)}
+#flrmarker-modal.show .modal-box{transform:translateY(0) scale(1)}
+#nav-btns{display:none;gap:6px;margin-top:8px;flex-direction:row}
+#nav-btns.show{display:flex}
+#nav-btns button:disabled{opacity:.4;cursor:not-allowed}
+/* 길 안내 패널 */
+#nav-panel{position:fixed;top:60px;right:0;width:320px;max-width:90vw;bottom:0;z-index:30;background:var(--glass-bg);border-left:2px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:-8px 0 32px rgba(0,0,0,.15);display:flex;flex-direction:column;padding:24px 20px;gap:0;overflow-y:auto;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;opacity:0;pointer-events:none}
+#nav-panel.show{transform:translateX(0);opacity:1;pointer-events:all}
+#nav-panel-close{position:absolute;top:14px;right:14px;border:none;background:none;font-size:1.1rem;cursor:pointer;color:var(--dim)}
+@media(max-width:600px){
+  #nav-panel{
+    top:auto!important;right:0!important;left:0!important;width:100%!important;max-width:100%!important;
+    bottom:0!important;height:auto!important;max-height:38vh!important;
+    border-left:none!important;border-top:1px solid var(--glass-border)!important;
+    border-radius:20px 20px 0 0!important;
+    padding:16px 20px 24px!important;
+    transform:translateY(100%)!important;
+  }
+  #nav-panel.show{transform:translateY(0)!important;}
+}
+.nav-route-row{display:flex;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--border)}
+.nav-route-row:last-child{border-bottom:none}
+.nav-route-icon{font-size:1.3rem;flex-shrink:0;width:28px;text-align:center}
+.nav-route-name{font-weight:700;font-size:1rem;color:var(--text)}
+.nav-route-sub{font-size:.72rem;color:var(--dim);margin-top:2px}
+.nav-arrow{color:var(--accent);font-size:1.4rem;font-weight:900;padding:4px 0;text-align:center}
+@media(max-width:600px){
+  #nav-panel{padding:14px 16px 20px!important}
+  #nav-panel-content{display:flex;align-items:center;gap:0;flex-wrap:nowrap;overflow:hidden}
+  #nav-panel-content .nav-route-row{border-bottom:none;padding:6px 12px;flex-shrink:1;flex-direction:column;align-items:center;gap:2px;min-width:0;flex:1}
+  #nav-panel-content .nav-route-row:first-child{padding-left:0}
+  #nav-panel-content .nav-route-row:last-child{padding-right:0}
+  #nav-panel-content .nav-route-icon{font-size:1.1rem;width:auto}
+  #nav-panel-content .nav-route-name{font-size:.8rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
+  #nav-panel-content .nav-route-sub{font-size:.65rem;text-align:center}
+  #nav-panel-content .nav-arrow{font-size:1rem;padding:0 4px;flex-shrink:0}
+  #nav-panel-content .nav-arrow::before{content:'→'}
+  #nav-panel-content .nav-arrow{font-size:0}  /* 기존 ↓ 숨기기 */
+  #nav-panel-content .nav-arrow::before{font-size:1rem;color:var(--accent);font-weight:900}
+  .nav-reset-btn{margin-top:10px;padding:8px;font-size:.8rem}
+}
+.nav-reset-btn{margin-top:16px;padding:10px;border-radius:10px;border:1.5px solid var(--accent);background:none;color:var(--accent);font-size:.85rem;cursor:pointer;font-weight:600;transition:background .15s}
+.nav-reset-btn:hover{background:rgba(0,119,204,.07)}
+#undo-dropdown{position:fixed;z-index:50;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px var(--shadow);min-width:220px;max-height:300px;overflow-y:auto;display:none;flex-direction:column;padding:6px 0}
+#undo-dropdown.show{display:flex}
+.undo-item{padding:9px 16px;font-size:.8rem;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s;border:none;background:none;text-align:left;width:100%}
+.undo-item:hover{background:rgba(0,119,204,.07)}
+.undo-item .undo-idx{font-size:.68rem;color:var(--dim);font-family:'Orbitron',monospace;flex-shrink:0}
+#mini-loader{position:fixed;bottom:80px;right:20px;z-index:25;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 14px;display:none;flex-direction:column;gap:6px;align-items:flex-end;box-shadow:0 4px 16px var(--shadow);backdrop-filter:blur(12px);min-width:140px}
+#mini-loader.show{display:flex}
+#mini-loader-label{font-size:.7rem;color:var(--dim)}
+#mini-loader-bar{width:100%;height:3px;background:rgba(0,119,204,.15);border-radius:2px;overflow:hidden}
+#mini-loader-fill{height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .1s ease}
+@media(max-width:600px){#mini-loader{bottom:70px;right:12px}}
+#loading{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .6s}
+#loading.hidden{opacity:0;pointer-events:none}
+.loader-ring{width:64px;height:64px;border:2px solid rgba(0,119,204,.15);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-family:'Orbitron',monospace;font-size:.8rem;letter-spacing:.18em;color:var(--accent)}
+.loader-sub{font-size:.72rem;color:var(--dim)}
+#pb-wrap{width:180px;height:2px;background:rgba(0,119,204,.15);border-radius:1px;overflow:hidden}
+#pb{height:100%;width:0;background:var(--accent);transition:width .1s}
+#err{display:none;position:fixed;inset:0;z-index:110;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:32px}
+#err.show{display:flex}
+#err .icon{font-size:2.5rem}
+#err h2{font-family:'Orbitron',monospace;color:#cc3333;font-size:1rem;letter-spacing:.1em}
+#err p{color:var(--dim);font-size:.82rem;max-width:360px;line-height:1.6}
+#err code{color:var(--accent);background:rgba(0,119,204,.08);padding:2px 8px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="loader-ring"></div>
+  <div class="loader-text">3D 모델 로딩 중</div>
+  <div id="pb-wrap"><div id="pb"></div></div>
+  <div class="loader-sub" id="lsub">model/1층.glb 불러오는 중…</div>
+</div>
+<div id="err">
+  <div class="icon">⚠️</div>
+  <h2>파일을 찾을 수 없습니다</h2>
+  <p><code>model/1층.glb</code> 파일을 확인하고 <code>node server.js</code>로 실행하세요.</p>
+  <p id="err-detail" style="color:#cc3333;font-size:.75rem;margin-top:6px"></p>
+</div>
+
+<div id="nav-panel">
+  <button id="nav-panel-close">✕</button>
+  <div id="nav-panel-content"></div>
+  <button class="nav-reset-btn" id="nav-reset-btn">🔄 경로 초기화</button>
+</div>
+
+<div id="undo-dropdown"></div>
+
+<div id="toast"></div>
+
+<div id="mini-loader">
+  <span id="mini-loader-label">불러오는 중…</span>
+  <div id="mini-loader-bar"><div id="mini-loader-fill"></div></div>
+</div>
+
+<div id="c"></div>
+
+<header id="hdr">
+  <div class="logo-area">
+    <a class="logo-link" href="https://jochiwon.sjedums.kr/jochiwon-m/main.do?sso=ok" target="_blank" rel="noopener">
+      <img id="logo-img" src="image/Logo_light.png" alt="로고" class="logo-img" onerror="this.style.display='none'"/>
+    </a>
+    <span class="logo-label">Map</span>
+  </div>
+  <!-- 모바일 전용 햄버거 버튼 (헤더 오른쪽) -->
+  <button id="mobile-menu-btn" title="메뉴" style="display:none;background:none;border:none;cursor:pointer;padding:6px 10px;flex-direction:column;gap:5px;align-items:center;justify-content:center;border-radius:8px">
+    <span style="display:block;width:20px;height:2px;background:var(--accent);border-radius:2px"></span>
+    <span style="display:block;width:20px;height:2px;background:var(--accent);border-radius:2px"></span>
+    <span style="display:block;width:20px;height:2px;background:var(--accent);border-radius:2px"></span>
+  </button>
+  <!-- 데스크톱 오른쪽 그룹 -->
+  <div id="header-right" style="display:flex;align-items:center;gap:8px">
+    <div class="floor-selector">
+      <button class="floor-btn active" id="fbtn-1" onclick="switchFloor(1)">1F</button>
+      <button class="floor-btn" id="fbtn-2" onclick="switchFloor(2)">2F</button>
+      <button class="floor-btn" id="fbtn-3" onclick="switchFloor(3)">3F</button>
+      <button class="floor-btn" id="fbtn-4" onclick="switchFloor(4)">4F</button>
+    </div>
+    <div id="theme-toggle" title="테마 전환" style="display:flex;align-items:center;background:var(--border);border-radius:50px;padding:3px;gap:2px;cursor:pointer;border:1.5px solid var(--border)">
+      <button id="theme-light-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .3s,color .3s;background:#ffffff;color:#1a2340">☀️ 화이트</button>
+      <button id="theme-dark-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .3s,color .3s;background:transparent;color:#6b7a9f">🌙 다크</button>
+    </div>
+    <button id="menu-btn" title="메뉴" style="background:none;border:none;cursor:pointer;padding:6px 10px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;border-radius:8px;transition:background .15s" onmouseenter="this.style.background='rgba(0,119,204,.08)'" onmouseleave="this.style.background='none'">
+      <span style="display:block;width:18px;height:2px;background:var(--accent);border-radius:2px"></span>
+      <span style="display:block;width:18px;height:2px;background:var(--accent);border-radius:2px"></span>
+      <span style="display:block;width:18px;height:2px;background:var(--accent);border-radius:2px"></span>
+    </button>
+  </div>
+</header>
+
+<!-- 앱 메뉴 (데스크톱: 드롭다운 / 모바일: 풀스크린) -->
+<div id="app-menu" style="display:none;position:fixed;top:48px;right:12px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:16px;box-shadow:var(--glass-shadow);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);min-width:200px;z-index:8000;opacity:0;transform:translateY(-8px) scale(.97);transition:opacity .18s,transform .18s cubic-bezier(.4,0,.2,1);overflow:hidden">
+  <!-- 모바일 전용: 층 선택 + 테마 -->
+  <div class="mobile-only" style="padding:12px 12px 0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-weight:700;font-size:.95rem;color:var(--text)">메뉴</span>
+      <button id="mobile-menu-close" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--dim);line-height:1;padding:2px 4px">✕</button>
+    </div>
+    <div style="font-size:.72rem;font-weight:600;color:var(--dim);margin-bottom:8px;letter-spacing:.05em">FLOOR</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="floor-btn active" id="mfbtn-1" onclick="switchFloor(1);toggleMenu()">1F</button>
+      <button class="floor-btn" id="mfbtn-2" onclick="switchFloor(2);toggleMenu()">2F</button>
+      <button class="floor-btn" id="mfbtn-3" onclick="switchFloor(3);toggleMenu()">3F</button>
+      <button class="floor-btn" id="mfbtn-4" onclick="switchFloor(4);toggleMenu()">4F</button>
+    </div>
+    <div style="font-size:.72rem;font-weight:600;color:var(--dim);margin-bottom:8px;letter-spacing:.05em">THEME</div>
+    <div style="display:flex;align-items:center;background:rgba(0,119,204,.08);border-radius:50px;padding:3px;gap:2px;width:fit-content;margin-bottom:14px">
+      <button id="mobile-theme-light-btn" style="display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:50px;border:none;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:#fff;color:#1a2340">☀️ 화이트</button>
+      <button id="mobile-theme-dark-btn" style="display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:50px;border:none;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:transparent;color:#6b7a9f">🌙 다크</button>
+    </div>
+    <div style="height:1px;background:var(--border);margin:0 -12px 4px"></div>
+  </div>
+  <!-- 공통 메뉴 항목 -->
+  <div style="padding:8px">
+    <button class="menu-item" onclick="openAppInfo()">ℹ️ 앱 정보</button>
+    <button class="menu-item" onclick="openGuide()">📖 사용 가이드</button>
+    <button class="menu-item" id="lowspec-btn" onclick="toggleLowSpec()">🐢 저사양 모드</button>
+  </div>
+</div>
+
+<!-- 가이드 모달 -->
+<div id="guide-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;opacity:0;transition:opacity .18s" onclick="if(event.target===this)closeGuide()">
+  <div class="guide-box" style="background:var(--card);border-radius:16px;padding:28px;width:420px;max-width:92vw;max-height:80vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:16px;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)">
+    <div style="font-size:1.1rem;font-weight:700;color:var(--text)">📖 사용 가이드</div>
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:.88rem;color:var(--dim);line-height:1.7">
+      <div>
+        <div style="font-weight:700;color:var(--accent);margin-bottom:4px">🖱️ 데스크톱 조작</div>
+        <div><span class="key">드래그</span> 회전 &nbsp;|&nbsp; <span class="key">휠</span> 확대/축소 &nbsp;|&nbsp; <span class="key">우클릭</span> 이동</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--accent);margin-bottom:4px">👆 모바일 조작</div>
+        <div><span class="key">1손가락</span> 회전 &nbsp;|&nbsp; <span class="key">핀치</span> 확대/축소 &nbsp;|&nbsp; <span class="key">2손가락</span> 이동</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--accent);margin-bottom:4px">⌨️ 단축키</div>
+        <div><span class="key">E+D</span> 편집 모드 진입/종료</div>
+        <div><span class="key">X+Y</span> 좌표 패널 표시</div>
+        <div><span class="key">Esc</span> 팝업/선택 취소</div>
+        <div><span class="key">Delete</span> 선택 항목 삭제 (편집 모드)</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--accent);margin-bottom:4px">🗺️ 길 안내</div>
+        <div>방을 클릭하면 출발지/도착지를 설정할 수 있어요. 다른 층의 방도 설정 가능해요.</div>
+      </div>
+      <div>
+        <div style="font-weight:700;color:var(--accent);margin-bottom:4px">✏️ 에디터 모드</div>
+        <div><span class="key">E+D</span> 단축키로 진입 후 비밀번호 입력</div>
+        <div style="margin-top:4px;display:flex;flex-direction:column;gap:3px">
+          <div>＋ <b>영역 그리기</b> — 바닥을 드래그해 방 생성</div>
+          <div>▣ <b>선택</b> — 방/선/마커 클릭해 정보 수정</div>
+          <div>✏️ <b>길 그리기</b> — 클릭으로 경로 점 추가</div>
+          <div>📍 <b>마커</b> — 방 안내용 마커 배치</div>
+          <div>🔼 <b>층이동 마커</b> — 계단/엘리베이터 포털 배치</div>
+          <div>🔗 <b>마커-선 연결</b> — 마커를 경로에 연결</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn btn-cancel" onclick="closeGuide()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 앱 정보 모달 -->
+<div id="appinfo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:center;justify-content:center;opacity:0;transition:opacity .18s" onclick="if(event.target===this)closeAppInfo()">
+  <div class="appinfo-box" style="background:var(--card);border-radius:16px;padding:32px 28px;width:360px;max-width:92vw;box-shadow:0 16px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:16px;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)">
+    <div style="font-size:1.15rem;font-weight:700;color:var(--text)">ℹ️ 앱 정보</div>
+    <div style="color:var(--dim);font-size:.92rem;line-height:1.7">
+      <p style="margin:0;font-weight:700;color:var(--text)">조치원 중학교 지도 v1.0</p>
+      <p style="margin:4px 0 0">정보주제탐구 동아리 9모둠 제작</p>
+    </div>
+    <div style="display:flex;justify-content:flex-end">
+      <button class="btn btn-cancel" onclick="closeAppInfo()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div id="edit-banner">
+  <span class="blink">●</span> 편집 모드 &nbsp;|&nbsp;
+  <kbd style="background:rgba(255,255,255,.2);border-radius:3px;padding:1px 6px;font-size:.7rem;">E+D</kbd> 로 종료
+</div>
+
+<div id="edit-toolbar">
+  <button class="tool-btn active" id="btn-draw">＋ 영역 그리기</button>
+  <button class="tool-btn" id="btn-sel">▣ 선택</button>
+  <button class="tool-btn" id="btn-resize">⤢ 크기 조절</button>
+  <button class="tool-btn" id="btn-move">✥ 방 이동</button>
+  <button class="tool-btn" id="btn-path">✏ 길 그리기</button>
+  <button class="tool-btn" id="btn-marker">📍 마커</button>
+  <button class="tool-btn" id="btn-flrmarker">🔼 층이동 마커</button>
+  <button class="tool-btn" id="btn-connect">🔗 마커-선 연결</button>
+  <span id="edit-hint">바닥을 클릭&드래그해 영역을 만드세요</span>
+  <span style="width:1px;height:20px;background:rgba(224,92,0,.3);margin:0 2px"></span>
+  <button class="tool-btn" id="btn-undo" disabled style="opacity:.4">↩ 되돌리기</button>
+</div>
+
+<div id="info-panel">
+  <div class="info-section">
+    <h3>현재 층</h3>
+    <div class="info-row"><span>층</span><span id="ip-floor">1층</span></div>
+    <div class="info-row"><span>파일</span><span id="ip-file">1층.glb</span></div>
+  </div>
+  <div class="info-section">
+    <h3>카메라</h3>
+    <div class="info-row"><span>거리</span><span id="cd">—</span></div>
+    <div class="info-row"><span>X</span><span id="cx">—</span></div>
+    <div class="info-row"><span>Y</span><span id="cy">—</span></div>
+  </div>
+</div>
+
+
+  <button id="search-btn" title="방 검색" style="width:38px;height:38px;border-radius:50%;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--accent);transition:background .15s" onmouseenter="this.style.background='rgba(0,119,204,.1)'" onmouseleave="this.style.background='none'">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+    </svg>
+  </button>
+</div>
+
+<!-- 방 검색 모달 -->
+<div id="search-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:flex-start;justify-content:center;padding-top:80px;opacity:0;transition:opacity .18s" onclick="if(event.target===this)closeSearch()">
+  <div class="search-box" style="background:#fff;border-radius:16px;width:480px;max-width:92vw;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.18);transform:translateY(-12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1);overflow:hidden">
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #eee">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077cc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+        <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+      </svg>
+      <input id="search-input" type="text" placeholder="방 이름, 태그로 검색..." autocomplete="off"
+        style="flex:1;border:none;outline:none;font-size:.95rem;color:#1a2233"
+        oninput="renderSearchResults()"/>
+      <button onclick="closeSearch()" style="background:none;border:none;cursor:pointer;color:#999;font-size:1.2rem;line-height:1;padding:2px">✕</button>
+    </div>
+    <div id="search-results" style="overflow-y:auto;padding:8px"></div>
+  </div>
+</div>
+
+<div id="room-popup">
+  <div class="popup-header">
+    <span class="popup-name" id="pp-name">—</span>
+    <button class="popup-close" id="popup-close-btn" onclick="closePopup()">✕</button>
+  </div>
+  <div class="popup-id" id="pp-id"></div>
+  <div class="popup-desc" id="pp-desc"></div>
+  <div class="popup-tags" id="pp-tags"></div>
+  <div id="nav-btns">
+    <button id="nav-start-btn" class="btn btn-primary" style="flex:1;font-size:.75rem;padding:5px 0">🚩 출발</button>
+    <button id="nav-end-btn"   class="btn btn-primary" style="flex:1;font-size:.75rem;padding:5px 0">🏁 도착</button>
+  </div>
+</div>
+
+<div id="pw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;opacity:0;transition:opacity .18s">
+  <div class="pw-box" style="background:#fff;border-radius:14px;padding:32px 28px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:14px;transform:translateY(12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1)">
+    <div style="font-size:1.1rem;font-weight:700;color:#1a2233">🔒 비밀번호를 입력하세요.</div>
+    <input id="pw-input" type="password" placeholder="여기에 입력" autocomplete="off"
+      style="border:1.5px solid #dde3f0;border-radius:8px;padding:10px 14px;font-size:.95rem;outline:none;width:100%;box-sizing:border-box"/>
+    <div id="pw-error" style="color:#e53935;font-size:.82rem;display:none">비밀번호가 틀렸습니다.</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button id="pw-cancel" style="padding:8px 18px;border-radius:7px;border:1.5px solid #dde3f0;background:#fff;cursor:pointer;font-size:.9rem">취소</button>
+      <button id="pw-ok" style="padding:8px 18px;border-radius:7px;border:none;background:#0077cc;color:#fff;cursor:pointer;font-size:.9rem;font-weight:600">확인</button>
+    </div>
+  </div>
+</div>
+
+<div id="flrmarker-modal">
+  <div class="modal-box">
+    <div class="modal-title">층 이동 마커 <span class="modal-mid" id="fm-mid"></span></div>
+    <div class="mf"><label>이름</label><input id="fm-name" type="text" placeholder="예: 계단A, 엘리베이터"/></div>
+    <div class="mf"><label>설명</label><textarea id="fm-desc" rows="2" placeholder="설명"></textarea></div>
+    <div class="mf"><label>연결된 선</label>
+      <select id="fm-path"><option value="">-- 없음 --</option></select>
+    </div>
+    <div class="mf" style="background:rgba(0,119,204,.06);border-radius:8px;padding:8px 10px">
+      <label style="font-weight:700">💡 같은 이름의 층이동 마커끼리 자동 연결돼요</label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn btn-danger" id="fm-delete">삭제</button>
+      <button class="btn btn-cancel" id="fm-cancel">취소</button>
+      <button class="btn btn-primary" id="fm-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<div id="marker-modal">
+  <div class="modal-box">
+    <div class="modal-title">마커 정보 <span class="modal-mid" id="mm-mid"></span></div>
+    <div class="mf"><label>이름</label><input id="mm-name" type="text" placeholder="예: 정문, 계단"/></div>
+    <div class="mf"><label>설명</label><textarea id="mm-desc" rows="2" placeholder="설명"></textarea></div>
+    <div class="mf"><label>태그</label><input id="mm-tags" type="text" placeholder="태그 (쉼표 구분)"/></div>
+    <div class="mf"><label>연결된 방</label>
+      <select id="mm-room"><option value="">-- 없음 --</option></select>
+    </div>
+    <div class="mf"><label>연결된 선 (길 안내용)</label>
+      <select id="mm-path"><option value="">-- 없음 --</option></select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+      <button class="btn btn-danger" id="mm-delete">마커 삭제</button>
+      <button class="btn btn-cancel" id="mm-cancel">취소</button>
+      <button class="btn btn-primary" id="mm-save">만들기</button>
+    </div>
+  </div>
+</div>
+
+<div id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-title">방 정보 편집<span class="modal-mid" id="m-mid"></span></div>
+    <div class="mf"><label>방 이름</label>
+      <input type="text" id="m-name" placeholder="예: 교무실, 1-1반 교실"/></div>
+    <div class="mf"><label>설명</label>
+      <textarea id="m-desc" placeholder="예: 담당 선생님: 홍길동"></textarea></div>
+    <div class="mf"><label>태그 <span style="font-size:.7rem;color:var(--dim)">(쉼표 구분)</span></label>
+      <input type="text" id="m-tags" placeholder="예: 교실, 2학년"/></div>
+    <div class="mf"><label>방 색상</label>
+      <div class="color-row">
+        <input type="color" id="m-color" value="#0077cc"
+          oninput="document.getElementById('m-cprev').style.background=this.value"/>
+        <span class="color-prev" id="m-cprev" style="background:#0077cc"></span>
+      </div></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="btn-delete-room">영역 삭제</button>
+      <button class="btn btn-cancel" id="btn-cancel-modal" onclick="closeModal()">취소</button>
+      <button class="btn btn-primary" id="btn-save-room">만들기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 버튼 클릭 핸들러 — 일반 script로 분리해서 모듈 스코프 문제 우회 -->
+<script>
+function closePopup() {
+  document.getElementById('room-popup').classList.remove('show');
+  if (window.__stopBlink) window.__stopBlink();
+}
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('show');
+  if (window.__stopBlink) window.__stopBlink();
+}
+</script>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}
+</script>
+<script type="module">
+const zones = [];
+let   zid   = 1;
+
+/* ════════════════════════════
+   NAVIGATION SYSTEM (길 안내)
+════════════════════════════ */
+let navStart = null; // { marker, zoneId }
+let navEnd   = null;
+let navRouteLines = []; // 경로 표시 선들
+
+const NAV_COLOR  = 0x1a6b9e;
+const NAV_WIDTH  = 3;
+
+let navAnimT = 0;
+const NAV_DASH_SIZE = 0.5;
+const NAV_GAP_SIZE  = 0.35;
+const NAV_TUBE_R    = 0.12; // 배경 반지름
+const NAV_DASH_R    = 0.085; // 파란 캡슐 반지름
+
+function drawNavRoute(points, transitionRange) {
+  // transitionRange: { from: idx, to: idx } 층 이동 구간 (연하게)
+  clearNavRoute();
+  if (points.length < 2) return;
+
+  const y0 = PATH_HEIGHT_OFFSET + 0.08;
+  const elevated = points.map(p => new THREE.Vector3(p.x, p.y + y0, p.z));
+
+  // 누적 거리 계산
+  const cumDist = [0];
+  for (let i = 1; i < elevated.length; i++) {
+    cumDist.push(cumDist[i-1] + elevated[i].distanceTo(elevated[i-1]));
+  }
+  const totalLen = cumDist[cumDist.length - 1];
+
+  // 경로 상의 거리 t에 해당하는 위치와 방향 반환
+  function samplePath(t) {
+    t = Math.max(0, Math.min(totalLen, t));
+    for (let i = 1; i < elevated.length; i++) {
+      if (cumDist[i] >= t || i === elevated.length - 1) {
+        const segLen = cumDist[i] - cumDist[i-1];
+        const alpha  = segLen < 0.0001 ? 0 : (t - cumDist[i-1]) / segLen;
+        const pos    = elevated[i-1].clone().lerp(elevated[i], alpha);
+        const dir    = elevated[i].clone().sub(elevated[i-1]).normalize();
+        return { pos, dir };
+      }
+    }
+    return { pos: elevated[elevated.length-1].clone(), dir: new THREE.Vector3(0,0,1) };
+  }
+
+  // 층 이동 구간 자동 감지 (Y가 크게 바뀌는 구간)
+  let transFrom = Infinity, transTo = -Infinity;
+  for (let i = 1; i < elevated.length; i++) {
+    const dy = Math.abs(elevated[i].y - elevated[i-1].y);
+    if (dy > 0.5) { // 층 이동 구간
+      transFrom = Math.min(transFrom, cumDist[i-1]);
+      transTo   = Math.max(transTo,   cumDist[i]);
+    }
+  }
+  const hasTransition = transFrom < transTo;
+
+  // 1. 흰 배경 튜브
+  const bgStep = 0.1;
+  for (let t = bgStep/2; t < totalLen; t += bgStep) {
+    const { pos, dir } = samplePath(t);
+    const isTrans = hasTransition && t >= transFrom && t <= transTo;
+    const geo = new THREE.CylinderGeometry(NAV_TUBE_R, NAV_TUBE_R, bgStep * 1.05, 8, 1);
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0xffffff, depthTest: false, transparent: true, opacity: isTrans ? 0.35 : 1
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.copy(pos);
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
+    mesh.renderOrder = 1001;
+    scene.add(mesh);
+    navRouteLines.push(mesh);
+  }
+
+  // 꺾임 지점 누적거리 저장 (각 꼭짓점)
+  navRouteLines._corners  = cumDist.slice(1, -1);
+  navRouteLines._totalLen = totalLen;
+  navRouteLines._transFrom = transFrom;
+  navRouteLines._transTo   = transTo;
+
+  // 2. 파란 캡슐 풀 생성
+  const CYCLE   = NAV_DASH_SIZE + NAV_GAP_SIZE;
+  const numDash = Math.ceil(totalLen / CYCLE) + 2;
+  const poolSize = numDash * 4;
+  const pool = [];
+  for (let i = 0; i < poolSize; i++) {
+    const geo  = new THREE.CapsuleGeometry(NAV_DASH_R, NAV_DASH_SIZE, 6, 8);
+    const mat  = new THREE.MeshBasicMaterial({ color: NAV_COLOR, depthTest: false, transparent: true, opacity: 0.97 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.visible = false;
+    mesh.renderOrder = 1002;
+    scene.add(mesh);
+    navRouteLines.push(mesh);
+    pool.push(mesh);
+  }
+  navRouteLines._dashPool = pool;
+
+  // 3. 도착지 화살표
+  const { pos: tip, dir: arrowDir } = samplePath(totalLen);
+  const side     = new THREE.Vector3(-arrowDir.z, 0, arrowDir.x);
+  const arrowLen = NAV_TUBE_R * 4;
+  const arrowW   = NAV_TUBE_R * 2.5;
+  const base1    = tip.clone().addScaledVector(arrowDir, -arrowLen).addScaledVector(side,  arrowW);
+  const base2    = tip.clone().addScaledVector(arrowDir, -arrowLen).addScaledVector(side, -arrowW);
+  const fillGeo  = new THREE.BufferGeometry();
+  fillGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([
+    base1.x, base1.y + 0.02, base1.z,
+    tip.x,   tip.y   + 0.02, tip.z,
+    base2.x, base2.y + 0.02, base2.z,
+  ]), 3));
+  const fillMesh = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({ color: NAV_COLOR, depthTest: false, side: THREE.DoubleSide }));
+  fillMesh.renderOrder = 1003;
+  scene.add(fillMesh);
+  navRouteLines.push(fillMesh);
+  // _samplePath 저장 (애니메이션에서 사용)
+  navRouteLines._samplePath = samplePath;
+
+  navAnimT = 0;
+}
+
+function tickNavRoute(dt) {
+  if (!navRouteLines.length) return;
+  navAnimT += dt * 0.8;
+  const CYCLE  = NAV_DASH_SIZE + NAV_GAP_SIZE;
+  const offset = navAnimT % CYCLE;
+  const sp       = navRouteLines._samplePath;
+  const pool     = navRouteLines._dashPool;
+  const transFrom = navRouteLines._transFrom || Infinity;
+  const transTo   = navRouteLines._transTo   || -Infinity;
+  if (!sp || !pool) return;
+
+  // 모든 대시 메시 숨기기
+  pool.forEach(m => { m.visible = false; });
+
+  let poolIdx = 0;
+  function getFromPool() {
+    if (poolIdx >= pool.length) return null;
+    const m = pool[poolIdx++];
+    m.visible = true;
+    return m;
+  }
+
+  const totalLen = navRouteLines._totalLen;
+  const numDash  = Math.ceil(totalLen / CYCLE) + 2;
+
+  for (let d = -1; d < numDash; d++) {
+    const tCenter = d * CYCLE + offset;
+    const tA = tCenter - NAV_DASH_SIZE / 2;
+    const tB = tCenter + NAV_DASH_SIZE / 2;
+    if (tB < 0 || tA > totalLen) continue;
+
+    const clampA = Math.max(0, tA);
+    const clampB = Math.min(totalLen, tB);
+
+    // 꺾임 지점 찾기 (이 캡슐 구간 안에 포함된 경로 꼭짓점들)
+    const corners = navRouteLines._corners.filter(c => c > clampA && c < clampB);
+
+    // 구간을 꺾임 기준으로 분할
+    const segments = [];
+    let prev = clampA;
+    for (const c of corners) {
+      segments.push([prev, c]);
+      prev = c;
+    }
+    segments.push([prev, clampB]);
+
+    // 각 세그먼트를 독립 캡슐로 그리기
+    for (const [sA, sB] of segments) {
+      const len = sB - sA;
+      if (len < 0.01) continue;
+      const { pos: posA } = sp(sA);
+      const { pos: posB } = sp(sB);
+      const center = posA.clone().add(posB).multiplyScalar(0.5);
+      const dir    = posB.clone().sub(posA).normalize();
+
+      const mesh = getFromPool();
+      if (!mesh) break;
+      mesh.scale.set(1, len / NAV_DASH_SIZE, 1);
+      mesh.position.copy(center);
+      mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
+      // 층 이동 구간 연하게
+      const tMid = (sA + sB) / 2;
+      mesh.material.opacity = (tMid >= transFrom && tMid <= transTo) ? 0.25 : 0.97;
+    }
+  }
+}
+
+function clearNavRoute() {
+  navRouteLines.forEach(obj => {
+    scene.remove(obj);
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material) obj.material.dispose();
+  });
+  navRouteLines = [];
+}
+
+// 출발/도착 방 깜박임
+let navBlinkZones = [];
+let navBlinkT     = 0;
+function startNavBlink(zoneId, color) {
+  const z = zones.find(z => z.id === zoneId);
+  if (!z) return;
+  navBlinkZones.push({ zone: z, color, origColor: z.color });
+}
+function tickNavBlink(dt) {
+  if (!navBlinkZones.length) return;
+  navBlinkT += dt;
+  const op = 0.08 + 0.25 * (0.5 + 0.5 * Math.sin(navBlinkT * Math.PI * 2));
+  navBlinkZones.forEach(({ zone, color }) => {
+    const mat = zone.mesh.material;
+    if (mat) {
+      mat.color.set(new THREE.Color(color));
+      mat.opacity = op;
+    }
+  });
+}
+function stopNavBlink() {
+  navBlinkZones.forEach(({ zone }) => {
+    const mat = zoneMat(zone.color);
+    mat.opacity = 0.07;
+    zone.mesh.material = mat;
+  });
+  navBlinkZones = []; navBlinkT = 0;
+}
+
+function showNavPanel(startZone, endZone, startFloor, endFloor) {
+  console.log('showNavPanel: startZone=', startZone?.name, 'endZone=', endZone?.name);
+  const panel   = document.getElementById('nav-panel');
+  const content = document.getElementById('nav-panel-content');
+  const sName   = startZone ? (startZone.name || startZone.id) : '?';
+  const eName   = endZone   ? (endZone.name   || endZone.id)   : '?';
+  const sFloor  = startFloor ? (startFloor + '층') : '';
+  const eFloor  = endFloor   ? (endFloor   + '층') : '';
+  const multiFloor = startFloor && endFloor && startFloor !== endFloor;
+  const stairDir = multiFloor ? (endFloor > startFloor ? '위로' : '아래로') : '';
+
+  content.innerHTML = `
+    <div class="nav-route-row">
+      <span class="nav-route-icon">🚩</span>
+      <div><div class="nav-route-name">${sName}</div><div class="nav-route-sub">${sFloor}</div></div>
+    </div>
+    <div class="nav-arrow">↓</div>
+    ${multiFloor ? `
+    <div class="nav-route-row" style="background:rgba(0,119,204,.06);border-radius:8px;padding:10px 14px;margin:0 -4px">
+      <span class="nav-route-icon">🪜</span>
+      <div><div class="nav-route-name">계단 이용</div><div class="nav-route-sub">${stairDir} ${endFloor}층으로 이동</div></div>
+    </div>
+    <div class="nav-arrow">↓</div>
+    ` : ''}
+    <div class="nav-route-row">
+      <span class="nav-route-icon">🏁</span>
+      <div><div class="nav-route-name">${eName}</div><div class="nav-route-sub">${eFloor}</div></div>
+    </div>
+  `;
+  panel.classList.add('show');
+}
+
+// 다층 경로: 두 층 그래프를 합치고 층이동 마커를 포털 엣지로 연결
+async function findMultiFloorRoute(startMarker, endMarker, startFloor, endFloor) {
+  // 출발층과 도착층만 로드 (중간층 불필요)
+  const floorsNeeded = [...new Set([startFloor, endFloor])];
+
+  // 필요한 층 데이터 로드
+  const savedFloor = currentFloor;
+  for (const f of floorsNeeded) {
+    currentFloor = f;
+    await loadMarkersForFloor(f);
+    await loadPathsForFloor(f);
+    await loadFlrMarkersForFloor(f);
+  }
+  currentFloor = savedFloor;
+
+  // 두 층 그래프를 각각 빌드하고 합치기
+  const nodes = {};
+
+  function ensureNode(id, pos) {
+    if (!nodes[id]) nodes[id] = { pos, neighbors: [] };
+  }
+  function addEdge(idA, idB, posA, posB) {
+    ensureNode(idA, posA); ensureNode(idB, posB);
+    const dist = posA.distanceTo(posB);
+    if (!nodes[idA].neighbors.find(n => n.id === idB))
+      nodes[idA].neighbors.push({ id: idB, dist });
+    if (!nodes[idB].neighbors.find(n => n.id === idA))
+      nodes[idB].neighbors.push({ id: idA, dist });
+  }
+
+  // 각 층의 선/마커/층이동마커를 노드로 추가
+  for (const f of floorsNeeded) {
+    const floorPaths   = paths.filter(p => p.floor === f);
+    const floorMarkers_= markers.filter(m => m.floor === f);
+    const floorFmks    = flrMarkers.filter(m => m.floor === f && m.pathId);
+
+    // Y 오프셋: 두 번째 층은 화면에서 위로 올려서 표시
+    // Y 오프셋: 항상 한 층 간격 (실제 층 번호 차이 무관)
+    const floorMin2 = Math.min(startFloor, endFloor);
+    const yOff = (f === floorMin2) ? 0 : FLOOR_HEIGHT;
+
+    // 선의 점들을 노드로
+    floorPaths.forEach(path => {
+      const pts = path.points.map(p => new THREE.Vector3(p[0], p[1] + yOff, p[2]));
+      pts.forEach((pos, i) => {
+        ensureNode(`p:${f}:${path.id}:${i}`, pos);
+        if (i > 0) addEdge(`p:${f}:${path.id}:${i-1}`, `p:${f}:${path.id}:${i}`, pts[i-1], pos);
+      });
+    });
+
+    // 일반 마커를 가장 가까운 점에 연결 (pathId 없어도 가장 가까운 선의 점에 연결)
+    floorMarkers_.forEach(m => {
+      const mPos = new THREE.Vector3(...m.pos).setY(m.pos[1] + yOff);
+      const mId  = `m:${f}:${m.id}`;
+      ensureNode(mId, mPos);
+
+      // pathId가 있으면 그 선의 점에, 없으면 모든 선 중 가장 가까운 점에 연결
+      let targetPath = floorPaths.find(p => p.id === m.pathId);
+      if (!targetPath && floorPaths.length > 0) {
+        // 가장 가까운 선의 점 찾기
+        let bestD = Infinity;
+        floorPaths.forEach(path => {
+          path.points.forEach((pt, i) => {
+            const p = new THREE.Vector3(pt[0], pt[1] + yOff, pt[2]);
+            const d = mPos.distanceTo(p);
+            if (d < bestD) { bestD = d; targetPath = path; }
+          });
+        });
+      }
+      if (!targetPath) return;
+
+      const pts = targetPath.points.map(p => new THREE.Vector3(p[0], p[1] + yOff, p[2]));
+      let bestIdx = 0, bestD = Infinity;
+      pts.forEach((p, i) => { const d = mPos.distanceTo(p); if (d < bestD) { bestD = d; bestIdx = i; } });
+      const dotId = `p:${f}:${targetPath.id}:${bestIdx}`;
+      addEdge(mId, dotId, mPos, pts[bestIdx]);
+    });
+
+    // 층이동 마커를 가장 가까운 점에 연결
+    floorFmks.forEach(m => {
+      const path = floorPaths.find(p => p.id === m.pathId);
+      if (!path) return;
+      const mPos = new THREE.Vector3(...m.pos).setY(m.pos[1] + yOff);
+      const pts  = path.points.map(p => new THREE.Vector3(p[0], p[1] + yOff, p[2]));
+      let bestIdx = 0, bestD = Infinity;
+      pts.forEach((p, i) => { const d = mPos.distanceTo(p); if (d < bestD) { bestD = d; bestIdx = i; } });
+      const fmId  = `fm:${f}:${m.id}`;
+      const dotId = `p:${f}:${path.id}:${bestIdx}`;
+      ensureNode(fmId, mPos);
+      addEdge(fmId, dotId, mPos, pts[bestIdx]);
+    });
+  }
+
+  // 층이동 마커: 같은 이름(name)을 가진 마커끼리 자동 포털 연결
+  console.log('=== PORTAL DEBUG ===');
+  console.log('floorsNeeded:', floorsNeeded);
+  console.log('all flrMarkers:', flrMarkers.map(m=>`${m.id}(f${m.floor},name:"${m.name}",path:${m.pathId})`));
+  const flrInNeeded = flrMarkers.filter(m => floorsNeeded.includes(m.floor));
+  console.log('flrMarkers in floorsNeeded:', flrInNeeded.map(m=>`${m.id}(f${m.floor},name:"${m.name}")`));
+  const processedPairs = new Set();
+  flrInNeeded.filter(m => m.name).forEach(m => {
+    flrInNeeded.filter(p =>
+      p.floor !== m.floor &&
+      p.name === m.name
+    ).forEach(pair => {
+      const pairKey = [m.floor, pair.floor, m.name].sort().join(':');
+      if (processedPairs.has(pairKey)) return;
+      processedPairs.add(pairKey);
+
+      const floorMin3 = Math.min(startFloor, endFloor);
+      const yA = (m.floor    === floorMin3) ? 0 : FLOOR_HEIGHT;
+      const yB = (pair.floor === floorMin3) ? 0 : FLOOR_HEIGHT;
+      const posA = new THREE.Vector3(...m.pos).setY(m.pos[1] + yA);
+      const posB = new THREE.Vector3(...pair.pos).setY(pair.pos[1] + yB);
+      const idA = `fm:${m.floor}:${m.id}`;
+      const idB = `fm:${pair.floor}:${pair.id}`;
+      console.log(`  portal: ${idA}(${m.name}) ↔ ${idB}(${pair.name})`);
+      addEdge(idA, idB, posA, posB);
+    });
+  });
+  console.log('portal pairs created:', [...processedPairs]);
+  if (processedPairs.size === 0) {
+    console.warn('⚠️ 포털 연결 없음! 층이동 마커에 같은 이름을 설정했는지 확인하세요.');
+  }
+
+  // 서로 다른 선의 가까운 점끼리 자동 연결 (분기 스냅)
+  const SNAP_DIST = 0.5;
+  const nodeIds = Object.keys(nodes).filter(id => id.startsWith('p:'));
+  for (let i = 0; i < nodeIds.length; i++) {
+    for (let j = i + 1; j < nodeIds.length; j++) {
+      const idA = nodeIds[i], idB = nodeIds[j];
+      const partsA = idA.split(':'), partsB = idB.split(':');
+      // 같은 층+같은 선이면 스킵
+      if (partsA[1] === partsB[1] && partsA[2] === partsB[2]) continue;
+      const dist = nodes[idA].pos.distanceTo(nodes[idB].pos);
+      if (dist < SNAP_DIST) {
+        if (!nodes[idA].neighbors.find(n => n.id === idB))
+          nodes[idA].neighbors.push({ id: idB, dist });
+        if (!nodes[idB].neighbors.find(n => n.id === idA))
+          nodes[idB].neighbors.push({ id: idA, dist });
+      }
+    }
+  }
+
+  // 출발/도착 마커 노드 ID
+  const startId = `m:${startFloor}:${startMarker.id}`;
+  const endId   = `m:${endFloor}:${endMarker.id}`;
+
+  console.log('=== NAV DEBUG ===');
+  console.log('startId:', startId, '존재:', !!nodes[startId]);
+  console.log('endId:', endId, '존재:', !!nodes[endId]);
+  console.log('총 노드 수:', Object.keys(nodes).length);
+  console.log('마커 노드:', Object.keys(nodes).filter(k => k.startsWith('m:')));
+  console.log('층이동 노드:', Object.keys(nodes).filter(k => k.startsWith('fm:')));
+  console.log('선 노드 수:', Object.keys(nodes).filter(k => k.startsWith('p:')).length);
+  if (nodes[startId]) console.log('출발 neighbors:', nodes[startId].neighbors.map(n=>n.id));
+  if (nodes[endId])   console.log('도착 neighbors:', nodes[endId].neighbors.map(n=>n.id));
+  Object.keys(nodes).filter(k=>k.startsWith('fm:')).forEach(k => {
+    console.log('fm node:', k, '→', nodes[k].neighbors.map(n=>n.id));
+  });
+
+  if (!nodes[startId] || !nodes[endId]) {
+    console.log('노드 없음! markers:', markers.map(m=>`${m.id}(f${m.floor},path:${m.pathId})`));
+    return null;
+  }
+
+  // 다익스트라
+  const pts = dijkstra(nodes, startId, endId);
+  if (!pts) return null;
+
+  // 층 경계 감지 (Y가 크게 바뀌는 구간)
+  const crossesFloor = pts.some((p, i) => i > 0 && Math.abs(p.y - pts[i-1].y) > SECONDARY_OFFSET_Y * 0.5);
+
+  return { singleFloor: !crossesFloor, pts, floorA: startFloor, floorB: endFloor };
+}
+
+// 다층 뷰: 두 층 모델 동시 표시
+let secondaryModel = []; // { model, floor, yOff, ownedByNav }
+let secondaryFloor = null;
+let SECONDARY_OFFSET_Y = 6; // 모델 로드 후 업데이트
+
+const FLOOR_HEIGHT = 4.5; // 층간 Y 간격 (고정값)
+
+function getFloorYOffset(floor) {
+  if (!Array.isArray(secondaryModel)) return 0;
+  const entry = secondaryModel.find(e => e.floor === floor);
+  return entry ? entry.yOff : 0;
+}
+
+let _navOrigModelY = 0; // nav 진입 전 currentModel Y 저장
+let _instantSwitch = false; // nav 직후 애니메이션 없이 전환
+
+async function showSecondaryFloor(startFloor, endFloor) {
+  hideSecondaryFloor();
+  secondaryFloor = endFloor;
+  secondaryModel = [];
+
+  // 기존 씬 모델 숨기기 (원래 Y 저장)
+  if (currentModel) {
+    _navOrigModelY = currentModel.position.y;
+    currentModel.visible = false;
+  }
+
+  document.querySelectorAll('.floor-btn').forEach(b => b.disabled = true);
+
+  const floorsToShow = [...new Set([startFloor, endFloor])];
+  const floorMin = Math.min(startFloor, endFloor);
+
+  for (const f of floorsToShow) {
+    const yOff = (f === floorMin) ? 0 : FLOOR_HEIGHT; // 항상 한 층 간격
+    try {
+      // 항상 새로 로드 (currentModel과 무관)
+      const model = await loadModel(f);
+      // loadModel이 설정한 Y 그대로 유지하고 yOff만 추가
+      model.position.y += yOff;
+      console.log(`  floor ${f}: model.position.y=${model.position.y.toFixed(3)}, yOff=${yOff}`);
+      model.traverse(n => { if (n.isMesh) { n.material.opacity = 0.88; n.visible = true; } });
+      const modelBaseY = model.position.y - yOff; // 원래 Y (기록용)
+      secondaryModel.push({ model, floor: f, yOff, modelBaseY, ownedByNav: true });
+
+      // 해당 층 데이터 로드
+      const savedFloor = currentFloor;
+      currentFloor = f;
+      await loadPathsForFloor(f);
+      await loadMarkersForFloor(f);
+      await loadFlrMarkersForFloor(f);
+      try {
+        const res = await fetch('/api/rooms/' + f);
+        if (res.ok) {
+          const files = await res.json();
+          for (const fname of files) {
+            if (zones.find(z => z.id === fname && z.floor === f)) {
+              console.log(`    skip zone ${fname} (already loaded for floor ${f})`);
+              continue;
+            }
+            const r = await fetch('/api/room/' + f + '/' + encodeURIComponent(fname));
+            if (!r.ok) continue;
+            const data = textToZone(await r.text(), fname);
+            if (data) {
+              console.log(`    adding zone ${data.id}(${data.name}) for floor ${f}`);
+              addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+            }
+          }
+        }
+      } catch(e) {}
+      currentFloor = savedFloor;
+
+      const floorZones = zones.filter(z => z.floor === f);
+      console.log(`  floor ${f} zones: ${floorZones.length}개, yOff=${yOff}`);
+      floorZones.forEach(z => {
+        const cy = z.box.getCenter(new THREE.Vector3()).y;
+        console.log(`    zone ${z.id}(${z.name}): cy=${cy.toFixed(3)} → y=${(cy+yOff).toFixed(3)}`);
+        z.mesh.position.y = cy + yOff;
+        z.line.position.y = cy + yOff;
+      });
+      paths.filter(p => p.floor === f).forEach(p => {
+        p.dotMeshes.forEach(m => { m.position.y += yOff; });
+        p.lines.forEach(l => {
+          const pos = l.geometry.attributes.position;
+          for (let i = 0; i < pos.count; i++) pos.setY(i, pos.getY(i) + yOff);
+          pos.needsUpdate = true;
+        });
+      });
+    } catch(err) { console.warn('floor load error:', f, err); }
+  }
+
+  setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
+  console.log('nav floors:', secondaryModel.map(e => `f${e.floor}@y${e.yOff.toFixed(1)}`));
+}
+
+function hideSecondaryFloor() {
+  secondaryModel.forEach(entry => {
+    if (entry.ownedByNav) {
+      scene.remove(entry.model);
+      entry.model.traverse(n => { if (n.isMesh && n.geometry) n.geometry.dispose(); });
+    }
+  });
+  secondaryModel = [];
+  secondaryFloor = null;
+  // 기존 모델 원래 Y로 복원
+  if (currentModel) {
+    currentModel.position.y = _navOrigModelY;
+    currentModel.visible = true;
+    console.log('hideSecondaryFloor: restored currentModel y=', _navOrigModelY);
+  }
+  document.querySelectorAll('.floor-btn').forEach(b => b.disabled = false);
+}
+
+function findAndDrawRoute() {
+  if (!navStart || !navEnd) return;
+  const startMarker = navStart.marker;
+  const endMarker   = navEnd.marker;
+  const startFloor  = navStart.floor || startMarker.floor || currentFloor;
+  const endFloor    = navEnd.floor   || endMarker.floor   || currentFloor;
+
+  (async () => {
+    // 다층이면 도착층 zone도 미리 로드
+    if (startFloor !== endFloor) {
+      const savedFloor = currentFloor;
+      currentFloor = endFloor;
+      await loadMarkersForFloor(endFloor);
+      await new Promise(resolve => {
+        fetch('/api/rooms/' + endFloor).then(r => r.ok ? r.json() : []).then(async files => {
+          for (const fname of files) {
+            // 같은 층의 같은 ID면 스킵
+            if (zones.find(z => z.id === fname && z.floor === endFloor)) continue;
+            const r = await fetch('/api/room/' + endFloor + '/' + encodeURIComponent(fname));
+            if (!r.ok) continue;
+            const data = textToZone(await r.text(), fname);
+            if (!data) continue;
+            addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+          }
+          resolve();
+        }).catch(() => resolve());
+      });
+      currentFloor = savedFloor;
+    }
+
+    const result = await findMultiFloorRoute(startMarker, endMarker, startFloor, endFloor);
+    currentFloor = startFloor; // findMultiFloorRoute 후 반드시 복원
+    // 실제 씬에 있는 모델의 층 번호 (switchFloor에서 업데이트됨)
+    const sceneModelFloor = currentModelFloor;
+    if (!result || !result.pts || result.pts.length < 2) {
+      showToast('❌ 경로를 찾을 수 없습니다.', 3000);
+      navStart = null; navEnd = null;
+      const btnS = document.getElementById('nav-start-btn');
+      const btnE = document.getElementById('nav-end-btn');
+      if (btnS) btnS.disabled = false;
+      if (btnE) btnE.disabled = false;
+      // 층 복원
+      [...zones].filter(z => z.floor !== currentFloor).forEach(z => removeZone(z));
+      [...paths].filter(p => p.floor !== currentFloor).forEach(p => removePath(p));
+      [...markers].filter(m => m.floor !== currentFloor).forEach(m => removeMarker(m));
+      hideSecondaryFloor();
+      _doInstantSwitch(currentFloor);
+      return;
+    }
+
+    if (!result.singleFloor) await showSecondaryFloor(startFloor, endFloor, sceneModelFloor);
+    else hideSecondaryFloor();
+
+    function zoneCenterPt(zone, floor) {
+      if (!zone) return null;
+      const c = zone.box.getCenter(new THREE.Vector3());
+      const yOff = result.singleFloor ? 0 : getFloorYOffset(floor);
+      return new THREE.Vector3(c.x, c.y + yOff, c.z);
+    }
+
+    const startZone = zones.find(z => z.id === navStart.zoneId && z.floor === startFloor)
+                   || zones.find(z => z.id === navStart.zoneId);
+    const endZone   = zones.find(z => z.id === navEnd.zoneId   && z.floor === endFloor)
+                   || zones.find(z => z.id === navEnd.zoneId);
+
+    const routePts = [
+      ...(zoneCenterPt(startZone, startFloor) ? [zoneCenterPt(startZone, startFloor)] : []),
+      ...result.pts,
+      ...(zoneCenterPt(endZone,   endFloor)   ? [zoneCenterPt(endZone,   endFloor)]   : []),
+    ];
+    drawNavRoute(routePts);
+
+    stopNavBlink();
+    if (startZone) startNavBlink(navStart.zoneId, '#00cc66');
+    if (endZone)   startNavBlink(navEnd.zoneId,   '#ff3300');
+    showNavPanel(startZone, endZone, startFloor, endFloor);
+    closePopup(); stopBlink();
+  })();
+}
+
+function resetNav() {
+  console.log('=== resetNav ===');
+  console.log('currentFloor:', currentFloor, 'secondaryFloor:', secondaryFloor);
+  console.log('zones before cleanup:', zones.map(z=>`${z.id}(f${z.floor},y=${z.mesh.position.y.toFixed(2)})`));
+  console.log('currentModel visible:', currentModel?.visible, 'y:', currentModel?.position.y?.toFixed(2));
+
+  navStart = null; navEnd = null;
+  clearNavRoute(); stopNavBlink();
+
+  if (secondaryFloor !== null) {
+    const toRemove = zones.filter(z => z.floor !== currentFloor);
+    console.log('removing zones:', toRemove.map(z=>z.id));
+    toRemove.forEach(z => removeZone(z));
+    [...paths].filter(p => p.floor !== currentFloor).forEach(p => removePath(p));
+    [...markers].filter(m => m.floor !== currentFloor).forEach(m => removeMarker(m));
+  }
+
+  hideSecondaryFloor();
+
+  zones.forEach(z => {
+    const cy = z.box.getCenter(new THREE.Vector3()).y;
+    z.mesh.position.y = cy;
+    z.line.position.y = cy;
+  });
+
+  console.log('zones after cleanup:', zones.map(z=>`${z.id}(f${z.floor},y=${z.mesh.position.y.toFixed(2)})`));
+  console.log('currentModel after:', currentModel?.visible, 'y:', currentModel?.position.y?.toFixed(2));
+
+  setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
+  document.getElementById('nav-panel').classList.remove('show');
+  const btnS = document.getElementById('nav-start-btn');
+  const btnE = document.getElementById('nav-end-btn');
+  if (btnS) btnS.disabled = false;
+  if (btnE) btnE.disabled = false;
+
+  // 현재 층으로 즉시 복원 (애니메이션 없이)
+  _doInstantSwitch(currentFloor);
+}
+
+// 그래프 구성: 마커를 노드, 선을 엣지로
+function buildNavGraph() {
+  // 노드 ID 체계: 마커 → "m:{markerId}", 선의 각 점 → "p:{pathId}:{dotIdx}"
+  const nodes = {}; // id → { pos: THREE.Vector3, neighbors: [{id, dist}], pts: {id→[Vector3]} }
+
+  function ensureNode(id, pos) {
+    if (!nodes[id]) nodes[id] = { pos, neighbors: [] };
+  }
+  function addEdge(idA, idB, posA, posB) {
+    ensureNode(idA, posA); ensureNode(idB, posB);
+    const dist = posA.distanceTo(posB);
+    // 중복 방지
+    if (!nodes[idA].neighbors.find(n => n.id === idB))
+      nodes[idA].neighbors.push({ id: idB, dist });
+    if (!nodes[idB].neighbors.find(n => n.id === idA))
+      nodes[idB].neighbors.push({ id: idA, dist });
+  }
+
+  // 1. 모든 선의 점들을 노드로 추가하고 인접 점끼리 엣지 연결
+  paths.filter(p => p.floor === currentFloor).forEach(path => {
+    const pts = path.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+    pts.forEach((pos, i) => {
+      const id = `p:${path.id}:${i}`;
+      ensureNode(id, pos);
+      if (i > 0) {
+        const prevId = `p:${path.id}:${i-1}`;
+        addEdge(prevId, id, pts[i-1], pos);
+      }
+    });
+  });
+
+  // 2. 마커를 가장 가까운 선의 점 노드에 연결
+  markers.filter(m => m.floor === currentFloor && m.pathId).forEach(m => {
+    const path = paths.find(p => p.id === m.pathId && p.floor === currentFloor);
+    if (!path) return;
+    const mPos = new THREE.Vector3(...m.pos);
+    const pts  = path.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+
+    // 가장 가까운 점 찾기
+    let bestIdx = 0, bestD = Infinity;
+    pts.forEach((p, i) => { const d = mPos.distanceTo(p); if (d < bestD) { bestD = d; bestIdx = i; } });
+
+    const mId    = `m:${m.id}`;
+    const dotId  = `p:${path.id}:${bestIdx}`;
+    ensureNode(mId, mPos);
+    addEdge(mId, dotId, mPos, pts[bestIdx]);
+  });
+
+  // 3. 층 이동 마커를 노드로 추가 + 같은 위치 선의 점과 연결
+  flrMarkers.filter(m => m.floor === currentFloor && m.pathId).forEach(m => {
+    const path = paths.find(p => p.id === m.pathId && p.floor === currentFloor);
+    if (!path) return;
+    const mPos = new THREE.Vector3(...m.pos);
+    const pts  = path.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+    let bestIdx = 0, bestD = Infinity;
+    pts.forEach((p, i) => { const d = mPos.distanceTo(p); if (d < bestD) { bestD = d; bestIdx = i; } });
+    const fmId  = `fm:${m.floor}:${m.id}`;
+    const dotId = `p:${path.id}:${bestIdx}`;
+    ensureNode(fmId, mPos);
+    addEdge(fmId, dotId, mPos, pts[bestIdx]);
+  });
+
+  // 4. 서로 다른 선의 점들 중 가까운 것끼리 자동 연결 (분기 연결)
+  const SNAP_DIST = 0.5;
+  const nodeIds = Object.keys(nodes).filter(id => id.startsWith('p:'));
+  for (let i = 0; i < nodeIds.length; i++) {
+    for (let j = i + 1; j < nodeIds.length; j++) {
+      const idA = nodeIds[i], idB = nodeIds[j];
+      const partsA = idA.split(':'), partsB = idB.split(':');
+      if (partsA[1] === partsB[1]) continue; // 같은 선 스킵
+      const dist = nodes[idA].pos.distanceTo(nodes[idB].pos);
+      if (dist < SNAP_DIST) {
+        if (!nodes[idA].neighbors.find(n => n.id === idB))
+          nodes[idA].neighbors.push({ id: idB, dist });
+        if (!nodes[idB].neighbors.find(n => n.id === idA))
+          nodes[idB].neighbors.push({ id: idA, dist });
+      }
+    }
+  }
+
+  return nodes;
+}
+
+// 다익스트라 최단경로 (점 기반)
+function dijkstra(nodes, startId, endId) {
+  if (!nodes[startId] || !nodes[endId]) return null;
+
+  const dist  = {}, prev = {};
+  const queue = new Set(Object.keys(nodes));
+  Object.keys(nodes).forEach(id => { dist[id] = Infinity; prev[id] = null; });
+  dist[startId] = 0;
+
+  while (queue.size) {
+    let u = null;
+    queue.forEach(id => { if (u === null || dist[id] < dist[u]) u = id; });
+    if (!u || dist[u] === Infinity || u === endId) break;
+    queue.delete(u);
+    for (const nb of nodes[u].neighbors) {
+      if (!queue.has(nb.id)) continue;
+      const alt = dist[u] + nb.dist;
+      if (alt < dist[nb.id]) { dist[nb.id] = alt; prev[nb.id] = u; }
+    }
+  }
+
+  if (dist[endId] === Infinity) return null;
+
+  const path = [];
+  let cur = endId;
+  while (cur) { path.unshift(nodes[cur].pos.clone()); cur = prev[cur]; }
+  return path;
+}
+
+// 현재 팝업에 표시된 zone과 연결된 마커 찾기
+function getNavMarkerForZone(zoneId) {
+  // roomId가 연결된 마커 (pathId 유무 무관)
+  return markers.find(m => m.floor === currentFloor && m.roomId === zoneId) || null;
+}
+
+function updateNavButtons(zone) {
+  const btnArea = document.getElementById('nav-btns');
+  const btnS    = document.getElementById('nav-start-btn');
+  const btnE    = document.getElementById('nav-end-btn');
+  const m = zone ? getNavMarkerForZone(zone.id) : null;
+
+  if (!m) { btnArea.classList.remove('show'); return; }
+  btnArea.classList.add('show');
+
+  btnS.disabled = !!navStart;
+  btnE.disabled = !!navEnd;
+  btnS.onclick = () => {
+    console.log('출발 설정: currentFloor=', currentFloor, 'marker.floor=', m.floor);
+    navStart = { marker: m, zoneId: zone.id, floor: currentFloor };
+    btnS.disabled = true;
+    closePopup(); stopBlink();
+    showToast('🚩 출발지: ' + (zone.name || zone.id) + ' (' + currentFloor + '층)');
+    if (navEnd) findAndDrawRoute();
+  };
+  btnE.onclick = () => {
+    console.log('도착 설정: currentFloor=', currentFloor, 'marker.floor=', m.floor);
+    navEnd = { marker: m, zoneId: zone.id, floor: currentFloor };
+    btnE.disabled = true;
+    closePopup(); stopBlink();
+    showToast('🏁 도착지: ' + (zone.name || zone.id) + ' (' + currentFloor + '층)');
+    if (navStart) findAndDrawRoute();
+  };
+}
+
+
+
+
+
+import * as THREE        from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader }   from 'three/addons/loaders/DRACOLoader.js';
+
+/* ── renderer ── */
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled   = true;
+renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace    = THREE.SRGBColorSpace;
+renderer.sortObjects = true;
+renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.getElementById('c').appendChild(renderer.domElement);
+
+/* ── scene / camera ── */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xe8edf5);
+scene.fog = new THREE.Fog(0xe8edf5, 50, 200);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1000);
+camera.position.set(10, 8, 14);
+
+/* ── orbit ── */
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping  = true;
+orbit.dampingFactor  = 0.07;
+orbit.minDistance    = 1;
+orbit.maxDistance    = 200;
+orbit.maxPolarAngle  = Math.PI / 3.5; // 약 51도, 너무 옆으로 눕히지 못하게
+orbit.update();
+
+/* ── lights ── */
+scene.add(new THREE.AmbientLight(0xffffff, 2.5));
+const sun = new THREE.DirectionalLight(0xffffff, 3.0);
+sun.position.set(15, 30, 15);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.camera.near = 0.5;
+sun.shadow.camera.far  = 300;
+sun.shadow.camera.left   = -50;
+sun.shadow.camera.right  =  50;
+sun.shadow.camera.top    =  50;
+sun.shadow.camera.bottom = -50;
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 1.8);
+fill.position.set(-10, 10, -10);
+scene.add(fill);
+const fill2 = new THREE.DirectionalLight(0xffffff, 1.2);
+fill2.position.set(0, -10, 0);
+scene.add(fill2);
+
+/* ── grid ── */
+const grid = new THREE.GridHelper(100, 50, 0x0077cc, 0xc8d4e8);
+grid.material.opacity     = 0.25;
+grid.material.transparent = true;
+grid.visible = false;
+scene.add(grid);
+
+/* ── ground plane (draw raycasting) ── */
+const gPlane   = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const _gTarget = new THREE.Vector3();
+
+/* ── raycaster ── */
+const rc = new THREE.Raycaster();
+function ndc(e) {
+  return new THREE.Vector2((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+}
+function groundPt(e) {
+  rc.setFromCamera(ndc(e), camera);
+  if (currentModel) {
+    const meshes = [];
+    currentModel.traverse(n => { if (n.isMesh) meshes.push(n); });
+    const hits = rc.intersectObjects(meshes, false);
+    // 위를 향한 면(normal.y > 0.5) 중 레이캐스트 순서상 첫 번째(가장 가까운 것)
+    const upHit = hits.find(h => {
+      if (!h.face) return false;
+      const wn = h.face.normal.clone().transformDirection(h.object.matrixWorld);
+      return wn.y > 0.5;
+    });
+    if (upHit) return upHit.point.clone();
+  }
+  return rc.ray.intersectPlane(gPlane, _gTarget) ? _gTarget.clone() : null;
+}
+
+/* ════════════════════════════════════
+   ROOM FILE API  (node server.js 필요)
+════════════════════════════════════ */
+function hexToRgbStr(hex) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0,2), 16);
+  const g = parseInt(h.substring(2,4), 16);
+  const b = parseInt(h.substring(4,6), 16);
+  return r + ' ' + g + ' ' + b;
+}
+function rgbStrToHex(str) {
+  const [r,g,b] = str.trim().split(/\s+/).map(Number);
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+function zoneToText(z) {
+  const mn = z.box.min, mx = z.box.max;
+  const coords = [mn.x, mn.y, mn.z, mx.x, mx.y, mx.z].map(v => v.toFixed(6)).join(' ');
+  const rgb    = hexToRgbStr(z.color || '#0077cc');
+  return coords + ' ' + rgb + '\n' + (z.name || '') + '\n' + (z.desc || '') + '\n' + (z.tags || '');
+}
+function textToZone(text, filename) {
+  const lines = text.split('\n');
+  const nums  = lines[0].trim().split(/\s+/).map(Number);
+  if (nums.length < 9 || nums.some(isNaN)) return null;
+  const [x1, y1, z1, x2, y2, z2, r, g, b] = nums;
+  return {
+    id:    filename,
+    box:   new THREE.Box3(new THREE.Vector3(x1, y1, z1), new THREE.Vector3(x2, y2, z2)),
+    color: rgbStrToHex(r + ' ' + g + ' ' + b),
+    name:  (lines[1] || '').trim(),
+    desc:  (lines[2] || '').trim(),
+    tags:  (lines[3] || '').trim(),
+  };
+}
+
+async function apiSaveZone(z) {
+  try {
+    const res = await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(z.id), {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: zoneToText(z),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch (e) {
+    console.error('save error:', e);
+    showToast('❌ 저장 실패 — node server.js 가 실행 중인지 확인하세요.', 4000);
+  }
+}
+async function apiDeleteZone(z) {
+  try {
+    await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(z.id), { method: 'DELETE' });
+  } catch (e) { console.warn('delete error:', e); }
+}
+async function apiLoadAll() {
+  try {
+    const res = await fetch('/api/rooms/' + currentFloor);
+    if (!res.ok) return;
+    const files = await res.json();
+    [...zones].forEach(z => removeZone(z));
+    for (const fname of files) {
+      try {
+        const r = await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(fname));
+        if (!r.ok) continue;
+        const data = textToZone(await r.text(), fname);
+        if (!data) continue;
+        const n = parseInt(data.id.replace('z', ''));
+        if (!isNaN(n) && n >= zid) zid = n + 1;
+        addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+      } catch (e) { console.warn('load error:', fname, e); }
+    }
+  } catch (e) { console.warn('room API unavailable, skipping'); }
+}
+
+let _toastTimer = null;
+function showToast(msg, duration = 2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+}
+
+
+/* ── 백업 / Undo 시스템 ── */
+const undoStack = []; // [{ label, snapshots: [{id,text}] }]
+
+function updateUndoBtn() {
+  const btn = document.getElementById('btn-undo');
+  if (!btn) return;
+  btn.disabled      = undoStack.length === 0;
+  btn.style.opacity = undoStack.length ? '1' : '.4';
+}
+
+function showUndoDropdown() {
+  if (!undoStack.length) return;
+  const btn  = document.getElementById('btn-undo');
+  const drop = document.getElementById('undo-dropdown');
+  drop.innerHTML = '';
+
+  [...undoStack].reverse().forEach((item, revIdx) => {
+    const idx = undoStack.length - 1 - revIdx;
+    const el  = document.createElement('button');
+    el.className = 'undo-item';
+    el.innerHTML = `<span class="undo-idx">${revIdx + 1}</span>${item.label}`;
+    el.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      drop.classList.remove('show');
+      await doUndoTo(idx);
+    });
+    drop.appendChild(el);
+  });
+
+  const rect = btn.getBoundingClientRect();
+  drop.style.left = rect.left + 'px';
+  drop.style.top  = (rect.bottom + 6) + 'px';
+  drop.classList.add('show');
+
+  // 드롭다운 외부 클릭 시 닫기 (드롭다운 자체 클릭은 제외)
+  function onOutside(e) {
+    if (!drop.contains(e.target) && e.target !== btn) {
+      drop.classList.remove('show');
+      document.removeEventListener('pointerdown', onOutside);
+    }
+  }
+  setTimeout(() => document.addEventListener('pointerdown', onOutside), 50);
+}
+
+function closeDrop() {
+  document.getElementById('undo-dropdown').classList.remove('show');
+}
+
+// idx 시점으로 복구 (idx 이후 스택 제거)
+async function doUndoTo(idx) {
+  if (idx < 0 || idx >= undoStack.length) return;
+  const { label, snapshot } = undoStack[idx];
+
+  undoStack.splice(idx + 1);
+  [...zones].forEach(z => removeZone(z));
+
+  for (const s of snapshot) {
+    const data = textToZone(s.text, s.id);
+    if (!data) { console.warn('textToZone failed for', s.id, s.text); continue; }
+    const z = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+    await apiSaveZone(z);
+  }
+
+  try {
+    const res   = await fetch('/api/rooms/' + currentFloor);
+    const files = await res.json();
+    const snapIds = new Set(snapshot.map(s => s.id));
+    for (const fname of files) {
+      if (!snapIds.has(fname)) {
+        await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(fname), { method: 'DELETE' });
+      }
+    }
+  } catch(e) { console.warn('undo cleanup error:', e); }
+
+  setVis();
+  showToast(`↩ "${label}" 이전으로 되돌렸습니다.`);
+  updateUndoBtn();
+}
+
+async function doUndo() { showUndoDropdown(); }
+
+// 현재 상태 스냅샷을 백업에 저장
+async function pushUndo(label) {
+  const snapshot = zones.map(z => ({ id: z.id, text: zoneToText(z) }));
+  undoStack.push({ label, snapshot });
+  updateUndoBtn();
+}
+
+
+// 페이지 로드 시 해당 층 백업 삭제 (새로고침 감지)
+async function clearBackups(floor) {
+  try { await fetch(`/api/backups/${floor}`, { method: 'DELETE' }); } catch(e) {}
+}
+
+
+/* ════════════════════════════
+   PATH SYSTEM (길 그리기)
+════════════════════════════ */
+const paths = [];
+let   pathId = 1;
+
+let pathDrawing   = false;
+let pathPoints    = [];
+let pathDotMeshes = [];
+let pathPreviewLine = null;
+let pathLines     = [];
+
+const PATH_COLOR     = 0xff6600;
+const PATH_COLOR_PRV = 0xffaa44;
+const PATH_DOT_R     = 0.06;
+const PATH_HEIGHT_OFFSET = 0.08;
+let   modelTopY = 0.5;
+
+function pathY(y) { return y + PATH_HEIGHT_OFFSET; }
+
+function pathDotMat() {
+  return new THREE.MeshBasicMaterial({ color: 0x888888, depthTest: false, depthWrite: false, transparent: true });
+}
+function pathLineMat(preview) {
+  return new THREE.LineBasicMaterial({
+    color: preview ? PATH_COLOR_PRV : PATH_COLOR,
+    linewidth: 2, depthTest: false, depthWrite: false, transparent: true,
+  });
+}
+
+function makeDotMesh(pos) {
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(PATH_DOT_R, 10, 10), pathDotMat());
+  mesh.position.set(pos.x, pos.y + PATH_HEIGHT_OFFSET, pos.z);
+  mesh.renderOrder = 999;
+  scene.add(mesh);
+  return mesh;
+}
+function makeLineSeg(a, b, preview) {
+  const geo  = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(a.x, a.y + PATH_HEIGHT_OFFSET, a.z),
+    new THREE.Vector3(b.x, b.y + PATH_HEIGHT_OFFSET, b.z),
+  ]);
+  const line = new THREE.Line(geo, pathLineMat(preview));
+  line.renderOrder = 999;
+  scene.add(line);
+  return line;
+}
+function pathGroundPt(e) {
+  rc.setFromCamera(ndc(e), camera);
+  // 1순위: 현재 모델 메시 레이캐스트 (정확한 클릭 위치)
+  if (currentModel) {
+    const meshes = [];
+    currentModel.traverse(n => { if (n.isMesh) meshes.push(n); });
+    const hits = rc.intersectObjects(meshes, false);
+    if (hits.length > 0) {
+      const pt = hits[0].point.clone();
+      return pt; // 실제 클릭한 모델 표면 위치
+    }
+  }
+  // 2순위: 모델 상단 평면
+  const topPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -modelTopY);
+  const target   = new THREE.Vector3();
+  return rc.ray.intersectPlane(topPlane, target) ? target.clone() : null;
+}
+function updatePreviewLine(to) {
+  if (!pathPoints.length) return;
+  if (pathPreviewLine) { scene.remove(pathPreviewLine); pathPreviewLine.geometry.dispose(); }
+  pathPreviewLine = makeLineSeg(pathPoints[pathPoints.length - 1], to, true);
+}
+let selectedDot = null; // { path, dotIdx } - 선택된 점
+
+// 기존 점 근처 클릭 감지
+function findExistingDotAt(pt) {
+  for (const path of paths) {
+    if (path.floor !== currentFloor) continue;
+    for (let i = 0; i < path.dotMeshes.length; i++) {
+      const pos = path.dotMeshes[i].position;
+      const d   = pt.distanceTo(new THREE.Vector3(pos.x, pt.y, pos.z));
+      if (d < PATH_DOT_R * 5) return { path, dotIdx: i };
+    }
+  }
+  return null;
+}
+
+function selectDot(path, dotIdx) {
+  deselectDot();
+  selectedDot = { path, dotIdx };
+  path.dotMeshes[dotIdx].material.color.set(0xffcc00);
+  document.getElementById('edit-hint').textContent = 'Del: 점 삭제 | 빈 곳 클릭: 여기서 분기 시작';
+}
+function deselectDot() {
+  if (!selectedDot) return;
+  selectedDot.path.dotMeshes[selectedDot.dotIdx].material.color.set(0x888888);
+  selectedDot = null;
+  document.getElementById('edit-hint').textContent = '영역을 클릭해 선택하세요';
+}
+
+// 점 삭제: 양쪽 선을 재연결
+function deleteDotFromPath(path, dotIdx) {
+  const dots = path.dotMeshes;
+  const segs = path.lines;
+
+  scene.remove(dots[dotIdx]); dots[dotIdx].geometry.dispose(); dots[dotIdx].material.dispose();
+
+  const toRemoveSegs = [];
+  if (dotIdx > 0)           toRemoveSegs.push(dotIdx - 1);
+  if (dotIdx < segs.length) toRemoveSegs.push(dotIdx);
+
+  // 중간 점이면 양쪽 연결
+  const newSeg = (dotIdx > 0 && dotIdx < dots.length - 1)
+    ? makeLineSeg(
+        { x: dots[dotIdx-1].position.x, y: dots[dotIdx-1].position.y - PATH_HEIGHT_OFFSET, z: dots[dotIdx-1].position.z },
+        { x: dots[dotIdx+1].position.x, y: dots[dotIdx+1].position.y - PATH_HEIGHT_OFFSET, z: dots[dotIdx+1].position.z },
+        false)
+    : null;
+
+  [...new Set(toRemoveSegs)].sort((a,b)=>b-a).forEach(i => {
+    scene.remove(segs[i]); segs[i].geometry.dispose(); segs.splice(i, 1);
+  });
+  dots.splice(dotIdx, 1);
+  path.points.splice(dotIdx, 1);
+  if (newSeg) segs.splice(Math.max(0, dotIdx - 1), 0, newSeg);
+
+  if (path.points.length < 1) removePath(path);
+  else savePathToServer(path);
+  selectedDot = null;
+  showToast('점이 삭제되었습니다.');
+}
+
+// 선택된 점에서 분기 시작 (선택 툴 → 길그리기 툴로 전환 후 시작)
+function startBranchFromDot(clickPt) {
+  if (!selectedDot) return;
+  const dot = selectedDot.path.dotMeshes[selectedDot.dotIdx];
+  dot.material.color.set(0x888888);
+  const startPt = new THREE.Vector3(dot.position.x, dot.position.y - PATH_HEIGHT_OFFSET, dot.position.z);
+  selectedDot = null;
+  setTool('path');
+  pathDrawing   = true;
+  pathPoints    = [startPt.clone()];
+  pathDotMeshes = [];
+  pathLines     = [];
+  // 클릭한 위치까지 첫 선분 즉시 추가 (pt가 있을 때만)
+  if (clickPt && clickPt.distanceTo(startPt) > PATH_DOT_R * 2) {
+    pathLines.push(makeLineSeg(startPt, clickPt, false));
+    pathPoints.push(clickPt.clone());
+    pathDotMeshes.push(makeDotMesh(clickPt));
+  }
+  document.getElementById('edit-hint').textContent = '클릭으로 점 찍기 | 마지막 점 재클릭으로 완성 | Esc 취소';
+  showToast('분기 시작 — 계속 클릭해서 선을 그으세요');
+}
+
+function startPathDraw() {
+  pathDrawing = true; pathPoints = []; pathDotMeshes = []; pathLines = [];
+  document.getElementById('edit-hint').textContent = '클릭으로 점 찍기 | 마지막 점 재클릭으로 완성 | Esc 취소';
+}
+function cancelPathDraw() {
+  pathDrawing = false;
+  pathPoints = [];
+  pathDotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); });
+  pathDotMeshes = [];
+  pathLines.forEach(l => { scene.remove(l); l.geometry.dispose(); });
+  pathLines = [];
+  if (pathPreviewLine) { scene.remove(pathPreviewLine); pathPreviewLine.geometry.dispose(); pathPreviewLine = null; }
+}
+function addPathPoint(pt) {
+  if (pathDrawing && pathPoints.length > 0) {
+    const last = pathPoints[pathPoints.length - 1];
+    if (pt.distanceTo(last) < PATH_DOT_R * 4) { finalizePath(); return; }
+    pathLines.push(makeLineSeg(last, pt, false));
+  } else {
+    pathDrawing = true;
+  }
+  pathPoints.push(pt.clone());
+  pathDotMeshes.push(makeDotMesh(pt));
+}
+function finalizePath() {
+  if (pathPoints.length < 2) { cancelPathDraw(); return; }
+  if (pathPreviewLine) { scene.remove(pathPreviewLine); pathPreviewLine.geometry.dispose(); pathPreviewLine = null; }
+  const id   = 'path_' + pathId++;
+  const path = { id, floor: currentFloor, points: pathPoints.map(p => p.toArray()), dotMeshes: [...pathDotMeshes], lines: [...pathLines] };
+  paths.push(path);
+  pathDrawing = false; pathPoints = []; pathDotMeshes = []; pathLines = [];
+  setPathVis();
+  savePathToServer(path);
+  showToast('✅ 길이 저장되었습니다.');
+  document.getElementById('edit-hint').textContent = '바닥을 클릭&드래그해 영역을 만드세요';
+}
+function setPathVis() {
+  paths.forEach(p => {
+    const show = editMode && p.floor === currentFloor;
+    p.dotMeshes && p.dotMeshes.forEach(m => { m.visible = show; });
+    p.lines     && p.lines.forEach(l => { l.visible = show; });
+  });
+}
+function removePath(path) {
+  path.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+  path.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+  paths.splice(paths.indexOf(path), 1);
+}
+function pathToText(path) {
+  // 형식: 점마다 한 줄, x y z (공백 구분)
+  return path.points.map(p => p[0].toFixed(4) + ' ' + p[1].toFixed(4) + ' ' + p[2].toFixed(4)).join('\n');
+}
+function textToPath(text, id) {
+  const lines  = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) return null;
+  const points = lines.map(l => l.trim().split(/\s+/).map(Number));
+  if (points.some(p => p.length !== 3 || p.some(isNaN))) return null;
+  return { id, points };
+}
+async function savePathToServer(path) {
+  try {
+    const res = await fetch('/api/line/' + currentFloor + '/' + encodeURIComponent(path.id), {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: pathToText(path),
+    });
+    if (!res.ok) console.warn('path save failed:', res.status);
+    else showToast('✅ 선이 저장되었습니다.');
+  } catch(e) { console.warn('path save error:', e); }
+}
+async function loadPathsForFloor(floor) {
+  [...paths].filter(p => p.floor === floor).forEach(p => removePath(p));
+  try {
+    const res = await fetch('/api/lines/' + floor);
+    if (!res.ok) return; // 404 등 에러면 조용히 스킵
+    const files = await res.json();
+    for (const fname of files) {
+      try {
+        const r = await fetch('/api/line/' + floor + '/' + encodeURIComponent(fname));
+        if (!r.ok) continue;
+        const data = textToPath(await r.text(), fname);
+        if (!data) continue;
+        const pts  = data.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+        const dots = pts.map(p => makeDotMesh(p));
+        const segs = [];
+        for (let i = 1; i < pts.length; i++) segs.push(makeLineSeg(pts[i-1], pts[i], false));
+        paths.push({ id: data.id, floor, points: data.points, dotMeshes: dots, lines: segs });
+      } catch(e) { /* 개별 파일 에러 무시 */ }
+    }
+    setPathVis();
+  } catch(e) { /* line API 없으면 무시 */ }
+}
+
+// 방 이동 드래그
+let moveZone = null;
+let moveZoneDragStart = null; // 드래그 시작 시 groundPt
+let moveZoneOrigin   = null;  // 드래그 시작 시 zone center
+let dragDot = null; // { path, dotIdx, mesh }
+
+function findDotAtPointer(e) {
+  rc.setFromCamera(ndc(e), camera);
+  for (const path of paths) {
+    if (!editMode || path.floor !== currentFloor) continue;
+    for (let i = 0; i < path.dotMeshes.length; i++) {
+      const hits = rc.intersectObject(path.dotMeshes[i], false);
+      if (hits.length > 0) return { path, dotIdx: i, mesh: path.dotMeshes[i] };
+    }
+  }
+  return null;
+}
+
+function updateDotAndLines(path, dotIdx, newPt) {
+  const mesh = path.dotMeshes[dotIdx];
+  mesh.position.set(newPt.x, newPt.y + PATH_HEIGHT_OFFSET, newPt.z);
+  path.points[dotIdx] = [newPt.x, newPt.y, newPt.z];
+
+  // 이전 선분 업데이트
+  if (dotIdx > 0) {
+    const prev = path.dotMeshes[dotIdx - 1].position;
+    const seg  = path.lines[dotIdx - 1];
+    seg.geometry.dispose();
+    seg.geometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(prev.x, prev.y, prev.z),
+      new THREE.Vector3(newPt.x, newPt.y + PATH_HEIGHT_OFFSET, newPt.z),
+    ]);
+  }
+  // 다음 선분 업데이트
+  if (dotIdx < path.dotMeshes.length - 1) {
+    const next = path.dotMeshes[dotIdx + 1].position;
+    const seg  = path.lines[dotIdx];
+    seg.geometry.dispose();
+    seg.geometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(newPt.x, newPt.y + PATH_HEIGHT_OFFSET, newPt.z),
+      new THREE.Vector3(next.x, next.y, next.z),
+    ]);
+  }
+}
+
+const FACE_CURSOR = {
+  px: 'ew-resize', nx: 'ew-resize',
+  py: 'ns-resize', ny: 'ns-resize',
+  pz: 'ns-resize', nz: 'ns-resize',
+};
+const BOX_H = 0.6;
+/* ════════════════════════════
+   MARKER SYSTEM
+════════════════════════════ */
+const markers = [];
+let   markerId = 1;
+
+const MARKER_COLOR     = 0xff3300;
+const MARKER_CONNECTED = 0x0077cc;
+const MARKER_R         = 0.18;
+
+let markerDrag = null; // { marker }
+let modalMarker = null;
+
+function markerMat(connected) {
+  return new THREE.MeshBasicMaterial({
+    color: connected ? MARKER_CONNECTED : MARKER_COLOR,
+    depthTest: false, depthWrite: false, transparent: true,
+  });
+}
+
+function makeMarkerMesh(pos, connected) {
+  const geo  = new THREE.SphereGeometry(MARKER_R, 12, 12);
+  const mesh = new THREE.Mesh(geo, markerMat(connected));
+  mesh.position.set(pos.x, pos.y + PATH_HEIGHT_OFFSET * 2, pos.z);
+  mesh.renderOrder = 1000;
+  scene.add(mesh);
+  return mesh;
+}
+
+function addMarker(pos, id, name, desc, tags, roomId, pathId) {
+  const mid  = id || ('m' + markerId++);
+  const connected = !!roomId;
+  const mesh = makeMarkerMesh(pos, connected);
+  const m = {
+    id: mid, floor: currentFloor,
+    pos: [pos.x, pos.y, pos.z],
+    name: name || '', desc: desc || '',
+    tags: tags || '', roomId: roomId || '',
+    pathId: pathId || '',
+    mesh, isNew: false,
+  };
+  markers.push(m);
+  return m;
+}
+
+function removeMarker(m) {
+  scene.remove(m.mesh); m.mesh.geometry.dispose(); m.mesh.material.dispose();
+  markers.splice(markers.indexOf(m), 1);
+}
+
+function setMarkerVis() {
+  markers.forEach(m => {
+    m.mesh.visible = editMode && m.floor === currentFloor;
+  });
+}
+
+function markerToText(m) {
+  return m.pos[0].toFixed(4) + ' ' + m.pos[1].toFixed(4) + ' ' + m.pos[2].toFixed(4) + '\n'
+    + (m.name   || '') + '\n'
+    + (m.desc   || '') + '\n'
+    + (m.tags   || '') + '\n'
+    + (m.roomId || '') + '\n'
+    + (m.pathId || '');
+}
+function textToMarker(text, id) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 1) return null;
+  const coords = lines[0].trim().split(/\s+/).map(Number);
+  if (coords.length !== 3 || coords.some(isNaN)) return null;
+  return {
+    id, pos: coords,
+    name: lines[1] || '', desc: lines[2] || '',
+    tags: lines[3] || '', roomId: lines[4] || '', pathId: lines[5] || '',
+  };
+}
+
+async function saveMarkerToServer(m) {
+  try {
+    await fetch('/api/marker/' + m.floor + '/' + encodeURIComponent(m.id), {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: markerToText(m),
+    });
+  } catch(e) { console.warn('marker save error:', e); }
+}
+async function deleteMarkerFromServer(m) {
+  try {
+    await fetch('/api/marker/' + m.floor + '/' + encodeURIComponent(m.id), { method: 'DELETE' });
+  } catch(e) {}
+}
+async function loadMarkersForFloor(floor) {
+  [...markers].filter(m => m.floor === floor).forEach(m => removeMarker(m));
+  try {
+    const res = await fetch('/api/markers/' + floor);
+    if (!res.ok) return;
+    const files = await res.json();
+    for (const fname of files) {
+      try {
+        const r = await fetch('/api/marker/' + floor + '/' + encodeURIComponent(fname));
+        if (!r.ok) continue;
+        const data = textToMarker(await r.text(), fname);
+        if (!data) continue;
+        const n = parseInt(data.id.replace('m',''));
+        if (!isNaN(n) && n >= markerId) markerId = n + 1;
+        const pos = new THREE.Vector3(...data.pos);
+        const savedFloor = currentFloor;
+        currentFloor = floor; // 임시로 층 설정
+        const mk = addMarker(pos, data.id, data.name, data.desc, data.tags, data.roomId, data.pathId || '');
+        currentFloor = savedFloor;
+      } catch(e) { console.warn('marker load error:', fname, e); }
+    }
+    setMarkerVis();
+  } catch(e) { /* marker API 없으면 무시 */ }
+}
+
+// 마커 모달 열기
+function openMarkerModal(m) {
+  modalMarker = m;
+  document.getElementById('mm-mid').textContent = '(' + m.id + ')';
+  document.getElementById('mm-name').value = m.name || '';
+  document.getElementById('mm-desc').value = m.desc || '';
+  document.getElementById('mm-tags').value = m.tags || '';
+  // 방 목록 채우기
+  const sel = document.getElementById('mm-room');
+  sel.innerHTML = '<option value="">-- 없음 --</option>';
+  zones.forEach(z => {
+    const opt = document.createElement('option');
+    opt.value = z.id; opt.textContent = z.name || z.id;
+    if (z.id === m.roomId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  // 선 목록
+  const selPath = document.getElementById('mm-path');
+  selPath.innerHTML = '<option value="">-- 없음 --</option>';
+  paths.filter(p => p.floor === currentFloor).forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id; opt.textContent = p.id;
+    if (p.id === m.pathId) opt.selected = true;
+    selPath.appendChild(opt);
+  });
+
+  document.getElementById('mm-save').textContent = m.isNew ? '만들기' : '수정';
+  m.isNew = false;
+  document.getElementById('marker-modal').classList.add('show');
+}
+function closeMarkerModal() {
+  document.getElementById('marker-modal').classList.remove('show');
+  modalMarker = null;
+}
+
+// 포인터에서 선(path) 찾기
+function findPathAtPointer(e) {
+  rc.setFromCamera(ndc(e), camera);
+  for (const path of paths) {
+    if (path.floor !== currentFloor) continue;
+    for (const seg of path.lines) {
+      const hits = rc.intersectObject(seg, false);
+      if (hits.length > 0) return path;
+    }
+    for (const dot of path.dotMeshes) {
+      const hits = rc.intersectObject(dot, false);
+      if (hits.length > 0) return path;
+    }
+  }
+  return null;
+}
+
+let selectedPath = null; // 현재 선택된 선
+
+function selectPath(path) {
+  // 선택 표시 (점 색 변경)
+  if (selectedPath && selectedPath !== path) deselectPath();
+  selectedPath = path;
+  path.dotMeshes.forEach(m => { m.material.color.set(0xffcc00); });
+}
+function deselectPath() {
+  if (!selectedPath) return;
+  selectedPath.dotMeshes.forEach(m => { m.material.color.set(0x888888); });
+  selectedPath = null;
+}
+async function deleteSelectedPath() {
+  if (!selectedPath) return;
+  try {
+    await fetch('/api/line/' + currentFloor + '/' + encodeURIComponent(selectedPath.id), { method: 'DELETE' });
+  } catch(e) {}
+  removePath(selectedPath);
+  selectedPath = null;
+  showToast('🗑 선이 삭제되었습니다.');
+}
+// 마커-선 연결 툴 상태
+let connectStep   = 0;  // 0=마커선택, 1=선선택
+let connectMarker = null;
+
+function startConnect() {
+  connectStep   = 0;
+  connectMarker = null;
+  document.getElementById('edit-hint').textContent = '연결할 마커를 클릭하세요';
+}
+function cancelConnect() {
+  if (connectMarker) {
+    connectMarker.mesh.material.color.set(connectMarker.roomId ? MARKER_CONNECTED : MARKER_COLOR);
+  }
+  connectStep = 0; connectMarker = null;
+}
+
+let connectIsFlr = false; // 층이동 마커인지 여부
+
+function handleConnectClick(e) {
+  if (connectStep === 0) {
+    // 일반 마커 먼저, 없으면 층이동 마커
+    let m = findMarkerAtPointer(e);
+    let isFm = false;
+    if (!m) {
+      m = findFlrMarkerAtPointer(e);
+      isFm = !!m;
+    }
+    if (!m) { showToast('마커 또는 층이동 마커를 클릭하세요'); return; }
+    connectMarker = m;
+    connectIsFlr  = isFm;
+    connectStep   = 1;
+    m.mesh.material.color.set(0xffcc00);
+    document.getElementById('edit-hint').textContent = '연결할 선을 클릭하세요 (Esc 취소)';
+    showToast((isFm ? '층이동 마커' : '마커') + ' 선택됨: ' + (m.name || m.id));
+  } else {
+    const p = findPathAtPointer(e);
+    if (!p) { showToast('선을 클릭하세요'); return; }
+    connectMarker.pathId = p.id;
+    if (connectIsFlr) {
+      connectMarker.mesh.material.color.set(FLR_MARKER_COLOR);
+      saveFlrMarkerToServer(connectMarker);
+    } else {
+      connectMarker.mesh.material.color.set(connectMarker.roomId ? MARKER_CONNECTED : MARKER_COLOR);
+      saveMarkerToServer(connectMarker);
+    }
+    showToast(`✅ "${connectMarker.name || connectMarker.id}" → 선 "${p.id}" 연결 완료`);
+    connectStep = 0; connectMarker = null; connectIsFlr = false;
+    document.getElementById('edit-hint').textContent = '연결할 마커를 클릭하세요';
+  }
+}
+
+function findMarkerAtPointer(e) {
+  rc.setFromCamera(ndc(e), camera);
+  for (const m of markers) {
+    if (m.floor !== currentFloor) continue;
+    const hits = rc.intersectObject(m.mesh, false);
+    if (hits.length > 0) return m;
+  }
+  return null;
+}
+
+
+
+/* ════════════════════════════
+   FLOOR MARKER SYSTEM (층 이동 마커)
+════════════════════════════ */
+const flrMarkers = [];
+let   flrMarkerId = 1;
+let   modalFlrMarker = null;
+
+const FLR_MARKER_COLOR = 0x9900cc;
+const FLR_MARKER_R     = 0.16;
+
+function flrMarkerMat() {
+  return new THREE.MeshBasicMaterial({ color: FLR_MARKER_COLOR, depthTest: false, depthWrite: false, transparent: true });
+}
+function makeFlrMarkerMesh(pos) {
+  // 마름모 형태 (위/아래 뾰족)
+  const geo  = new THREE.OctahedronGeometry(FLR_MARKER_R, 0);
+  const mesh = new THREE.Mesh(geo, flrMarkerMat());
+  mesh.position.set(pos.x, pos.y + PATH_HEIGHT_OFFSET * 2, pos.z);
+  mesh.renderOrder = 1000;
+  scene.add(mesh);
+  return mesh;
+}
+
+function addFlrMarker(pos, id, name, desc, pathId, targetFloor, pairId) {
+  const fid = id || ('fm' + flrMarkerId++);
+  const mesh = makeFlrMarkerMesh(pos);
+  const m = { id: fid, floor: currentFloor, pos: [pos.x, pos.y, pos.z],
+    name: name||'', desc: desc||'', pathId: pathId||'',
+    targetFloor: targetFloor||'', pairId: pairId||'', mesh };
+  flrMarkers.push(m);
+  return m;
+}
+function removeFlrMarker(m) {
+  scene.remove(m.mesh); m.mesh.geometry.dispose(); m.mesh.material.dispose();
+  flrMarkers.splice(flrMarkers.indexOf(m), 1);
+}
+function setFlrMarkerVis() {
+  flrMarkers.forEach(m => { m.mesh.visible = editMode && m.floor === currentFloor; });
+}
+function flrMarkerToText(m) {
+  return m.pos[0].toFixed(4)+' '+m.pos[1].toFixed(4)+' '+m.pos[2].toFixed(4)+'\n'
+    +(m.name||'')+'\n'+(m.desc||'')+'\n'+(m.pathId||'')+'\n'
+    +(m.targetFloor||'')+'\n'+(m.pairId||'');
+}
+function textToFlrMarker(text, id) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 1) return null;
+  const coords = lines[0].trim().split(/\s+/).map(Number);
+  if (coords.length!==3||coords.some(isNaN)) return null;
+  return { id, pos: coords, name: lines[1]||'', desc: lines[2]||'',
+    pathId: lines[3]||'', targetFloor: lines[4]||'', pairId: lines[5]||'' };
+}
+async function saveFlrMarkerToServer(m) {
+  try {
+    await fetch('/api/flr_marker/'+m.floor+'/'+encodeURIComponent(m.id), {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:flrMarkerToText(m)
+    });
+  } catch(e) { console.warn('flrmarker save error:', e); }
+}
+async function deleteFlrMarkerFromServer(m) {
+  try { await fetch('/api/flr_marker/'+m.floor+'/'+encodeURIComponent(m.id),{method:'DELETE'}); } catch(e){}
+}
+async function loadFlrMarkersForFloor(floor) {
+  [...flrMarkers].filter(m=>m.floor===floor).forEach(m=>removeFlrMarker(m));
+  try {
+    const res = await fetch('/api/flr_markers/'+floor);
+    if (!res.ok) return;
+    const files = await res.json();
+    for (const fname of files) {
+      const r = await fetch('/api/flr_marker/'+floor+'/'+encodeURIComponent(fname));
+      if (!r.ok) continue;
+      const data = textToFlrMarker(await r.text(), fname);
+      if (!data) continue;
+      const n = parseInt(data.id.replace('fm',''));
+      if (!isNaN(n)&&n>=flrMarkerId) flrMarkerId=n+1;
+      const savedFloor = currentFloor;
+      currentFloor = floor;
+      addFlrMarker(new THREE.Vector3(...data.pos), data.id, data.name, data.desc, data.pathId, data.targetFloor, data.pairId);
+      currentFloor = savedFloor;
+    }
+    setFlrMarkerVis();
+  } catch(e) {}
+}
+
+function findFlrMarkerAtPointer(e) {
+  rc.setFromCamera(ndc(e), camera);
+  for (const m of flrMarkers) {
+    if (m.floor!==currentFloor) continue;
+    if (rc.intersectObject(m.mesh,false).length>0) return m;
+  }
+  return null;
+}
+
+function openFlrMarkerModal(m) {
+  modalFlrMarker = m;
+  document.getElementById('fm-mid').textContent = '('+m.id+')';
+  document.getElementById('fm-name').value = m.name||'';
+  document.getElementById('fm-desc').value = m.desc||'';
+  const selPath = document.getElementById('fm-path');
+  selPath.innerHTML = '<option value="">-- 없음 --</option>';
+  paths.filter(p=>p.floor===currentFloor).forEach(p=>{
+    const opt=document.createElement('option'); opt.value=p.id; opt.textContent=p.id;
+    if(p.id===m.pathId) opt.selected=true; selPath.appendChild(opt);
+  });
+  document.getElementById('fm-save').textContent = m.isNew?'만들기':'수정';
+  m.isNew = false;
+  document.getElementById('flrmarker-modal').classList.add('show');
+}
+function closeFlrMarkerModal() {
+  document.getElementById('flrmarker-modal').classList.remove('show');
+  modalFlrMarker = null;
+}
+
+
+
+function zoneMat(color) {
+  return new THREE.MeshBasicMaterial({
+    color: new THREE.Color(color || '#0077cc'),
+    transparent: true, opacity: 0.22,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+}
+function zoneSelMat() {
+  return new THREE.MeshBasicMaterial({
+    color: 0xe05c00, transparent: true, opacity: 0.30,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+}
+function lineMat(color) {
+  return new THREE.LineDashedMaterial({
+    color: new THREE.Color(color || '#0055aa'), dashSize: 0.15, gapSize: 0.08,
+  });
+}
+
+function buildZoneMesh(box, color) {
+  const sz  = box.getSize(new THREE.Vector3());
+  sz.x = Math.max(sz.x, 0.05); sz.y = Math.max(sz.y, 0.05); sz.z = Math.max(sz.z, 0.05);
+  const ctr = box.getCenter(new THREE.Vector3());
+  const geo  = new THREE.BoxGeometry(sz.x, sz.y, sz.z);
+  const mesh = new THREE.Mesh(geo, zoneMat(color));
+  mesh.position.copy(ctr); mesh.renderOrder = 2;
+  const line = new THREE.LineSegments(new THREE.EdgesGeometry(geo), lineMat(color));
+  line.computeLineDistances(); line.position.copy(ctr); line.renderOrder = 3;
+  return { mesh, line };
+}
+
+function addZone(box, id, name, desc, tags, color) {
+  const { mesh, line } = buildZoneMesh(box, color);
+  const z = {
+    id:    id || ('z' + zid++),
+    floor: currentFloor,
+    name:  name  || '',
+    desc:  desc  || '',
+    tags:  tags  || '',
+    color: color || '#0077cc',
+    box:   box.clone(), mesh, line,
+  };
+  mesh.visible = true;
+  const initMat = zoneMat(color);
+  initMat.opacity = 0.07;
+  mesh.material = initMat;
+  line.visible = false;
+  scene.add(mesh); scene.add(line);
+  zones.push(z);
+  return z;
+}
+
+function rebuildZone(z) {
+  scene.remove(z.mesh); z.mesh.geometry.dispose(); z.mesh.material.dispose();
+  scene.remove(z.line); z.line.geometry.dispose(); z.line.material.dispose();
+  const { mesh, line } = buildZoneMesh(z.box, z.color);
+  z.mesh = mesh; z.line = line;
+  mesh.visible = editMode; line.visible = editMode;
+  scene.add(mesh); scene.add(line);
+  if (z === selZ) z.mesh.material = zoneSelMat();
+}
+
+function removeZone(z) {
+  scene.remove(z.mesh); z.mesh.geometry.dispose(); z.mesh.material.dispose();
+  scene.remove(z.line); z.line.geometry.dispose(); z.line.material.dispose();
+  zones.splice(zones.indexOf(z), 1);
+}
+
+function setVis() {
+  const navActive = secondaryFloor !== null;
+  const navFloors = navActive ? secondaryModel.map(e => e.floor) : [];
+  console.log(`setVis: zones=${zones.length}, navFloors=${navFloors}, currentFloor=${currentFloor}`);
+
+  zones.forEach(z => {
+    const show = navActive
+      ? navFloors.includes(z.floor)
+      : z.floor === currentFloor;
+
+    z.mesh.visible = show;
+    z.line.visible = show && editMode;
+
+    if (!show) return;
+
+    if (navActive) {
+      const entry = secondaryModel.find(e => e.floor === z.floor);
+      if (entry) {
+        const cy = z.box.getCenter(new THREE.Vector3()).y;
+        z.mesh.position.y = cy + entry.yOff;
+        z.line.position.y = cy + entry.yOff;
+      }
+    } else {
+      const cy = z.box.getCenter(new THREE.Vector3()).y;
+      z.mesh.position.y = cy;
+      z.line.position.y = cy;
+    }
+
+    if (z === selZ) {
+      z.mesh.material = zoneSelMat();
+    } else {
+      const mat = zoneMat(z.color);
+      mat.opacity = editMode ? 0.22 : 0.07;
+      z.mesh.material = mat;
+    }
+  });
+}
+
+/* ════════════════════════════
+   STATE
+════════════════════════════ */
+let editMode = false, tool = 'draw', selZ = null, modalZ = null;
+let drawing  = false, dA = null, dB = null, dPrev = null;
+let resizing = false, rZ = null, rFace = null, rMouse = null, rBox = null;
+let rResizePlane = null, rStartWorld = null;
+let pDown = null, pMoved = false;
+
+/* ════════════════════════════
+   EDIT MODE
+════════════════════════════ */
+let _darkMode = false;
+
+function toggleDarkMode() {
+  _darkMode = !_darkMode;
+  document.body.classList.toggle('dark', _darkMode);
+
+  // 로고 이미지 전환
+  const logo = document.getElementById('logo-img');
+  if (logo) logo.src = _darkMode ? 'image/Logo_dark.png' : 'image/Logo_light.png';
+
+  // 테마 토글 필 버튼 상태 업데이트 (하드코딩 — var() 안 먹음)
+  const lightBtn = document.getElementById('theme-light-btn');
+  const darkBtn  = document.getElementById('theme-dark-btn');
+  const mLightBtn = document.getElementById('mobile-theme-light-btn');
+  const mDarkBtn  = document.getElementById('mobile-theme-dark-btn');
+  [lightBtn, mLightBtn].forEach(b => { if (!b) return;
+    b.style.background = _darkMode ? 'transparent' : '#ffffff';
+    b.style.color      = _darkMode ? '#8898bb'     : '#1a2340';
+  });
+  [darkBtn, mDarkBtn].forEach(b => { if (!b) return;
+    b.style.background = _darkMode ? '#1e2436'     : 'transparent';
+    b.style.color      = _darkMode ? '#e4eaf8'     : '#6b7a9f';
+  });
+
+  // Three.js 배경색 부드럽게 전환
+  const fromColor = new THREE.Color(scene.background);
+  const toColor   = new THREE.Color(_darkMode ? 0x0d1117 : 0xe8edf5);
+  const startTime = performance.now();
+  const DURATION  = 500;
+  function animateBg() {
+    const t = Math.min((performance.now() - startTime) / DURATION, 1);
+    const eased = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // ease in-out quad
+    const cur = fromColor.clone().lerp(toColor, eased);
+    scene.background = cur;
+    if (scene.fog) scene.fog.color.copy(cur);
+    renderer.setClearColor(cur);
+    if (t < 1) requestAnimationFrame(animateBg);
+  }
+  animateBg();
+
+  // 모델 색상 부드럽게 전환
+  const targetModelColor = new THREE.Color(getModelColor());
+  function animateModels(model) {
+    if (!model) return;
+    const meshes = [];
+    model.traverse(n => { if (n.isMesh) meshes.push({ mesh: n, from: n.material.color.clone() }); });
+    const t0 = performance.now();
+    function tick() {
+      const t = Math.min((performance.now() - t0) / DURATION, 1);
+      const eased = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      meshes.forEach(({ mesh, from }) => {
+        mesh.material.color.copy(from).lerp(targetModelColor, eased);
+      });
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    tick();
+  }
+  if (currentModel) animateModels(currentModel);
+  if (Array.isArray(secondaryModel)) secondaryModel.forEach(e => animateModels(e.model));
+}
+
+// ── 앱 메뉴 ──────────────────────────────────────
+let _menuOpen = false;
+let _lowSpec  = false;
+
+function toggleMenu() {
+  const menu = document.getElementById('app-menu');
+  const isMobile = window.innerWidth <= 600;
+
+  if (_menuOpen) {
+    menu.style.opacity = '0';
+    menu.style.transform = 'translateY(-8px) scale(.97)';
+    setTimeout(() => { menu.style.display = 'none'; }, 200);
+    _menuOpen = false;
+  } else {
+    menu.style.display = 'block';
+    menu.style.opacity = '0';
+    menu.style.transform = 'translateY(-8px) scale(.97)';
+    // CSS @media가 위치를 처리하므로 JS에서 별도 위치 설정 불필요
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      menu.style.opacity = '1';
+      menu.style.transform = 'translateY(0) scale(1)';
+    }));
+    _menuOpen = true;
+  }
+}
+
+let _justOpenedPopup = false;
+
+// 메뉴 외부 클릭 시 닫기
+document.addEventListener('click', e => {
+  // 메뉴 닫기
+  if (_menuOpen && !e.target.closest('#app-menu') && !e.target.closest('#menu-btn') && !e.target.closest('#mobile-menu-btn')) {
+    const menu = document.getElementById('app-menu');
+    menu.style.opacity = '0';
+    menu.style.transform = 'translateY(-8px) scale(.97)';
+    setTimeout(() => { menu.style.display = 'none'; }, 180);
+    _menuOpen = false;
+  }
+  // 모바일: 방 팝업 외부 클릭 시 닫기 (방금 열린 경우 제외)
+  if (window.innerWidth <= 600) {
+    if (_justOpenedPopup) { _justOpenedPopup = false; return; }
+    const popup = document.getElementById('room-popup');
+    if (popup && popup.classList.contains('show') && !e.target.closest('#room-popup')) {
+      closePopup();
+    }
+  }
+});
+
+function openAppInfo() {
+  toggleMenu();
+  const modal = document.getElementById('appinfo-modal');
+  const box   = modal.querySelector('.appinfo-box');
+  modal.style.opacity = '0';
+  box.style.transform = 'translateY(12px) scale(.97)';
+  box.style.transition = 'none';
+  modal.style.transition = 'none';
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    box.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
+    modal.style.transition = 'opacity .22s';
+    modal.style.opacity = '1';
+    box.style.transform = 'translateY(0) scale(1)';
+  }));
+}
+
+function closeAppInfo() {
+  const modal = document.getElementById('appinfo-modal');
+  const box   = modal.querySelector('.appinfo-box');
+  modal.style.opacity = '0';
+  box.style.transform = 'translateY(12px) scale(.97)';
+  setTimeout(() => { modal.style.display = 'none'; }, 220);
+}
+
+function toggleLowSpec() {
+  _lowSpec = !_lowSpec;
+  document.body.classList.toggle('lowspec', _lowSpec);
+  document.getElementById('lowspec-btn').classList.toggle('active', _lowSpec);
+  document.getElementById('lowspec-btn').textContent = _lowSpec ? '⚡ 일반 모드' : '🐢 저사양 모드';
+
+  if (_lowSpec) {
+    renderer.setPixelRatio(1);
+    renderer.shadowMap.enabled = false;
+    renderer.antialias = false;
+    scene.fog = null;
+  } else {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    if (!scene.fog) scene.fog = new THREE.FogExp2(0xe8edf5, 0.008);
+  }
+
+  // 모델 재질 강제 업데이트
+  scene.traverse(n => {
+    if (n.isMesh && n.material) {
+      n.material.needsUpdate = true;
+    }
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  toggleMenu();
+}
+
+// ── 앱 메뉴 끝 ───────────────────────────────────
+function openGuide() {
+  toggleMenu();
+  const modal = document.getElementById('guide-modal');
+  const box   = modal.querySelector('.guide-box');
+  modal.style.opacity = '0';
+  box.style.transform = 'translateY(12px) scale(.97)';
+  box.style.transition = 'none';
+  modal.style.transition = 'none';
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    box.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
+    modal.style.transition = 'opacity .22s';
+    modal.style.opacity = '1';
+    box.style.transform = 'translateY(0) scale(1)';
+  }));
+}
+
+function closeGuide() {
+  const modal = document.getElementById('guide-modal');
+  const box   = modal.querySelector('.guide-box');
+  modal.style.opacity = '0';
+  box.style.transform = 'translateY(12px) scale(.97)';
+  setTimeout(() => { modal.style.display = 'none'; }, 220);
+}
+
+// ── 방 검색 ──────────────────────────────────────
+let _allRooms = []; // { id, name, desc, tags, floor }
+
+async function openSearch() {
+  // 모든 층의 방 로드
+  _allRooms = [];
+  for (const f of [1,2,3,4]) {
+    try {
+      const res = await fetch('/api/rooms/' + f);
+      if (!res.ok) continue;
+      const files = await res.json();
+      for (const fname of files) {
+        const r = await fetch('/api/room/' + f + '/' + encodeURIComponent(fname));
+        if (!r.ok) continue;
+        const lines = (await r.text()).split('\n');
+        _allRooms.push({
+          id: fname, floor: f,
+          name: lines[1] || fname,
+          desc: lines[2] || '',
+          tags: lines[3] || '',
+        });
+      }
+    } catch(e) {}
+  }
+
+  const modal = document.getElementById('search-modal');
+  const box   = modal.querySelector('.search-box');
+  modal.style.opacity = '0';
+  box.style.transform = 'translateY(-12px) scale(.97)';
+  box.style.transition = 'none';
+  modal.style.transition = 'none';
+  modal.style.display = 'flex';
+  document.getElementById('search-input').value = '';
+  renderSearchResults();
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    box.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
+    modal.style.transition = 'opacity .22s';
+    modal.style.opacity = '1';
+    box.style.transform = 'translateY(0) scale(1)';
+    document.getElementById('search-input').focus();
+  }));
+}
+
+function closeSearch() {
+  const modal = document.getElementById('search-modal');
+  const box   = modal.querySelector('.search-box');
+  modal.style.opacity = '0';
+  box.style.transform = 'translateY(-12px) scale(.97)';
+  setTimeout(() => { modal.style.display = 'none'; }, 220);
+}
+
+function renderSearchResults() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const list = q
+    ? _allRooms.filter(r =>
+        r.name.toLowerCase().includes(q) ||
+        r.tags.toLowerCase().includes(q) ||
+        r.desc.toLowerCase().includes(q))
+    : _allRooms;
+
+  const el = document.getElementById('search-results');
+  if (list.length === 0) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:#999;font-size:.88rem">검색 결과가 없어요</div>';
+    return;
+  }
+  el.innerHTML = list.map(r => `
+    <div onclick="goToRoom('${r.id}',${r.floor})" style="padding:12px 16px;border-radius:10px;cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:12px"
+      onmouseenter="this.style.background='rgba(0,119,204,.06)'" onmouseleave="this.style.background='none'">
+      <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,119,204,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;font-weight:700;color:var(--accent)">${r.floor}F</div>
+      <div>
+        <div style="font-weight:600;color:#1a2233;font-size:.92rem">${r.name || r.id}</div>
+        ${r.tags ? `<div style="font-size:.75rem;color:#888;margin-top:2px">${r.tags}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function goToRoom(id, floor) {
+  closeSearch();
+  const doOpen = () => {
+    const z = zones.find(z => z.id === id && z.floor === floor)
+           || zones.find(z => z.id === id);
+    if (z) {
+      const center = z.box.getCenter(new THREE.Vector3());
+      center.project(camera);
+      const sx = (center.x * 0.5 + 0.5) * window.innerWidth;
+      const sy = (-center.y * 0.5 + 0.5) * window.innerHeight;
+      showPopup(z, sx, sy);
+      startBlink(z); // z.id 아닌 zone 객체 전달
+    }
+  };
+
+  if (floor !== currentFloor) {
+    switchFloor(floor);
+    let tries = 0;
+    const wait = setInterval(() => {
+      tries++;
+      console.log(`goToRoom wait: tries=${tries}, slideAnim=${!!slideAnim}, currentFloor=${currentFloor}, target=${floor}`);
+      if ((!slideAnim && currentFloor === floor) || tries > 50) {
+        clearInterval(wait);
+        console.log('goToRoom: interval cleared, opening popup');
+        if (currentFloor === floor) doOpen();
+      }
+    }, 100);
+  } else {
+    doOpen();
+  }
+}
+// ── 방 검색 끝 ───────────────────────────────────
+
+window.openGuide     = openGuide;
+window.closeGuide    = closeGuide;
+window.openSearch    = openSearch;
+window.closeSearch   = closeSearch;
+window.renderSearchResults = renderSearchResults;
+window.goToRoom      = goToRoom;
+window.openAppInfo   = openAppInfo;
+window.closeAppInfo  = closeAppInfo;
+window.toggleLowSpec = toggleLowSpec;
+window.toggleMenu    = toggleMenu;
+window.toggleDarkMode = toggleDarkMode;
+
+// 버튼 이벤트 등록 (onclick 대신 JS로)
+document.getElementById('menu-btn').addEventListener('click', () => {
+  console.log('menu-btn clicked, toggleMenu=', typeof toggleMenu);
+  toggleMenu();
+});
+document.getElementById('mobile-menu-btn').addEventListener('click', toggleMenu);
+document.getElementById('mobile-menu-close').addEventListener('click', toggleMenu);
+document.getElementById('mobile-theme-light-btn').addEventListener('click', () => { if (_darkMode) toggleDarkMode(); });
+document.getElementById('mobile-theme-dark-btn').addEventListener('click', () => { if (!_darkMode) toggleDarkMode(); });
+document.getElementById('search-btn').addEventListener('click', () => {
+  console.log('search-btn clicked, openSearch=', typeof openSearch);
+  openSearch();
+});
+document.getElementById('theme-light-btn').addEventListener('click', () => { if (_darkMode) toggleDarkMode(); });
+document.getElementById('theme-dark-btn').addEventListener('click', () => { if (!_darkMode) toggleDarkMode(); });
+
+const EDIT_PASSWORD = 'jochm_ap12345@';
+let _editUnlocked = false;
+
+function showPasswordPrompt() {
+  if (_editUnlocked) { toggleEdit(); return; }
+  const modal = document.getElementById('pw-modal');
+  const input = document.getElementById('pw-input');
+  const error = document.getElementById('pw-error');
+  const box   = modal.querySelector('.pw-box');
+  input.value = '';
+  error.style.display = 'none';
+  // 초기 상태 먼저 설정 후 display 변경
+  modal.style.opacity = '0';
+  box.style.transform = 'translateY(12px) scale(.97)';
+  box.style.transition = 'none';
+  modal.style.transition = 'none';
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    box.style.transition = 'transform .22s cubic-bezier(.4,0,.2,1)';
+    modal.style.transition = 'opacity .22s';
+    modal.style.opacity = '1';
+    box.style.transform = 'translateY(0) scale(1)';
+  }));
+  setTimeout(() => input.focus(), 80);
+
+  const ok = () => {
+    if (input.value === EDIT_PASSWORD) {
+      _editUnlocked = true;
+      const box = modal.querySelector('.pw-box');
+      modal.style.opacity = '0';
+      box.style.transform = 'translateY(12px) scale(.97)';
+      setTimeout(() => { modal.style.display = 'none'; }, 220);
+      cleanup();
+      setTimeout(() => toggleEdit(), 220);
+    } else {
+      error.style.display = 'block';
+      input.value = '';
+      input.focus();
+    }
+  };
+  const cancel = () => {
+    modal.style.opacity = '0';
+    box.style.transform = 'translateY(12px) scale(.97)';
+    setTimeout(() => { modal.style.display = 'none'; }, 220);
+    cleanup();
+  };
+  const onKey = e => { if (e.key === 'Enter') ok(); if (e.key === 'Escape') cancel(); };
+
+  document.getElementById('pw-ok').onclick = ok;
+  document.getElementById('pw-cancel').onclick = cancel;
+  input.addEventListener('keydown', onKey);
+
+  function cleanup() {
+    document.getElementById('pw-ok').onclick = null;
+    document.getElementById('pw-cancel').onclick = null;
+    input.removeEventListener('keydown', onKey);
+  }
+}
+
+function toggleEdit() {
+  editMode = !editMode;
+  document.getElementById('hdr').classList.toggle('edit-mode', editMode);
+  document.getElementById('edit-banner').classList.toggle('show', editMode);
+  document.getElementById('edit-toolbar').classList.toggle('show', editMode);
+  if (!editMode) { cancelDraw(); cancelPathDraw(); selZ = null; closePopup(); deselectPath(); }
+  setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
+  renderer.domElement.style.cursor = editMode ? 'crosshair' : 'default';
+  orbit.mouseButtons = editMode
+    ? { LEFT: THREE.MOUSE.PAN,    MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }
+    : { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
+}
+
+window.setTool = function (t) {
+  if (tool === 'path' && t !== 'path') cancelPathDraw();
+  if (tool === 'connect' && t !== 'connect') cancelConnect();
+  tool = t;
+  if (t === 'connect') startConnect();
+  document.getElementById('btn-draw').classList.toggle('active',   t === 'draw');
+  document.getElementById('btn-sel').classList.toggle('active',    t === 'select');
+  document.getElementById('btn-resize').classList.toggle('active',    t === 'resize');
+  document.getElementById('btn-path').classList.toggle('active',      t === 'path');
+  document.getElementById('btn-marker').classList.toggle('active',    t === 'marker');
+  document.getElementById('btn-flrmarker').classList.toggle('active', t === 'flrmarker');
+  document.getElementById('btn-move').classList.toggle('active',      t === 'move');
+  document.getElementById('btn-connect').classList.toggle('active',   t === 'connect');
+  const hints = {
+    draw:      '바닥을 클릭&드래그해 영역을 만드세요',
+    select:    '영역을 클릭해 선택하세요',
+    resize:    '선택 후 면을 드래그해 크기를 조절하세요',
+    move:      '방을 클릭&드래그해 이동하세요',
+    path:      '클릭으로 점 찍기 | 마지막 점 재클릭으로 완성 | Esc 취소',
+    marker:    '바닥을 클릭해 마커를 찍으세요',
+    flrmarker: '바닥을 클릭해 층 이동 마커를 찍으세요',
+    connect:   connectStep === 0 ? '연결할 마커를 클릭하세요' : '연결할 선을 클릭하세요',
+  };
+  document.getElementById('edit-hint').textContent = hints[t] || '';
+};
+
+/* ════════════════════════════
+   DRAW
+════════════════════════════ */
+const PREV_MAT = new THREE.MeshBasicMaterial({
+  color: 0x0099ff, transparent: true, opacity: 0.25, side: THREE.DoubleSide, depthWrite: false,
+});
+
+function startDraw(e) {
+  const pt = groundPt(e); if (!pt) return;
+  dA = pt.clone(); drawing = true;
+  dPrev = new THREE.Mesh(new THREE.BoxGeometry(0.01, BOX_H, 0.01), PREV_MAT);
+  dPrev.position.set(pt.x, pt.y + BOX_H / 2, pt.z); dPrev.renderOrder = 2;
+  scene.add(dPrev);
+  orbit.enabled = false;
+}
+function moveDraw(e) {
+  if (!drawing || !dPrev) return;
+  const pt = groundPt(e); if (!pt) return; dB = pt.clone();
+  const w    = Math.max(Math.abs(dB.x - dA.x), 0.05);
+  const d    = Math.max(Math.abs(dB.z - dA.z), 0.05);
+  const baseY = dA.y;
+  dPrev.geometry.dispose();
+  dPrev.geometry = new THREE.BoxGeometry(w, BOX_H, d);
+  dPrev.position.set((dA.x + dB.x) / 2, baseY + BOX_H / 2, (dA.z + dB.z) / 2);
+}
+function endDraw() {
+  if (!drawing || !dPrev) { cancelDraw(); return; }
+  scene.remove(dPrev); dPrev.geometry.dispose(); dPrev = null; drawing = false;
+  if (dB && Math.hypot(dB.x - dA.x, dB.z - dA.z) > 0.1) {
+    const baseY = dA.y;
+    const box = new THREE.Box3(
+      new THREE.Vector3(Math.min(dA.x, dB.x), baseY,          Math.min(dA.z, dB.z)),
+      new THREE.Vector3(Math.max(dA.x, dB.x), baseY + BOX_H,  Math.max(dA.z, dB.z))
+    );
+    const z = addZone(box); selZ = z; setVis();
+    z.mesh.material = zoneSelMat();
+    z.isNew = true;
+    openModal(z);
+  }
+  dA = null; dB = null; orbit.enabled = true;
+}
+function cancelDraw() {
+  if (dPrev) { scene.remove(dPrev); dPrev.geometry.dispose(); dPrev = null; }
+  drawing = false; dA = null; dB = null; orbit.enabled = true;
+}
+
+/* ════════════════════════════
+   RESIZE
+════════════════════════════ */
+function detectFace(z, e) {
+  rc.setFromCamera(ndc(e), camera);
+  const hits = rc.intersectObject(z.mesh, false);
+  if (!hits.length) return null;
+  const n = hits[0].face.normal.clone().transformDirection(z.mesh.matrixWorld);
+  const dirs = [
+    { name: 'px', v: new THREE.Vector3( 1, 0, 0) },
+    { name: 'nx', v: new THREE.Vector3(-1, 0, 0) },
+    { name: 'py', v: new THREE.Vector3( 0, 1, 0) },
+    { name: 'ny', v: new THREE.Vector3( 0,-1, 0) },
+    { name: 'pz', v: new THREE.Vector3( 0, 0, 1) },
+    { name: 'nz', v: new THREE.Vector3( 0, 0,-1) },
+  ];
+  return dirs.reduce((b, f) => { const d = n.dot(f.v); return d > b.d ? { name: f.name, d } : b; }, { name: null, d: -2 }).name;
+}
+function startResize(z, face, e) {
+  pushUndo(`크기 조절 전 (${z.name || z.id})`);
+  resizing = true; rZ = z; rFace = face;
+  rMouse = { x: e.clientX, y: e.clientY };
+  rBox = z.box.clone();
+  orbit.enabled = false;
+
+  // 시작 시점의 월드 좌표 기록 (face에 따라 평면 선택)
+  rc.setFromCamera(ndc(e), camera);
+  const isY = rFace === 'py' || rFace === 'ny';
+  const isX = rFace === 'px' || rFace === 'nx';
+  // X/Z 면은 XZ 평면(Y=box center), Y 면은 XZ 평면(Y=face)
+  const ctr = z.box.getCenter(new THREE.Vector3());
+  const planeY = isY
+    ? (rFace === 'py' ? z.box.max.y : z.box.min.y)
+    : ctr.y;
+  rResizePlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY);
+  rStartWorld  = new THREE.Vector3();
+  rc.ray.intersectPlane(rResizePlane, rStartWorld);
+}
+
+function moveResize(e) {
+  if (!resizing) return;
+  rc.setFromCamera(ndc(e), camera);
+  const cur = new THREE.Vector3();
+  if (!rc.ray.intersectPlane(rResizePlane, cur)) return;
+
+  const delta = cur.clone().sub(rStartWorld); // 월드 공간 이동량
+  const b = rBox.clone();
+
+  if      (rFace === 'px') b.max.x = Math.max(b.min.x + 0.05, rBox.max.x + delta.x);
+  else if (rFace === 'nx') b.min.x = Math.min(b.max.x - 0.05, rBox.min.x + delta.x);
+  else if (rFace === 'pz') b.max.z = Math.max(b.min.z + 0.05, rBox.max.z + delta.z);
+  else if (rFace === 'nz') b.min.z = Math.min(b.max.z - 0.05, rBox.min.z + delta.z);
+  else if (rFace === 'py') b.max.y = Math.max(b.min.y + 0.05, rBox.max.y - delta.z);
+  else if (rFace === 'ny') b.min.y = Math.min(b.max.y - 0.05, rBox.min.y - delta.z);
+
+  rZ.box = b; rebuildZone(rZ); rZ.mesh.material = zoneSelMat();
+}
+function endResize() {
+  if (!resizing) return;
+  resizing = false;
+  orbit.enabled = true;
+  if (rZ) apiSaveZone(rZ);
+}
+
+/* ════════════════════════════
+   GLOW (클릭 순간 한 번)
+════════════════════════════ */
+const glows = [];
+function triggerGlow(z) {
+  const ctr   = z.box.getCenter(new THREE.Vector3());
+  const light = new THREE.PointLight(new THREE.Color(z.color || '#0077cc'), 0, 20);
+  light.position.copy(ctr);
+  scene.add(light);
+  glows.push({ light, t: 0, dur: 1.6, peak: 8 });
+}
+function tickGlows(dt) {
+  for (let i = glows.length - 1; i >= 0; i--) {
+    const g = glows[i]; g.t += dt;
+    const p = g.t / g.dur;
+    g.light.intensity = p < 0.12
+      ? (p / 0.12) * g.peak
+      : g.peak * Math.pow(1 - (p - 0.12) / 0.88, 2);
+    if (g.t >= g.dur) { scene.remove(g.light); glows.splice(i, 1); }
+  }
+}
+
+/* ════════════════════════════
+   PULSE BLINK (중앙→외곽 방사형)
+════════════════════════════ */
+
+/* ════════════════════════════
+   BLINK (팝업 열려있는 동안 깜박)
+════════════════════════════ */
+let blinkZone = null;
+let blinkT    = 0;
+
+function startBlink(z) {
+  if (!z || !z.mesh) return;
+  if (blinkZone && blinkZone !== z) stopBlink();
+  blinkZone = z;
+  blinkT    = 0;
+  z.mesh.visible = true;
+  z.line.visible = false;
+  const c = new THREE.Color(z.color || '#0077cc');
+  c.lerp(new THREE.Color(0xffffff), 0.25);
+  z.mesh.material.color.set(c);
+}
+
+function stopBlink() {
+  if (!blinkZone || !blinkZone.mesh) { blinkZone = null; return; }
+  const mat = zoneMat(blinkZone.color);
+  mat.opacity = editMode ? 0.22 : 0.07;
+  blinkZone.mesh.material = mat;
+  blinkZone.mesh.visible = true;
+  blinkZone.line.visible = editMode;
+  blinkZone = null;
+}
+
+function tickBlink(dt) {
+  if (!blinkZone || !blinkZone.mesh || !blinkZone.mesh.material) return;
+  blinkT += dt;
+  const alpha = (Math.sin(blinkT * Math.PI * 2) + 1) / 2;
+  blinkZone.mesh.material.opacity = alpha * 0.42;
+}
+
+/* ════════════════════════════
+   HIT ZONE
+════════════════════════════ */
+function hitZone(e) {
+  const meshes = zones.map(z => z.mesh);
+  const saved  = meshes.map(m => m.visible);
+  meshes.forEach(m => { m.visible = true; });
+
+  // 모바일: 주변 여러 점 샘플링해서 가장 가까운 hit
+  const isMobile = e.pointerType === 'touch' || window.innerWidth <= 600;
+  let result = null;
+
+  if (isMobile) {
+    const offsets = [[0,0],[8,0],[-8,0],[0,8],[0,-8],[12,0],[-12,0],[0,12],[0,-12]];
+    let minDist = Infinity;
+    for (const [ox, oy] of offsets) {
+      const fakeE = { clientX: e.clientX + ox, clientY: e.clientY + oy };
+      rc.setFromCamera(ndc(fakeE), camera);
+      const hits = rc.intersectObjects(meshes, false);
+      if (hits.length && hits[0].distance < minDist) {
+        minDist = hits[0].distance;
+        result = zones.find(z => z.mesh === hits[0].object) || null;
+      }
+    }
+  } else {
+    rc.setFromCamera(ndc(e), camera);
+    const hits = rc.intersectObjects(meshes, false);
+    if (hits.length) result = zones.find(z => z.mesh === hits[0].object) || null;
+  }
+
+  meshes.forEach((m, i) => { m.visible = saved[i]; });
+  return result;
+}
+
+/* ════════════════════════════
+   POPUP
+════════════════════════════ */
+function showPopup(z, sx, sy) {
+  document.getElementById('pp-id').textContent   = z.id;
+  document.getElementById('pp-name').textContent = z.name || '(이름 없음)';
+  const dEl = document.getElementById('pp-desc');
+  if (z.name || z.desc) {
+    dEl.textContent  = z.desc;
+    dEl.style.fontStyle = '';
+    dEl.style.color     = '';
+  } else {
+    dEl.textContent  = '등록된 정보가 없습니다.';
+    dEl.style.fontStyle = 'italic';
+    dEl.style.color     = 'var(--dim)';
+  }
+  const tEl = document.getElementById('pp-tags'); tEl.innerHTML = '';
+  (z.tags || '').split(',').map(t => t.trim()).filter(Boolean).forEach(t => {
+    const s = document.createElement('span'); s.className = 'popup-tag'; s.textContent = t; tEl.appendChild(s);
+  });
+  const pop = document.getElementById('room-popup');
+  pop.style.display = '';
+  pop.classList.add('show');
+  _justOpenedPopup = true; // 즉시 닫힘 방지
+
+  if (window.innerWidth <= 600) {
+    pop.style.left = '16px';
+    pop.style.top = 'auto';
+    pop.style.bottom = '90px';
+    pop.style.right = '16px';
+    pop.style.transform = 'scale(1)';
+    const cs = getComputedStyle(pop);
+  } else {
+    pop.style.bottom = '';
+    pop.style.right  = '';
+    pop.style.transform = '';
+    const pw = pop.offsetWidth, ph = pop.offsetHeight;
+    let lx = sx + 14, ly = sy - ph / 2;
+    if (lx + pw > innerWidth  - 20) lx = sx - pw - 14;
+    if (ly < 80)                     ly = 80;
+    if (ly + ph > innerHeight - 20)  ly = innerHeight - ph - 20;
+    pop.style.left = lx + 'px'; pop.style.top = ly + 'px';
+  }
+
+  updateNavButtons(z);
+}
+window.__stopBlink = stopBlink;
+
+/* ════════════════════════════
+   MODAL
+════════════════════════════ */
+function openModal(z) {
+  modalZ = z;
+  document.getElementById('m-mid').textContent   = '(' + z.id + ')';
+  document.getElementById('m-name').value  = z.name  || '';
+  document.getElementById('m-desc').value  = z.desc  || '';
+  document.getElementById('m-tags').value  = z.tags  || '';
+  document.getElementById('m-color').value = z.color || '#0077cc';
+  document.getElementById('m-cprev').style.background = z.color || '#0077cc';
+  document.getElementById('btn-save-room').textContent = z.isNew ? '만들기' : '수정';
+  z.isNew = false; // 이후부터는 수정
+  document.getElementById('edit-modal').classList.add('show');
+}
+window.closeModal = function () {
+  document.getElementById('edit-modal').classList.remove('show'); modalZ = null;
+};
+
+// 버튼 이벤트 직접 바인딩 (type=module 에서 onclick 불가)
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('popup-close-btn').addEventListener('click', () => window.closePopup());
+  document.getElementById('nav-panel-close').addEventListener('click', () => resetNav());
+  document.getElementById('nav-reset-btn').addEventListener('click',   () => resetNav());
+  document.getElementById('btn-draw').addEventListener('click',        () => setTool('draw'));
+  document.getElementById('btn-sel').addEventListener('click',         () => setTool('select'));
+  document.getElementById('btn-resize').addEventListener('click',      () => setTool('resize'));
+  document.getElementById('btn-path').addEventListener('click',        () => setTool('path'));
+  document.getElementById('btn-marker').addEventListener('click',      () => setTool('marker'));
+  document.getElementById('btn-move').addEventListener('click',       () => setTool('move'));
+  document.getElementById('btn-flrmarker').addEventListener('click',  () => setTool('flrmarker'));
+  document.getElementById('btn-connect').addEventListener('click', () => setTool('connect'));
+
+  // 마커 모달 버튼
+  document.getElementById('fm-cancel').addEventListener('click', () => closeFlrMarkerModal());
+  document.getElementById('fm-save').addEventListener('click', async () => {
+    if (!modalFlrMarker) return;
+    modalFlrMarker.name   = document.getElementById('fm-name').value.trim();
+    modalFlrMarker.desc   = document.getElementById('fm-desc').value.trim();
+    modalFlrMarker.pathId = document.getElementById('fm-path').value;
+    await saveFlrMarkerToServer(modalFlrMarker);
+    closeFlrMarkerModal();
+    showToast('✅ 층 이동 마커 저장');
+  });
+  document.getElementById('fm-delete').addEventListener('click', async () => {
+    if (!modalFlrMarker) return;
+    await deleteFlrMarkerFromServer(modalFlrMarker);
+    removeFlrMarker(modalFlrMarker);
+    closeFlrMarkerModal();
+    showToast('🗑 층 이동 마커 삭제');
+  });
+  document.getElementById('mm-cancel').addEventListener('click', () => closeMarkerModal());
+  document.getElementById('mm-save').addEventListener('click', async () => {
+    if (!modalMarker) return;
+    modalMarker.name   = document.getElementById('mm-name').value.trim();
+    modalMarker.desc   = document.getElementById('mm-desc').value.trim();
+    modalMarker.tags   = document.getElementById('mm-tags').value.trim();
+    const roomId = document.getElementById('mm-room').value;
+    const pathId = document.getElementById('mm-path').value;
+    modalMarker.roomId = roomId;
+    modalMarker.pathId = pathId;
+    modalMarker.mesh.material = markerMat(!!roomId);
+    await saveMarkerToServer(modalMarker);
+    closeMarkerModal();
+    showToast('✅ 마커가 저장되었습니다.');
+  });
+  document.getElementById('mm-delete').addEventListener('click', async () => {
+    if (!modalMarker) return;
+    await deleteMarkerFromServer(modalMarker);
+    removeMarker(modalMarker);
+    closeMarkerModal();
+    showToast('🗑 마커가 삭제되었습니다.');
+  });
+  document.getElementById('btn-cancel-modal').addEventListener('click',() => window.closeModal());
+  document.getElementById('btn-save-room').addEventListener('click', async () => {
+    if (!modalZ) return;
+    const isNew = document.getElementById('btn-save-room').textContent === '만들기';
+    await pushUndo(isNew ? `방 만들기 (${modalZ.id})` : `정보 수정 (${modalZ.name || modalZ.id})`);
+    modalZ.name  = document.getElementById('m-name').value.trim();
+    modalZ.desc  = document.getElementById('m-desc').value.trim();
+    modalZ.tags  = document.getElementById('m-tags').value.trim();
+    modalZ.color = document.getElementById('m-color').value;
+    rebuildZone(modalZ);
+    await apiSaveZone(modalZ);
+    closeModal();
+  });
+  document.getElementById('btn-delete-room').addEventListener('click', () => deleteRoom());
+});
+window.saveRoom = async function () {
+  if (!modalZ) return;
+  modalZ.name  = document.getElementById('m-name').value.trim();
+  modalZ.desc  = document.getElementById('m-desc').value.trim();
+  modalZ.tags  = document.getElementById('m-tags').value.trim();
+  modalZ.color = document.getElementById('m-color').value;
+  rebuildZone(modalZ);
+  await apiSaveZone(modalZ);
+  closeModal();
+};
+window.deleteRoom = async function () {
+  if (!modalZ) return;
+  await pushUndo(`영역 삭제 (${modalZ.name || modalZ.id})`);
+  await apiDeleteZone(modalZ);
+  if (selZ === modalZ) selZ = null;
+  removeZone(modalZ); modalZ = null;
+  document.getElementById('edit-modal').classList.remove('show');
+};
+
+/* ════════════════════════════
+   POINTER EVENTS
+════════════════════════════ */
+const el = renderer.domElement;
+
+el.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  pDown = { x: e.clientX, y: e.clientY }; pMoved = false;
+  if (!editMode) return;
+  if (tool === 'draw') { startDraw(e); return; }
+  if (tool === 'path') { return; }
+
+  if (tool === 'move') {
+    const hit = hitZone(e);
+    if (hit) {
+      moveZone = hit;
+      const pt = groundPt(e);
+      moveZoneDragStart = pt ? pt.clone() : null;
+      moveZoneOrigin    = hit.box.getCenter(new THREE.Vector3()).clone();
+      orbit.enabled = false;
+      return;
+    }
+  }
+
+  // 선택/크기조절 툴에서만 마커 드래그 시도
+  if (tool === 'select' || tool === 'resize') {
+    const found = findMarkerAtPointer(e);
+    if (found) {
+      markerDrag = found;
+      orbit.enabled = false;
+      return;
+    }
+  }
+
+  // 선택된 점이 있을 때만 그 점 드래그 허용
+  if ((tool === 'select' || tool === 'resize') && selectedDot) {
+    rc.setFromCamera(ndc(e), camera);
+    const dotHits = rc.intersectObject(selectedDot.path.dotMeshes[selectedDot.dotIdx], false);
+    if (dotHits.length > 0) {
+      dragDot = selectedDot;
+      orbit.enabled = false;
+      return;
+    }
+  }
+
+  if (tool === 'resize' && selZ) {
+    const f = detectFace(selZ, e); if (f) { startResize(selZ, f, e); return; }
+  }
+  // select 또는 resize에서 영역 클릭 → 선택
+  const hit = hitZone(e); selZ = hit || null; setVis();
+});
+
+el.addEventListener('pointermove', e => {
+  const threshold = e.pointerType === 'touch' ? 12 : 4;
+  if (pDown && Math.hypot(e.clientX - pDown.x, e.clientY - pDown.y) > threshold) {
+    pMoved = true;
+  }
+  if (!editMode) { el.style.cursor = 'default'; return; }
+  if (drawing)  { moveDraw(e);   return; }
+  if (resizing) { moveResize(e); return; }
+
+  // 방 이동 드래그
+  if (moveZone && moveZoneDragStart) {
+    pMoved = true;
+    const pt = groundPt(e);
+    if (pt) {
+      const dx = pt.x - moveZoneDragStart.x;
+      const dz = pt.z - moveZoneDragStart.z;
+      const size = moveZone.box.getSize(new THREE.Vector3());
+      const newMin = new THREE.Vector3(
+        moveZoneOrigin.x - size.x/2 + dx,
+        moveZone.box.min.y,
+        moveZoneOrigin.z - size.z/2 + dz,
+      );
+      const newMax = newMin.clone().add(size);
+      moveZone.box.set(newMin, newMax);
+      rebuildZone(moveZone);
+    }
+    return;
+  }
+
+  // 마커 드래그 중
+  if (markerDrag) {
+    pMoved = true;
+    const pt = pathGroundPt(e);
+    if (pt) {
+      markerDrag.mesh.position.set(pt.x, pt.y + PATH_HEIGHT_OFFSET * 2, pt.z);
+      markerDrag.pos = [pt.x, pt.y, pt.z];
+    }
+    return;
+  }
+  // 마커 툴에서 마커 위 드래그 감지 (lazy start)
+  if (tool === 'marker' && pDown && !markerDrag && Math.hypot(e.clientX - pDown.x, e.clientY - pDown.y) > 4) {
+    const found = findMarkerAtPointer(e);
+    if (found) { markerDrag = found; orbit.enabled = false; }
+  }
+  if (dragDot) {
+    pMoved = true;
+    const pt = pathGroundPt(e);
+    if (pt) updateDotAndLines(dragDot.path, dragDot.dotIdx, pt);
+    return;
+  }
+  if (moveZone) { el.style.cursor = 'grabbing'; return; }
+  if (dragDot)  { el.style.cursor = 'grabbing'; return; }
+  if (tool === 'move') {
+    el.style.cursor = hitZone(e) ? 'grab' : 'default';
+  } else if (tool === 'resize' && selZ) {
+    const f = detectFace(selZ, e);
+    el.style.cursor = f ? FACE_CURSOR[f] : 'default';
+  } else if (tool === 'select' || tool === 'resize') {
+    // grab 커서는 선택된 점 위에서만
+    if (selectedDot) {
+      rc.setFromCamera(ndc(e), camera);
+      const dotHits = rc.intersectObject(selectedDot.path.dotMeshes[selectedDot.dotIdx], false);
+      el.style.cursor = dotHits.length > 0 ? 'grab' : 'default';
+    } else {
+      el.style.cursor = 'default';
+    }
+  } else if (tool === 'path') {
+    el.style.cursor = 'crosshair';
+    if (pathDrawing) {
+      const pt = pathGroundPt(e);
+      if (pt) updatePreviewLine(pt);
+    }
+  } else {
+    el.style.cursor = tool === 'draw' ? 'crosshair' : 'default';
+  }
+});
+
+el.addEventListener('pointerup', async e => {
+  if (e.button !== 0) { orbit.enabled = true; return; }
+  if (drawing)  { endDraw();   return; }
+  if (resizing) { endResize(); return; }
+
+  // 방 이동 완료
+  if (moveZone) {
+    orbit.enabled = true;
+    if (pMoved) {
+      pushUndo(`방 이동 (${moveZone.name || moveZone.id})`);
+      await apiSaveZone(moveZone);
+      showToast('✅ 방 위치 저장');
+    }
+    moveZone = null; moveZoneDragStart = null; moveZoneOrigin = null;
+    return;
+  }
+
+  // 마커 드래그 완료
+  if (markerDrag) {
+    orbit.enabled = true;
+    if (pMoved) {
+      await saveMarkerToServer(markerDrag);
+    } else {
+      // 클릭 → 모달 열기
+      openMarkerModal(markerDrag);
+    }
+    markerDrag = null;
+    return;
+  }
+
+  // 점 드래그 완료
+  if (dragDot) {
+    orbit.enabled = true;
+    await savePathToServer(dragDot.path);
+    dragDot = null;
+    return;
+  }
+  orbit.enabled = true;
+  if (!pMoved) {
+    if (editMode && tool === 'connect' && !pMoved) {
+      handleConnectClick(e);
+      return;
+    }
+    if (editMode && tool === 'flrmarker') {
+      const found = findFlrMarkerAtPointer(e);
+      if (found) {
+        if (pMoved) { await saveFlrMarkerToServer(found); }
+        else { openFlrMarkerModal(found); }
+      } else if (!pMoved) {
+        const pt = pathGroundPt(e);
+        if (pt) {
+          const m = addFlrMarker(pt, null, '', '', '', '', '');
+          m.isNew = true;
+          await saveFlrMarkerToServer(m);
+          openFlrMarkerModal(m);
+        }
+      }
+      return;
+    }
+    if (editMode && tool === 'marker') {
+      const found = findMarkerAtPointer(e);
+      if (found) {
+        if (pMoved) {
+          // 드래그로 이동했으면 저장
+          await saveMarkerToServer(found);
+        } else {
+          // 클릭 → 모달
+          openMarkerModal(found);
+        }
+      } else if (!pMoved) {
+        // 빈 곳 클릭 → 새 마커
+        const pt = pathGroundPt(e);
+        if (pt) {
+          const m = addMarker(pt, null, '', '', '', '');
+          m.isNew = true;
+          await saveMarkerToServer(m);
+          openMarkerModal(m);
+        }
+      }
+      return;
+    }
+    if (editMode && tool === 'path' && !pMoved) {
+      const pt = pathGroundPt(e);
+      if (pt) {
+        if (!pathDrawing) startPathDraw();
+        addPathPoint(pt);
+      }
+      return;
+    }
+    if (editMode && (tool === 'select' || tool === 'resize' || tool === 'move') && !pMoved) {
+      // 0. 층이동 마커 클릭 확인
+      const flrFound = findFlrMarkerAtPointer(e);
+      if (flrFound) { openFlrMarkerModal(flrFound); return; }
+
+      // 0-1. 일반 마커 클릭 확인
+      const mFound = findMarkerAtPointer(e);
+      if (mFound) { openMarkerModal(mFound); return; }
+
+      // 1. 점 클릭 우선 확인 (레이캐스트로 정확히)
+      const dotFound = findDotAtPointer(e);
+      if (dotFound) { selectDot(dotFound.path, dotFound.dotIdx); return; }
+
+      // 2. 선택된 점 있으면 → 분기 시작 (빈 곳 클릭)
+      if (selectedDot) {
+        const pt = pathGroundPt(e);
+        startBranchFromDot(pt || null);
+        return;
+      }
+
+      // 3. 선 클릭
+      const fp = findPathAtPointer(e);
+      if (fp) { deselectPath(); selectPath(fp); return; }
+
+      deselectDot(); deselectPath();
+
+      // 4. 영역 클릭
+      const hit = hitZone(e);
+      if (hit) { selZ = hit; setVis(); startBlink(selZ); openModal(selZ); return; }
+      selZ = null; setVis();
+    }
+    if (!editMode) {
+      const z = hitZone(e);
+      if (z) {
+        showPopup(z, e.clientX, e.clientY); triggerGlow(z); startBlink(z);
+      }
+      else { closePopup(); stopBlink(); }
+    }
+  }
+  pDown = null;
+});
+
+/* ════════════════════════════
+   KEYBOARD
+════════════════════════════ */
+const keys = new Set();
+window.addEventListener('keydown', e => {
+  keys.add(e.key.toLowerCase());
+  if (keys.has('x') && keys.has('y') && !e.target.matches('input,textarea')) {
+    e.preventDefault();
+    const p = document.getElementById('info-panel');
+    const show = p.style.display === 'none' ? 'flex' : 'none';
+    p.style.display = show;
+    grid.visible = (show === 'flex');
+  }
+  if (keys.has('e') && keys.has('d') && !e.target.matches('input,textarea')) {
+    e.preventDefault();
+    if (editMode) { toggleEdit(); return; } // 편집 모드 종료는 바로
+    // 편집 모드 진입 시 비밀번호 확인
+    showPasswordPrompt();
+  }
+  if (e.key === 'Escape') {
+    if (document.getElementById('edit-modal').classList.contains('show')) { closeModal(); return; }
+    if (drawing) { cancelDraw(); return; }
+    if (pathDrawing) { cancelPathDraw(); return; }
+    if (tool === 'connect' && connectStep > 0) { cancelConnect(); startConnect(); return; }
+    closePopup();
+  }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && editMode && !e.target.matches('input,textarea')) {
+    if (selectedDot) { deleteDotFromPath(selectedDot.path, selectedDot.dotIdx); return; }
+    if (selectedPath) { deleteSelectedPath(); return; }
+    if (selZ) {
+      pushUndo(`영역 삭제 (${selZ.name || selZ.id})`);
+      apiDeleteZone(selZ); removeZone(selZ); selZ = null;
+    }
+  }
+});
+window.addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+
+/* ════════════════════════════
+   FLOOR / GLB LOAD
+════════════════════════════ */
+const draco = new DRACOLoader();
+draco.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/libs/draco/');
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(draco);
+
+const FLOORS = {
+  1: { file: 'model/1층.glb', label: '1층' },
+  2: { file: 'model/2층.glb', label: '2층' },
+  3: { file: 'model/3층.glb', label: '3층' },
+  4: { file: 'model/4층.glb', label: '4층' },
+};
+
+// ══════════════════════════════════════════════
+//  층 전환 애니메이션
+//  단일 slideAnim 객체로 모든 케이스 처리
+//  models: [oldM, mid0, mid1, ..., newM]
+//  각 모델은 순서대로 등장:
+//   - 이전 모델이 HALF_T 지점 도달 시 다음 모델 시작
+//   - 중간 모델: 끝까지 이동 후 사라짐
+//   - 목적 모델: HALF_T 지점에서 스프링으로 멈춤
+// ══════════════════════════════════════════════
+let slideAnim = null;
+const SLIDE_DIST = 18;
+const FULL_T     = 0.55;  // 한 모델이 끝까지 가는 시간
+const HALF_T     = 0.28;  // 중간 지점 시간 (다음 모델 시작 트리거)
+
+function easeOutBack(t) {
+  const c1 = 0.8, c3 = c1 + 1;
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+}
+function easeIn(t) { return t * t; }
+function clamp01(t) { return Math.max(0, Math.min(1, t)); }
+function startNextSlide() {}
+
+function tickSlide(dt) {
+  if (!slideAnim) return;
+  slideAnim.t += dt;
+
+  const { dir, models, baseYs, startTs, oldZones } = slideAnim;
+  const t = slideAnim.t;
+
+  models.forEach((m, i) => {
+    const st = startTs[i];
+    const isLast = i === models.length - 1;
+    const isOld  = i === 0;
+    const localT = t - st;
+    if (localT < 0) return;
+
+    if (isOld) {
+      if (!m.visible) m.visible = true;
+      const p = clamp01(localT / FULL_T);
+      const dy = dir * SLIDE_DIST * easeIn(p);
+      m.position.y = baseYs[i] + dy;
+      m.traverse(n => { if (n.isMesh) n.material.opacity = 0.88 * Math.max(0, 1 - p * 2); });
+
+      // oldZones도 함께 이동
+      if (oldZones) {
+        oldZones.forEach(z => {
+          z.mesh.position.y = z._slideBaseY + dy;
+          z.line.position.y = z._slideBaseY + dy;
+          const op = 0.07 * Math.max(0, 1 - p * 2);
+          z.mesh.material.opacity = op;
+        });
+      }
+
+      if (p >= 1) {
+        if (m.parent) scene.remove(m);
+        // oldZones 완전 제거
+        if (oldZones) oldZones.forEach(z => {
+          scene.remove(z.mesh); z.mesh.geometry.dispose(); z.mesh.material.dispose();
+          scene.remove(z.line); z.line.geometry.dispose(); z.line.material.dispose();
+        });
+      }
+
+    } else if (!isLast) {
+      if (!m.visible) m.visible = true;
+      const p = clamp01(localT / FULL_T);
+      m.position.y = baseYs[i] + (-dir) * SLIDE_DIST * (1 - p) + dir * SLIDE_DIST * p;
+      const fade = p < 0.25 ? p / 0.25 : p > 0.75 ? (1 - p) / 0.25 : 1;
+      m.traverse(n => { if (n.isMesh) n.material.opacity = 0.88 * fade; });
+      if (p >= 1 && m.parent) scene.remove(m);
+
+    } else {
+      if (!m.visible) m.visible = true;
+      const p = clamp01(localT / FULL_T);
+      const e = easeOutBack(p);
+      const dy = (-dir) * SLIDE_DIST * (1 - e);
+      m.position.y = baseYs[i] + dy;
+      m.traverse(n => { if (n.isMesh) n.material.opacity = Math.min(0.88, p * 2 * 0.88); });
+
+      // newZones도 함께 이동
+      const newZones = slideAnim.newZones || [];
+      newZones.forEach(z => {
+        if (!z.mesh.visible && p > 0) { z.mesh.visible = true; }
+        z.mesh.position.y = z._newZoneBaseY + dy;
+        z.line.position.y = z._newZoneBaseY + dy;
+        const op = Math.min(0.07, 0.07 * p * 2);
+        z.mesh.material.opacity = op;
+      });
+
+      if (p >= 1) {
+        m.position.y = baseYs[i];
+        m.traverse(n => { if (n.isMesh) n.material.opacity = 0.88; });
+        // newZones 최종 위치 확정
+        newZones.forEach(z => {
+          z.mesh.position.y = z._newZoneBaseY;
+          z.line.position.y = z._newZoneBaseY;
+          z.mesh.material.opacity = 0.07;
+        });
+        const cb = slideAnim.onComplete;
+        slideAnim = null;
+        if (cb) cb();
+      }
+    }
+  });
+}
+
+// ── 모델 로드 헬퍼 ──
+function getModelColor() {
+  return _darkMode ? 0x2a3040 : 0xddeeff;
+}
+
+function applyDarkModeToModel(model) {
+  const color = getModelColor();
+  model.traverse(n => {
+    if (!n.isMesh) return;
+    n.material.color.set(color);
+    n.material.needsUpdate = true;
+  });
+}
+
+function loadModel(floor) {
+  return new Promise((resolve, reject) => {
+    const wMat = new THREE.MeshStandardMaterial({
+      color: getModelColor(), transparent: true, opacity: 0,
+      roughness: 0.9, metalness: 0.0, side: THREE.DoubleSide,
+    });
+    gltfLoader.load(FLOORS[floor].file, gltf => {
+      const model = gltf.scene;
+      model.traverse(n => {
+        if (!n.isMesh) return;
+        n.castShadow = true; n.receiveShadow = true;
+        n.material = wMat.clone();
+      });
+      model.updateMatrixWorld(true);
+      const tmpBox = new THREE.Box3();
+      model.traverse(n => {
+        if (n.isMesh && n.geometry) {
+          n.geometry.computeBoundingBox();
+          tmpBox.union(n.geometry.boundingBox.clone().applyMatrix4(n.matrixWorld));
+        }
+      });
+      const s0 = tmpBox.getSize(new THREE.Vector3());
+      const sc = 10 / Math.max(s0.x, s0.y, s0.z, 0.001);
+      model.scale.setScalar(sc);
+      model.updateMatrixWorld(true);
+      const b1 = new THREE.Box3();
+      model.traverse(n => {
+        if (n.isMesh && n.geometry) {
+          n.geometry.computeBoundingBox();
+          b1.union(n.geometry.boundingBox.clone().applyMatrix4(n.matrixWorld));
+        }
+      });
+      const c1 = b1.getCenter(new THREE.Vector3());
+      model.position.x -= c1.x;
+      model.position.z -= c1.z;
+      model.position.y -= b1.min.y;
+      scene.add(model);
+      resolve(model);
+    }, undefined, reject);
+  });
+}
+
+function safeBbox(model) {
+  const box = new THREE.Box3();
+  model.traverse(n => {
+    if (n.isMesh && n.geometry) {
+      n.geometry.computeBoundingBox();
+      box.union(n.geometry.boundingBox.clone().applyMatrix4(n.matrixWorld));
+    }
+  });
+  return box;
+}
+
+// ── switchFloor ──
+let currentFloor = 1;
+let currentModel = null;
+let currentModelFloor = 1;
+let isLoading    = false;
+
+async function _doInstantSwitch(floor) {
+  if (isLoading || slideAnim) return;
+  isLoading = true;
+  currentFloor = floor;
+  document.querySelectorAll('.floor-btn').forEach(b => b.disabled = true);
+  [...zones].forEach(z => removeZone(z));
+  try {
+    const newM = await loadModel(floor);
+    if (currentModel && currentModel !== newM) scene.remove(currentModel);
+    currentModel = newM;
+    currentModelFloor = floor;
+    _navOrigModelY = newM.position.y;
+    const b2 = safeBbox(newM);
+    gPlane.constant = -b2.min.y;
+    modelTopY = b2.max.y;
+    await apiLoadAll();
+    await loadPathsForFloor(floor);
+    await loadMarkersForFloor(floor);
+    await loadFlrMarkersForFloor(floor);
+    newM.traverse(n => { if (n.isMesh) n.material.opacity = 0.88; });
+    setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
+  } catch(e) { console.error('instant switch error:', e); }
+  isLoading = false;
+  document.querySelectorAll('.floor-btn').forEach(b => {
+    b.disabled = false;
+    b.classList.toggle('active', parseInt(b.id.replace('fbtn-','').replace('mfbtn-','')) === floor);
+  });
+}
+
+function switchFloor(floor) {
+  console.log('switchFloor:', floor, 'navRouteLines:', navRouteLines.length, 'currentFloor:', currentFloor);
+  if (navRouteLines.length > 0) { console.log('  blocked: route active'); return; }
+  if (floor === currentFloor && currentModel && !_instantSwitch) return;
+  if (isLoading || slideAnim) return;
+
+  // nav 직후 즉시 전환 모드
+  if (_instantSwitch) {
+    _instantSwitch = false;
+    _doInstantSwitch(floor);
+    return;
+  }
+
+  isLoading = true;
+
+  const dir       = floor > currentFloor ? -1 : 1;
+  const fromFloor = currentFloor;
+  const oldModel  = currentModel;
+
+  document.querySelectorAll('.floor-btn').forEach(b => b.disabled = true);
+  stopBlink(); closePopup();
+
+  // zones는 즉시 제거하지 않고 슬라이드 중 oldModel과 함께 이동
+  const oldZones = [...zones];
+  oldZones.forEach(z => {
+    z._slideBaseY = z.mesh.position.y;
+    z.mesh.visible = true;
+    z.line.visible = false;
+  });
+  [...zones].forEach(z => removeZone(z));
+  // removeZone이 씬에서 제거하므로 다시 추가
+  oldZones.forEach(z => {
+    scene.add(z.mesh);
+    // line은 안 보여도 되므로 추가 안 함
+  });
+
+  // 로드할 층: 중간층 + 목적층
+  const floorsToLoad = [];
+  if (fromFloor === floor) {
+    floorsToLoad.push(floor);
+  } else {
+    const step = floor > fromFloor ? 1 : -1;
+    for (let f = fromFloor + step; f !== floor + step; f += step)
+      floorsToLoad.push(f);
+  }
+
+  const miniLoader = document.getElementById('mini-loader');
+  const miniFill   = document.getElementById('mini-loader-fill');
+  const miniLabel  = document.getElementById('mini-loader-label');
+  if (oldModel) {
+    miniLoader.classList.add('show');
+    miniFill.style.width = '0%';
+    miniLabel.textContent = FLOORS[floor].label + ' 불러오는 중…';
+  }
+
+  (async () => {
+    try {
+      const loaded = [];
+      for (let i = 0; i < floorsToLoad.length; i++) {
+        const m = await loadModel(floorsToLoad[i]);
+        loaded.push(m);
+        if (oldModel) miniFill.style.width = ((i+1)/floorsToLoad.length*100)+'%';
+      }
+
+      const newM = loaded[loaded.length - 1];
+
+      // 카메라 설정 (최초 1회)
+      if (!oldModel) {
+        const b2 = safeBbox(newM);
+        const s2 = b2.getSize(new THREE.Vector3());
+        const c2 = b2.getCenter(new THREE.Vector3());
+        const fov = camera.fov * Math.PI / 180;
+        const isMobile = window.innerWidth <= 600;
+        const distMult = isMobile ? 2.2 : 1.4; // 모바일은 더 멀리서 시작
+        const fd  = Math.max(s2.x, s2.z) / (2 * Math.tan(fov / 2)) * distMult;
+        camera.position.set(0, fd * 0.7, fd * 0.55);
+        orbit.target.set(0, c2.y, 0);
+        camera.far = fd * 10;
+        camera.updateProjectionMatrix();
+        const id = camera.position.distanceTo(orbit.target);
+        orbit.maxDistance = isMobile ? id * 2.0 : id; // 모바일은 더 축소 가능
+        orbit.minDistance = id * 0.2;
+        orbit.update();
+        scene.fog.near = fd * 2; scene.fog.far = fd * 8;
+        grid.position.y = b2.min.y; gPlane.constant = -b2.min.y;
+        // 모델 상단 Y 저장 (길 그리기에 사용)
+        modelTopY = b2.max.y;
+        // 층 간격 = 모델 전체 높이 + 여유
+        SECONDARY_OFFSET_Y = Math.max((b2.max.y - b2.min.y) * 1.2, 3);
+        newM.traverse(n => { if (n.isMesh) n.material.opacity = 0.88; });
+
+      } else {
+        // 모든 로드된 모델 완전히 숨김 (opacity 대신 visible 사용)
+        loaded.forEach(m => { m.visible = false; });
+
+        // models 배열: [oldM, mid0, mid1, ..., newM]
+        const models = [oldModel, ...loaded];
+        const baseYs = models.map(m => m.position.y);
+
+        // startTs: 각 모델 시작 시각
+        const startTs = [0];
+        for (let i = 1; i < models.length; i++) {
+          startTs.push(startTs[i-1] + HALF_T);
+        }
+
+        // 목적층 zones 미리 로드
+        let newZones = [];
+        try {
+          const res = await fetch('/api/rooms/' + floor);
+          if (res.ok) {
+            const files = await res.json();
+            for (const fname of files) {
+              try {
+                const r = await fetch('/api/room/' + floor + '/' + encodeURIComponent(fname));
+                if (!r.ok) continue;
+                const data = textToZone(await r.text(), fname);
+                if (!data) continue;
+                const n = parseInt(data.id.replace('z',''));
+                if (!isNaN(n) && n >= zid) zid = n + 1;
+                const z = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+                // newM과 같은 시작 위치 (반대 방향 SLIDE_DIST 밖)에 배치
+                const offsetY = (-dir) * SLIDE_DIST;
+                z.mesh.position.y = z.mesh.position.y + offsetY;
+                z.line.position.y = z.line.position.y + offsetY;
+                z._newZoneBaseY = z.mesh.position.y - offsetY; // 최종 목표 Y
+                z._newZoneOffsetY = offsetY;
+                z.mesh.visible = false;
+                z.line.visible = false;
+                newZones.push(z);
+              } catch(e) { console.warn('newZone load error:', fname, e); }
+            }
+          }
+        } catch(e) { console.warn('newZones fetch error:', e); }
+
+        slideAnim = { dir, t: 0, models, baseYs, startTs, oldZones, newZones,
+          onComplete: async () => {
+            // 새 모델 바닥 Y로 gPlane 업데이트
+            const nb = safeBbox(newM);
+            grid.position.y = nb.min.y;
+            gPlane.constant = -nb.min.y;
+            modelTopY = nb.max.y;
+            undoStack.length = 0;
+            updateUndoBtn();
+            await clearBackups(floor);
+            await apiLoadAll();
+            await loadPathsForFloor(floor);
+            await loadMarkersForFloor(floor);
+            await loadFlrMarkersForFloor(floor);
+            setVis();
+          }
+        };
+        miniLoader.classList.remove('show');
+      }
+
+      currentModel = newM;
+      currentModelFloor = floor; // 실제 로드된 층 추적
+      _navOrigModelY = newM.position.y; // nav용 원래 Y 저장
+      currentFloor = floor;
+      document.querySelectorAll('.floor-btn').forEach(b => {
+        b.classList.toggle('active', parseInt(b.id.replace('fbtn-','').replace('mfbtn-','')) === floor);
+        b.disabled = false;
+      });
+      document.getElementById('ip-floor').textContent = FLOORS[floor].label;
+      document.getElementById('ip-file').textContent  = FLOORS[floor].file.replace('model/','');
+      isLoading = false;
+      if (!oldModel) {
+        await clearBackups(floor);
+        undoStack.length = 0;
+        updateUndoBtn();
+        miniLoader.classList.remove('show');
+        await apiLoadAll();
+        await loadPathsForFloor(floor);
+        await loadMarkersForFloor(floor);
+        await loadFlrMarkersForFloor(floor);
+        const loadEl = document.getElementById('loading');
+        loadEl.classList.add('hidden');
+        setTimeout(() => { loadEl.style.display = 'none'; }, 600);
+      }
+      // 층 전환 시 apiLoadAll은 slideAnim.onComplete에서 호출
+
+    } catch(err) {
+      console.error('GLB error:', err);
+      isLoading = false;
+      document.querySelectorAll('.floor-btn').forEach(b => b.disabled = false);
+      miniLoader.classList.remove('show');
+      document.getElementById('err').classList.add('show');
+      document.getElementById('err-detail').textContent = err.message || String(err);
+    }
+  })();
+}
+
+window.switchFloor = switchFloor;
+switchFloor(1);
+
+/* ── resize ── */
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* ── render loop ── */
+const clock = new THREE.Clock();
+let fc = 0;
+(function loop() {
+  requestAnimationFrame(loop);
+  const dt = clock.getDelta();
+  orbit.update();
+  tickGlows(dt);
+  tickBlink(dt);
+  tickNavBlink(dt);
+  tickNavRoute(dt);
+  tickSlide(dt);
+  if (++fc % 6 === 0) {
+    document.getElementById('cd').textContent = camera.position.distanceTo(orbit.target).toFixed(2);
+    document.getElementById('cx').textContent = camera.position.x.toFixed(2);
+    document.getElementById('cy').textContent = camera.position.y.toFixed(2);
+  }
+  renderer.render(scene, camera);
+})();
+</script>
+</body>
+</html>

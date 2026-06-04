@@ -1,0 +1,12 @@
+{
+  "name": "joch-map",
+  "version": "1.0.0",
+  "description": "조치원중학교 3D 지도 안내 시스템",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
