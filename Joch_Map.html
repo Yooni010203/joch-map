@@ -293,7 +293,20 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
   <button class="nav-reset-btn" id="nav-reset-btn">🔄 경로 초기화</button>
 </div>
 
-<div id="undo-dropdown"></div>
+<div id="snapshot-dropdown" style="display:none;position:fixed;z-index:9000;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px var(--shadow);min-width:220px;max-height:300px;overflow-y:auto;flex-direction:column;padding:6px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)"></div>
+
+<div id="snapshot-name-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9500;align-items:center;justify-content:center;opacity:0;transition:opacity .18s" onclick="if(event.target===this){document.getElementById('snapshot-name-modal').style.opacity='0';setTimeout(()=>document.getElementById('snapshot-name-modal').style.display='none',180)}">
+  <div style="background:var(--panel);border:1px solid var(--glass-border);border-radius:16px;padding:24px;width:340px;max-width:92vw;box-shadow:var(--glass-shadow);backdrop-filter:var(--glass-blur);display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:1rem;font-weight:700;color:var(--text)">💾 임시저장 이름</div>
+    <input id="snapshot-name-input" type="text" placeholder="예: 1층 작업 완료" maxlength="30" autocomplete="off"
+      style="border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.88rem;outline:none;font-family:'Noto Sans KR',sans-serif;background:var(--input-bg);color:var(--text)"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-cancel" id="snapshot-name-cancel">취소</button>
+      <button class="btn btn-primary" id="snapshot-name-confirm">저장</button>
+    </div>
+  </div>
+</div> style="display:none;position:fixed;z-index:9000;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px var(--shadow);min-width:220px;max-height:300px;overflow-y:auto;flex-direction:column;padding:6px;backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)"></div>
 
 <div id="toast"></div>
 
@@ -444,7 +457,69 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
   <button class="tool-btn" id="btn-connect">🔗 마커-선 연결</button>
   <span id="edit-hint">바닥을 클릭&드래그해 영역을 만드세요</span>
   <span style="width:1px;height:20px;background:rgba(224,92,0,.3);margin:0 2px"></span>
-  <button class="tool-btn" id="btn-undo" disabled style="opacity:.4">↩ 되돌리기</button>
+  <button class="tool-btn" id="btn-undo" style="opacity:.4;cursor:not-allowed">↩ 되돌리기</button>
+  <button class="tool-btn" id="btn-snapshot" style="color:#0066aa;flex-shrink:0">💾 임시저장</button>
+  <span style="width:1px;height:20px;background:rgba(224,92,0,.3);margin:0 2px;flex-shrink:0"></span>
+  <button class="tool-btn" id="btn-reset-floor" style="color:#cc2200;flex-shrink:0">🗑 현재 층 초기화</button>
+  <button class="tool-btn" id="btn-reset-all" style="color:#990000;flex-shrink:0">💥 전체 초기화</button>
+</div>
+
+<!-- 현재 층 초기화 모달 -->
+<div id="reset-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9500;align-items:center;justify-content:center;opacity:0;transition:opacity .18s">
+  <div style="background:rgba(255,255,255,.9);border:1px solid rgba(255,0,0,.2);border-radius:20px;padding:28px;width:380px;max-width:92vw;box-shadow:0 16px 48px rgba(0,0,0,.18);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:16px">
+    <div style="font-size:1.1rem;font-weight:700;color:#cc2200">🗑 현재 층 초기화</div>
+    <div style="font-size:.88rem;color:#444;line-height:1.7"><b id="reset-floor-label">현재 층</b>의 모든 방, 선, 마커 데이터가 삭제됩니다.<br>이 작업은 되돌릴 수 없습니다.<br><br>계속하려면 편집 모드 비밀번호를 입력하세요.</div>
+    <input id="reset-pw-input" type="password" placeholder="비밀번호 입력" autocomplete="new-password"
+      style="border:1.5px solid #ddd;border-radius:8px;padding:8px 12px;font-size:.88rem;outline:none;font-family:'Noto Sans KR',sans-serif"
+      onfocus="this.style.borderColor='#cc2200'" onblur="this.style.borderColor='#ddd'"/>
+    <div id="reset-pw-error" style="font-size:.75rem;color:#cc2200;display:none">비밀번호가 틀렸습니다.</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-cancel" id="reset-cancel-btn">취소</button>
+      <button class="btn" id="reset-confirm-btn" style="background:#cc2200;color:#fff;padding:8px 20px;border-radius:8px;border:none;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- 전체 초기화 비밀번호 모달 -->
+<div id="reset-all-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9500;align-items:center;justify-content:center;opacity:0;transition:opacity .18s">
+  <div style="background:rgba(255,255,255,.9);border:1px solid rgba(150,0,0,.3);border-radius:20px;padding:28px;width:380px;max-width:92vw;box-shadow:0 16px 48px rgba(0,0,0,.25);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:16px">
+    <div style="font-size:1.1rem;font-weight:700;color:#990000">💥 전체 초기화</div>
+    <div style="font-size:.88rem;color:#444;line-height:1.7"><b>1~4층 전체</b>의 모든 방, 선, 마커 데이터가 삭제됩니다.<br>이 작업은 절대 되돌릴 수 없습니다.<br><br>계속하려면 편집 모드 비밀번호를 입력하세요.</div>
+    <input id="reset-all-pw-input" type="password" placeholder="비밀번호 입력" autocomplete="new-password"
+      style="border:1.5px solid #ddd;border-radius:8px;padding:8px 12px;font-size:.88rem;outline:none;font-family:'Noto Sans KR',sans-serif"
+      onfocus="this.style.borderColor='#990000'" onblur="this.style.borderColor='#ddd'"/>
+    <div id="reset-all-pw-error" style="font-size:.75rem;color:#990000;display:none">비밀번호가 틀렸습니다.</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-cancel" id="reset-all-cancel-btn">취소</button>
+      <button class="btn" id="reset-all-confirm-btn" style="background:#990000;color:#fff;padding:8px 20px;border-radius:8px;border:none;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif">다음</button>
+    </div>
+  </div>
+</div>
+
+<!-- 전체 초기화 2차 확인 -->
+<div id="reset-all-confirm2" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9600;align-items:center;justify-content:center;opacity:0;transition:opacity .18s">
+  <div style="background:rgba(255,255,255,.95);border:2px solid #990000;border-radius:20px;padding:28px;width:360px;max-width:92vw;box-shadow:0 16px 48px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:16px;text-align:center">
+    <div style="font-size:2rem">⚠️</div>
+    <div style="font-size:1rem;font-weight:700;color:#990000">정말로 전체 초기화하시겠습니까?</div>
+    <div style="font-size:.85rem;color:#666">1~4층 모든 데이터가 영구 삭제됩니다.</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-cancel" id="reset-all2-cancel-btn">아니오</button>
+      <button class="btn" id="reset-all2-next-btn" style="background:#990000;color:#fff;padding:8px 20px;border-radius:8px;border:none;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif">예, 계속</button>
+    </div>
+  </div>
+</div>
+
+<!-- 전체 초기화 3차 최종 확인 -->
+<div id="reset-all-confirm3" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9700;align-items:center;justify-content:center;opacity:0;transition:opacity .18s">
+  <div style="background:#fff;border:3px solid #990000;border-radius:20px;padding:28px;width:360px;max-width:92vw;box-shadow:0 16px 48px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:16px;text-align:center">
+    <div style="font-size:2rem">🚨</div>
+    <div style="font-size:1rem;font-weight:700;color:#990000">마지막 경고</div>
+    <div style="font-size:.85rem;color:#444;line-height:1.6">이 버튼을 누르면 <b>모든 데이터가 즉시 삭제</b>됩니다.<br>복구할 수 없습니다. 정말 삭제하시겠습니까?</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn btn-cancel" id="reset-all3-cancel-btn">취소</button>
+      <button class="btn" id="reset-all3-confirm-btn" style="background:#ccc;color:#fff;padding:8px 20px;border-radius:8px;border:none;font-size:.85rem;font-weight:600;cursor:not-allowed;font-family:'Noto Sans KR',sans-serif" disabled>전체 삭제 (5초)</button>
+    </div>
+  </div>
 </div>
 
 <div id="info-panel">
@@ -560,6 +635,19 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
       <textarea id="m-desc" placeholder="예: 담당 선생님: 홍길동"></textarea></div>
     <div class="mf"><label>태그 <span style="font-size:.7rem;color:var(--dim)">(쉼표 구분)</span></label>
       <input type="text" id="m-tags" placeholder="예: 교실, 2학년"/></div>
+    <div class="mf"><label>중앙 표시 텍스트 <span style="font-size:.7rem;color:var(--dim)">(비우면 방 이름 표시)</span></label>
+      <textarea id="m-centertext" placeholder="예: 1-1" autocomplete="off" rows="2" style="resize:vertical"></textarea></div>
+    <div class="mf"><label>중앙 표시 이미지 <span style="font-size:.7rem;color:var(--dim)">(이미지 설정 시 텍스트 대신 표시)</span></label>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span id="m-centerimage-name" style="font-size:.8rem;color:var(--dim);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">없음</span>
+        <label style="cursor:pointer;padding:5px 12px;background:rgba(0,119,204,.1);color:var(--accent);border-radius:6px;font-size:.78rem;font-weight:600;white-space:nowrap">
+          📁 업로드
+          <input type="file" id="m-centerimage-upload" accept="image/*" style="display:none"/>
+        </label>
+        <button id="m-centerimage-clear" style="padding:5px 10px;background:rgba(204,0,0,.1);color:#cc2200;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;white-space:nowrap">🗑 삭제</button>
+      </div>
+      <img id="m-centerimage-preview" src="" style="display:none;max-height:60px;max-width:100%;border-radius:6px;margin-top:6px;object-fit:contain"/>
+    </div>
     <div class="mf"><label>방 색상</label>
       <div class="color-row">
         <input type="color" id="m-color" value="#0077cc"
@@ -577,8 +665,22 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 <!-- 버튼 클릭 핸들러 — 일반 script로 분리해서 모듈 스코프 문제 우회 -->
 <script>
 function closePopup() {
-  document.getElementById('room-popup').classList.remove('show');
+  const popup = document.getElementById('room-popup');
+  const zid = document.getElementById('pp-id')?.textContent;
+  if (!popup.classList.contains('show')) return; // 이미 닫혀있으면 무시
+  popup.classList.remove('show');
   if (window.__stopBlink) window.__stopBlink();
+  // 레이블 복원
+  if (zid) {
+    requestAnimationFrame(() => {
+      const allZones = window._zones;
+      if (!allZones) return;
+      const z = allZones.find(z => z.id === zid);
+      if (z && z.label) {
+        z.label.visible = !!z.name;
+      }
+    });
+  }
 }
 function closeModal() {
   document.getElementById('edit-modal').classList.remove('show');
@@ -591,6 +693,7 @@ function closeModal() {
 </script>
 <script type="module">
 const zones = [];
+window._zones = zones; // closePopup에서 접근용
 let   zid   = 1;
 
 /* ════════════════════════════
@@ -819,7 +922,6 @@ function stopNavBlink() {
 }
 
 function showNavPanel(startZone, endZone, startFloor, endFloor) {
-  console.log('showNavPanel: startZone=', startZone?.name, 'endZone=', endZone?.name);
   const panel   = document.getElementById('nav-panel');
   const content = document.getElementById('nav-panel-content');
   const sName   = startZone ? (startZone.name || startZone.id) : '?';
@@ -944,11 +1046,7 @@ async function findMultiFloorRoute(startMarker, endMarker, startFloor, endFloor)
   }
 
   // 층이동 마커: 같은 이름(name)을 가진 마커끼리 자동 포털 연결
-  console.log('=== PORTAL DEBUG ===');
-  console.log('floorsNeeded:', floorsNeeded);
-  console.log('all flrMarkers:', flrMarkers.map(m=>`${m.id}(f${m.floor},name:"${m.name}",path:${m.pathId})`));
   const flrInNeeded = flrMarkers.filter(m => floorsNeeded.includes(m.floor));
-  console.log('flrMarkers in floorsNeeded:', flrInNeeded.map(m=>`${m.id}(f${m.floor},name:"${m.name}")`));
   const processedPairs = new Set();
   flrInNeeded.filter(m => m.name).forEach(m => {
     flrInNeeded.filter(p =>
@@ -966,11 +1064,9 @@ async function findMultiFloorRoute(startMarker, endMarker, startFloor, endFloor)
       const posB = new THREE.Vector3(...pair.pos).setY(pair.pos[1] + yB);
       const idA = `fm:${m.floor}:${m.id}`;
       const idB = `fm:${pair.floor}:${pair.id}`;
-      console.log(`  portal: ${idA}(${m.name}) ↔ ${idB}(${pair.name})`);
       addEdge(idA, idB, posA, posB);
     });
   });
-  console.log('portal pairs created:', [...processedPairs]);
   if (processedPairs.size === 0) {
     console.warn('⚠️ 포털 연결 없음! 층이동 마커에 같은 이름을 설정했는지 확인하세요.');
   }
@@ -997,22 +1093,12 @@ async function findMultiFloorRoute(startMarker, endMarker, startFloor, endFloor)
   // 출발/도착 마커 노드 ID
   const startId = `m:${startFloor}:${startMarker.id}`;
   const endId   = `m:${endFloor}:${endMarker.id}`;
-
-  console.log('=== NAV DEBUG ===');
-  console.log('startId:', startId, '존재:', !!nodes[startId]);
-  console.log('endId:', endId, '존재:', !!nodes[endId]);
-  console.log('총 노드 수:', Object.keys(nodes).length);
-  console.log('마커 노드:', Object.keys(nodes).filter(k => k.startsWith('m:')));
-  console.log('층이동 노드:', Object.keys(nodes).filter(k => k.startsWith('fm:')));
-  console.log('선 노드 수:', Object.keys(nodes).filter(k => k.startsWith('p:')).length);
-  if (nodes[startId]) console.log('출발 neighbors:', nodes[startId].neighbors.map(n=>n.id));
-  if (nodes[endId])   console.log('도착 neighbors:', nodes[endId].neighbors.map(n=>n.id));
+  if (nodes[startId])
+  if (nodes[endId])
   Object.keys(nodes).filter(k=>k.startsWith('fm:')).forEach(k => {
-    console.log('fm node:', k, '→', nodes[k].neighbors.map(n=>n.id));
   });
 
   if (!nodes[startId] || !nodes[endId]) {
-    console.log('노드 없음! markers:', markers.map(m=>`${m.id}(f${m.floor},path:${m.pathId})`));
     return null;
   }
 
@@ -1065,7 +1151,6 @@ async function showSecondaryFloor(startFloor, endFloor) {
       const model = await loadModel(f);
       // loadModel이 설정한 Y 그대로 유지하고 yOff만 추가
       model.position.y += yOff;
-      console.log(`  floor ${f}: model.position.y=${model.position.y.toFixed(3)}, yOff=${yOff}`);
       model.traverse(n => { if (n.isMesh) { n.material.opacity = 0.88; n.visible = true; } });
       const modelBaseY = model.position.y - yOff; // 원래 Y (기록용)
       secondaryModel.push({ model, floor: f, yOff, modelBaseY, ownedByNav: true });
@@ -1082,15 +1167,14 @@ async function showSecondaryFloor(startFloor, endFloor) {
           const files = await res.json();
           for (const fname of files) {
             if (zones.find(z => z.id === fname && z.floor === f)) {
-              console.log(`    skip zone ${fname} (already loaded for floor ${f})`);
               continue;
             }
             const r = await fetch('/api/room/' + f + '/' + encodeURIComponent(fname));
             if (!r.ok) continue;
             const data = textToZone(await r.text(), fname);
             if (data) {
-              console.log(`    adding zone ${data.id}(${data.name}) for floor ${f}`);
-              addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+              const zz1 = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+              zz1.centerText = data.centerText || ''; zz1.centerImage = data.centerImage || ''; updateZoneLabel(zz1);
             }
           }
         }
@@ -1098,10 +1182,8 @@ async function showSecondaryFloor(startFloor, endFloor) {
       currentFloor = savedFloor;
 
       const floorZones = zones.filter(z => z.floor === f);
-      console.log(`  floor ${f} zones: ${floorZones.length}개, yOff=${yOff}`);
       floorZones.forEach(z => {
         const cy = z.box.getCenter(new THREE.Vector3()).y;
-        console.log(`    zone ${z.id}(${z.name}): cy=${cy.toFixed(3)} → y=${(cy+yOff).toFixed(3)}`);
         z.mesh.position.y = cy + yOff;
         z.line.position.y = cy + yOff;
       });
@@ -1117,7 +1199,6 @@ async function showSecondaryFloor(startFloor, endFloor) {
   }
 
   setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
-  console.log('nav floors:', secondaryModel.map(e => `f${e.floor}@y${e.yOff.toFixed(1)}`));
 }
 
 function hideSecondaryFloor() {
@@ -1133,7 +1214,6 @@ function hideSecondaryFloor() {
   if (currentModel) {
     currentModel.position.y = _navOrigModelY;
     currentModel.visible = true;
-    console.log('hideSecondaryFloor: restored currentModel y=', _navOrigModelY);
   }
   document.querySelectorAll('.floor-btn').forEach(b => b.disabled = false);
 }
@@ -1160,7 +1240,8 @@ function findAndDrawRoute() {
             if (!r.ok) continue;
             const data = textToZone(await r.text(), fname);
             if (!data) continue;
-            addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+            const zz = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+            zz.centerText = data.centerText || ''; zz.centerImage = data.centerImage || ''; updateZoneLabel(zz);
           }
           resolve();
         }).catch(() => resolve());
@@ -1219,17 +1300,12 @@ function findAndDrawRoute() {
 }
 
 function resetNav() {
-  console.log('=== resetNav ===');
-  console.log('currentFloor:', currentFloor, 'secondaryFloor:', secondaryFloor);
-  console.log('zones before cleanup:', zones.map(z=>`${z.id}(f${z.floor},y=${z.mesh.position.y.toFixed(2)})`));
-  console.log('currentModel visible:', currentModel?.visible, 'y:', currentModel?.position.y?.toFixed(2));
 
   navStart = null; navEnd = null;
   clearNavRoute(); stopNavBlink();
 
   if (secondaryFloor !== null) {
     const toRemove = zones.filter(z => z.floor !== currentFloor);
-    console.log('removing zones:', toRemove.map(z=>z.id));
     toRemove.forEach(z => removeZone(z));
     [...paths].filter(p => p.floor !== currentFloor).forEach(p => removePath(p));
     [...markers].filter(m => m.floor !== currentFloor).forEach(m => removeMarker(m));
@@ -1242,9 +1318,6 @@ function resetNav() {
     z.mesh.position.y = cy;
     z.line.position.y = cy;
   });
-
-  console.log('zones after cleanup:', zones.map(z=>`${z.id}(f${z.floor},y=${z.mesh.position.y.toFixed(2)})`));
-  console.log('currentModel after:', currentModel?.visible, 'y:', currentModel?.position.y?.toFixed(2));
 
   setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
   document.getElementById('nav-panel').classList.remove('show');
@@ -1387,7 +1460,6 @@ function updateNavButtons(zone) {
   btnS.disabled = !!navStart;
   btnE.disabled = !!navEnd;
   btnS.onclick = () => {
-    console.log('출발 설정: currentFloor=', currentFloor, 'marker.floor=', m.floor);
     navStart = { marker: m, zoneId: zone.id, floor: currentFloor };
     btnS.disabled = true;
     closePopup(); stopBlink();
@@ -1395,7 +1467,6 @@ function updateNavButtons(zone) {
     if (navEnd) findAndDrawRoute();
   };
   btnE.onclick = () => {
-    console.log('도착 설정: currentFloor=', currentFloor, 'marker.floor=', m.floor);
     navEnd = { marker: m, zoneId: zone.id, floor: currentFloor };
     btnE.disabled = true;
     closePopup(); stopBlink();
@@ -1439,7 +1510,9 @@ orbit.enableDamping  = true;
 orbit.dampingFactor  = 0.07;
 orbit.minDistance    = 1;
 orbit.maxDistance    = 200;
-orbit.maxPolarAngle  = Math.PI / 3.5; // 약 51도, 너무 옆으로 눕히지 못하게
+orbit.maxPolarAngle  = Math.PI / 3.5;
+// 모든 모드 통일: 좌클릭=화면회전, 우클릭=카메라이동
+orbit.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 orbit.update();
 
 /* ── lights ── */
@@ -1513,7 +1586,7 @@ function zoneToText(z) {
   const mn = z.box.min, mx = z.box.max;
   const coords = [mn.x, mn.y, mn.z, mx.x, mx.y, mx.z].map(v => v.toFixed(6)).join(' ');
   const rgb    = hexToRgbStr(z.color || '#0077cc');
-  return coords + ' ' + rgb + '\n' + (z.name || '') + '\n' + (z.desc || '') + '\n' + (z.tags || '');
+  return coords + ' ' + rgb + '\n' + (z.name || '') + '\n' + (z.desc || '') + '\n' + (z.tags || '') + '\n' + (z.centerText || '') + '\n' + (z.centerImage || '');
 }
 function textToZone(text, filename) {
   const lines = text.split('\n');
@@ -1524,9 +1597,11 @@ function textToZone(text, filename) {
     id:    filename,
     box:   new THREE.Box3(new THREE.Vector3(x1, y1, z1), new THREE.Vector3(x2, y2, z2)),
     color: rgbStrToHex(r + ' ' + g + ' ' + b),
-    name:  (lines[1] || '').trim(),
-    desc:  (lines[2] || '').trim(),
-    tags:  (lines[3] || '').trim(),
+    name:        (lines[1] || '').trim(),
+    desc:        (lines[2] || '').trim(),
+    tags:        (lines[3] || '').trim(),
+    centerText:  (lines[4] || '').trim(),
+    centerImage: (lines[5] || '').trim(),
   };
 }
 
@@ -1562,7 +1637,8 @@ async function apiLoadAll() {
         if (!data) continue;
         const n = parseInt(data.id.replace('z', ''));
         if (!isNaN(n) && n >= zid) zid = n + 1;
-        addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+        const zz2 = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+        zz2.centerText = data.centerText || ''; zz2.centerImage = data.centerImage || ''; updateZoneLabel(zz2);
       } catch (e) { console.warn('load error:', fname, e); }
     }
   } catch (e) { console.warn('room API unavailable, skipping'); }
@@ -1578,98 +1654,143 @@ function showToast(msg, duration = 2500) {
 }
 
 
-/* ── 백업 / Undo 시스템 ── */
-const undoStack = []; // [{ label, snapshots: [{id,text}] }]
+/* ── 임시저장 / 되돌리기 시스템 ── */
+const snapshots = []; // [{ label, floor, zones, paths, markers, flrMarkers }]
+const SNAP_MAX  = 10;
 
 function updateUndoBtn() {
   const btn = document.getElementById('btn-undo');
   if (!btn) return;
-  btn.disabled      = undoStack.length === 0;
-  btn.style.opacity = undoStack.length ? '1' : '.4';
+  const has = snapshots.length > 0;
+  btn.style.opacity = has ? '1' : '.4';
+  btn.style.cursor  = has ? 'pointer' : 'not-allowed';
+  btn.textContent   = has ? `↩ 되돌리기 (${snapshots.length})` : '↩ 되돌리기';
 }
 
-function showUndoDropdown() {
-  if (!undoStack.length) return;
-  const btn  = document.getElementById('btn-undo');
-  const drop = document.getElementById('undo-dropdown');
-  drop.innerHTML = '';
+function pushUndo() {} // 호환성 유지 (빈 함수)
 
-  [...undoStack].reverse().forEach((item, revIdx) => {
-    const idx = undoStack.length - 1 - revIdx;
-    const el  = document.createElement('button');
-    el.className = 'undo-item';
-    el.innerHTML = `<span class="undo-idx">${revIdx + 1}</span>${item.label}`;
+// 현재 층 전체 상태 임시저장
+async function saveSnapshot() {
+  const modal = document.getElementById('snapshot-name-modal');
+  const input = document.getElementById('snapshot-name-input');
+  input.value = '';
+  modal.style.display = 'flex';
+  modal.style.opacity = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    modal.style.opacity = '1';
+    input.focus();
+  }));
+}
+
+async function doSaveSnapshot(name) {
+  const modal = document.getElementById('snapshot-name-modal');
+  modal.style.opacity = '0';
+  setTimeout(() => { modal.style.display = 'none'; }, 180);
+
+  const f = currentFloor;
+  const label = (name.trim() || '임시저장') + ' (' + f + '층 · ' +
+    new Date().toLocaleTimeString('ko', {hour:'2-digit', minute:'2-digit'}) + ')';
+  const snap = {
+    floor: f, label,
+    zones:      zones.filter(z=>z.floor===f).map(z=>({ id:z.id, text:zoneToText(z) })),
+    paths:      paths.filter(p=>p.floor===f).map(p=>({ id:p.id, text:pathToText(p) })),
+    markers:    markers.filter(m=>m.floor===f).map(m=>({ id:m.id, text:markerToText(m) })),
+    flrMarkers: flrMarkers.filter(m=>m.floor===f).map(m=>({ id:m.id, text:flrMarkerToText(m) })),
+  };
+  snapshots.push(snap);
+  if (snapshots.length > SNAP_MAX) snapshots.shift();
+  updateUndoBtn();
+  showToast('💾 임시저장: ' + label);
+}
+
+async function doUndo() {
+  if (!snapshots.length) return;
+  const btn  = document.getElementById('btn-undo');
+  const drop = document.getElementById('snapshot-dropdown');
+
+  // 이미 열려있으면 닫기
+  if (drop.style.display === 'flex') {
+    drop.style.display = 'none'; return;
+  }
+
+  // 목록 생성
+  drop.innerHTML = '';
+  [...snapshots].reverse().forEach((snap, revIdx) => {
+    const idx = snapshots.length - 1 - revIdx;
+    const el = document.createElement('button');
+    el.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border:none;background:none;cursor:pointer;border-radius:8px;font-size:.82rem;font-family:\'Noto Sans KR\',sans-serif;color:var(--text);text-align:left;transition:background .12s';
+    el.onmouseenter = () => el.style.background = 'rgba(0,119,204,.08)';
+    el.onmouseleave = () => el.style.background = 'none';
+    el.innerHTML = `<span style="font-size:.7rem;color:var(--dim);flex-shrink:0">${revIdx + 1}</span><span>${snap.label}</span>`;
     el.addEventListener('click', async (e) => {
       e.stopPropagation();
-      drop.classList.remove('show');
-      await doUndoTo(idx);
+      drop.style.display = 'none';
+      await restoreSnapshot(idx);
     });
     drop.appendChild(el);
   });
 
+  // 위치 설정
   const rect = btn.getBoundingClientRect();
   drop.style.left = rect.left + 'px';
   drop.style.top  = (rect.bottom + 6) + 'px';
-  drop.classList.add('show');
+  drop.style.display = 'flex';
 
-  // 드롭다운 외부 클릭 시 닫기 (드롭다운 자체 클릭은 제외)
-  function onOutside(e) {
-    if (!drop.contains(e.target) && e.target !== btn) {
-      drop.classList.remove('show');
-      document.removeEventListener('pointerdown', onOutside);
-    }
-  }
-  setTimeout(() => document.addEventListener('pointerdown', onOutside), 50);
-}
-
-function closeDrop() {
-  document.getElementById('undo-dropdown').classList.remove('show');
-}
-
-// idx 시점으로 복구 (idx 이후 스택 제거)
-async function doUndoTo(idx) {
-  if (idx < 0 || idx >= undoStack.length) return;
-  const { label, snapshot } = undoStack[idx];
-
-  undoStack.splice(idx + 1);
-  [...zones].forEach(z => removeZone(z));
-
-  for (const s of snapshot) {
-    const data = textToZone(s.text, s.id);
-    if (!data) { console.warn('textToZone failed for', s.id, s.text); continue; }
-    const z = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
-    await apiSaveZone(z);
-  }
-
-  try {
-    const res   = await fetch('/api/rooms/' + currentFloor);
-    const files = await res.json();
-    const snapIds = new Set(snapshot.map(s => s.id));
-    for (const fname of files) {
-      if (!snapIds.has(fname)) {
-        await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(fname), { method: 'DELETE' });
+  // 외부 클릭 시 닫기
+  setTimeout(() => {
+    function onOutside(e) {
+      if (!drop.contains(e.target) && e.target !== btn) {
+        drop.style.display = 'none';
+        document.removeEventListener('pointerdown', onOutside);
       }
     }
-  } catch(e) { console.warn('undo cleanup error:', e); }
-
-  setVis();
-  showToast(`↩ "${label}" 이전으로 되돌렸습니다.`);
-  updateUndoBtn();
+    document.addEventListener('pointerdown', onOutside);
+  }, 50);
 }
 
-async function doUndo() { showUndoDropdown(); }
+async function restoreSnapshot(idx) {
+  if (idx < 0 || idx >= snapshots.length) return;
+  const snap = snapshots[idx];
+  const f    = snap.floor;
 
-// 현재 상태 스냅샷을 백업에 저장
-async function pushUndo(label) {
-  const snapshot = zones.map(z => ({ id: z.id, text: zoneToText(z) }));
-  undoStack.push({ label, snapshot });
+  // 선택한 스냅샷 이후 것들 제거
+  snapshots.splice(idx);
   updateUndoBtn();
-}
 
+  await resetFloor(f);
 
-// 페이지 로드 시 해당 층 백업 삭제 (새로고침 감지)
-async function clearBackups(floor) {
-  try { await fetch(`/api/backups/${floor}`, { method: 'DELETE' }); } catch(e) {}
+  for (const s of snap.zones) {
+    const data = textToZone(s.text, s.id);
+    if (data) { const zz3 = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color); zz3.centerText = data.centerText || ''; zz3.centerImage = data.centerImage || ''; updateZoneLabel(zz3); await apiSaveZone(zz3); }
+  }
+  for (const s of snap.paths) {
+    const data = textToPath(s.text, s.id);
+    if (!data) continue;
+    const pts = data.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+    const dotMeshes = pts.map(p => { const m = makeDotMesh(p); m.visible = editMode; return m; });
+    const lines2 = [];
+    for (let i = 1; i < pts.length; i++) {
+      const l = makeLineSeg(pts[i-1], pts[i], false);
+      l.visible = editMode; lines2.push(l);
+    }
+    paths.push({ id: s.id, floor: f, points: data.points, dotMeshes, lines: lines2 });
+    await savePathToServer(paths[paths.length-1]);
+  }
+  for (const s of snap.markers) {
+    const ml = s.text.split('\n');
+    const pos = new THREE.Vector3(...ml[0].split(' ').map(Number));
+    addMarker(pos, s.id, ml[1]||'', ml[2]||'', ml[3]||'', ml[4]||'', ml[5]||'');
+    await saveMarkerToServer(markers.find(m=>m.id===s.id));
+  }
+  for (const s of snap.flrMarkers) {
+    const fl = s.text.split('\n');
+    const pos = new THREE.Vector3(...fl[0].split(' ').map(Number));
+    addFlrMarker(pos, s.id, fl[1]||'', fl[2]||'', fl[3]||'', null, null);
+    await saveFlrMarkerToServer(flrMarkers.find(m=>m.id===s.id));
+  }
+
+  setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
+  showToast('↩ ' + snap.label + ' 으로 되돌렸습니다.');
 }
 
 
@@ -1881,7 +2002,6 @@ function finalizePath() {
   if (_branchFromDotEdit) { _branchFromDotEdit = false; setTool('dot-edit'); }
 }
 function setPathVis() {
-  console.log('setPathVis: editMode='+editMode+' paths='+paths.length);
   paths.forEach(p => {
     const show = editMode && p.floor === currentFloor;
     p.dotMeshes && p.dotMeshes.forEach(m => { m.visible = show; });
@@ -2438,6 +2558,97 @@ function buildZoneMesh(box, color) {
   return { mesh, line };
 }
 
+// 방 이름 빌보드 레이블
+function makeZoneLabel(name, box) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 256, 128);
+
+  const fontSize = 22;
+  ctx.font = `${fontSize}px "Noto Sans KR", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+  // 방 크기에 따라 최대 줄 너비 결정
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  const maxLineWidth = Math.min(220, Math.max(80, size.x * 40));
+
+  // 줄넘김 처리: \n으로 명시 분리 후 자동 줄바꿈 적용
+  const inputLines = (name || '').split('\n');
+  const lines = [];
+  for (const inputLine of inputLines) {
+    if (!inputLine) { lines.push(''); continue; }
+    const words = inputLine.split('');
+    let cur = '';
+    for (const ch of words) {
+      const test = cur + ch;
+      if (ctx.measureText(test).width > maxLineWidth && cur.length > 0) {
+        lines.push(cur); cur = ch;
+      } else { cur = test; }
+    }
+    if (cur) lines.push(cur);
+  }
+
+  const lineH = fontSize + 4;
+  const totalH = lines.length * lineH;
+  const maxW = Math.max(...lines.map(l => ctx.measureText(l).width));
+
+  // 캔버스 크기 재조정
+  canvas.width  = Math.ceil(maxW + 16);
+  canvas.height = Math.ceil(totalH + 12);
+  ctx.font = `${fontSize}px "Noto Sans KR", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+  ctx.fillStyle = _darkMode ? 'rgba(180,185,200,0.85)' : 'rgba(90,100,130,0.85)';
+  lines.forEach((line, i) => {
+    const y = (canvas.height / 2) - ((lines.length - 1) * lineH / 2) + i * lineH;
+    ctx.fillText(line, canvas.width / 2, y);
+  });
+
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  // 크기: 아주 작게
+  sprite.scale.set(canvas.width / 300, canvas.height / 300, 1);
+  sprite.renderOrder = 999;
+  return sprite;
+}
+
+function updateZoneLabel(z) {
+  if (z.label) { scene.remove(z.label); z.label.material.map?.dispose(); z.label.material.dispose(); z.label = null; }
+  const center = z.box.getCenter(new THREE.Vector3());
+
+  if (z.centerImage) {
+    // 이미지가 있어도 방 mesh는 그대로 유지
+    const tex = new THREE.TextureLoader().load('image/' + z.centerImage, (t) => {
+      if (!z.label) return;
+      const aspect = t.image.width / t.image.height;
+      const size = new THREE.Vector3(); z.box.getSize(size);
+      const maxS = Math.min(size.x, size.z) * 0.6;
+      if (aspect >= 1) z.label.scale.set(maxS, maxS / aspect, 1);
+      else             z.label.scale.set(maxS * aspect, maxS, 1);
+      z.label.material.needsUpdate = true;
+    });
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false, color: 0xffffff });
+    const sprite = new THREE.Sprite(mat);
+    sprite.renderOrder = 15;
+    sprite.position.set(center.x, center.y + 0.3, center.z);
+    sprite.visible = z.mesh.visible;
+    scene.add(sprite);
+    z.label = sprite;
+    return;
+  }
+
+  const displayText = z.centerText || z.name;
+  if (!displayText) return;
+  const sprite = makeZoneLabel(displayText, z.box);
+  sprite.position.set(center.x, center.y + 0.3, center.z);
+  sprite.visible = z.mesh.visible;
+  scene.add(sprite);
+  z.label = sprite;
+}
+
 function addZone(box, id, name, desc, tags, color) {
   const { mesh, line } = buildZoneMesh(box, color);
   const z = {
@@ -2447,7 +2658,9 @@ function addZone(box, id, name, desc, tags, color) {
     desc:  desc  || '',
     tags:  tags  || '',
     color: color || '#0077cc',
-    box:   box.clone(), mesh, line,
+    centerText: '',
+    centerImage: '',
+    box:   box.clone(), mesh, line, label: null,
   };
   mesh.visible = true;
   const initMat = zoneMat(color);
@@ -2456,6 +2669,7 @@ function addZone(box, id, name, desc, tags, color) {
   line.visible = false;
   scene.add(mesh); scene.add(line);
   zones.push(z);
+  updateZoneLabel(z);
   return z;
 }
 
@@ -2467,18 +2681,19 @@ function rebuildZone(z) {
   mesh.visible = editMode; line.visible = editMode;
   scene.add(mesh); scene.add(line);
   if (z === selZ) z.mesh.material = zoneSelMat();
+  updateZoneLabel(z);
 }
 
 function removeZone(z) {
   scene.remove(z.mesh); z.mesh.geometry.dispose(); z.mesh.material.dispose();
   scene.remove(z.line); z.line.geometry.dispose(); z.line.material.dispose();
+  if (z.label) { scene.remove(z.label); z.label.material.map.dispose(); z.label.material.dispose(); z.label = null; }
   zones.splice(zones.indexOf(z), 1);
 }
 
 function setVis() {
   const navActive = secondaryFloor !== null;
   const navFloors = navActive ? secondaryModel.map(e => e.floor) : [];
-  console.log('setVis: editMode='+editMode+' zones='+zones.length+' currentFloor='+currentFloor);
   zones.forEach(z => {
     const show = navActive
       ? navFloors.includes(z.floor)
@@ -2486,6 +2701,7 @@ function setVis() {
 
     z.mesh.visible = show;
     z.line.visible = show && editMode;
+    if (z.label) z.label.visible = show && !!z.name;
 
     if (!show) return;
 
@@ -2583,6 +2799,9 @@ function toggleDarkMode() {
   }
   if (currentModel) animateModels(currentModel);
   if (Array.isArray(secondaryModel)) secondaryModel.forEach(e => animateModels(e.model));
+
+  // 레이블 다크모드 갱신
+  zones.forEach(z => updateZoneLabel(z));
 }
 
 // ── 앱 메뉴 ──────────────────────────────────────
@@ -2809,10 +3028,8 @@ function goToRoom(id, floor) {
     let tries = 0;
     const wait = setInterval(() => {
       tries++;
-      console.log(`goToRoom wait: tries=${tries}, slideAnim=${!!slideAnim}, currentFloor=${currentFloor}, target=${floor}`);
       if ((!slideAnim && currentFloor === floor) || tries > 50) {
         clearInterval(wait);
-        console.log('goToRoom: interval cleared, opening popup');
         if (currentFloor === floor) doOpen();
       }
     }, 100);
@@ -2822,7 +3039,159 @@ function goToRoom(id, floor) {
 }
 // ── 방 검색 끝 ───────────────────────────────────
 
-window.openGuide     = openGuide;
+// ── 데이터 초기화 ────────────────────────────────
+function showModal(id) {
+  const m = document.getElementById(id);
+  m.style.display = 'flex'; m.style.opacity = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => m.style.opacity = '1'));
+}
+function hideModal(id) {
+  const m = document.getElementById(id);
+  m.style.opacity = '0';
+  setTimeout(() => { m.style.display = 'none'; }, 180);
+}
+
+function openResetModal() {
+  document.getElementById('reset-floor-label').textContent = currentFloor + '층';
+  document.getElementById('reset-pw-input').value = '';
+  document.getElementById('reset-pw-error').style.display = 'none';
+  showModal('reset-modal');
+  setTimeout(() => document.getElementById('reset-pw-input').focus(), 200);
+}
+function closeResetModal() { hideModal('reset-modal'); }
+
+async function confirmReset() {
+  const pw = document.getElementById('reset-pw-input').value;
+  if (pw !== EDIT_PASSWORD) {
+    document.getElementById('reset-pw-error').style.display = 'block';
+    document.getElementById('reset-pw-input').value = '';
+    document.getElementById('reset-pw-input').focus();
+    return;
+  }
+  closeResetModal();
+  await resetFloor(currentFloor);
+  showToast('✅ ' + currentFloor + '층 데이터가 초기화되었습니다.');
+}
+
+function openResetAllModal() {
+  document.getElementById('reset-all-pw-input').value = '';
+  document.getElementById('reset-all-pw-error').style.display = 'none';
+  showModal('reset-all-modal');
+  setTimeout(() => document.getElementById('reset-all-pw-input').focus(), 200);
+}
+function closeResetAllModal() { hideModal('reset-all-modal'); }
+
+function confirmResetAllPw() {
+  const pw = document.getElementById('reset-all-pw-input').value;
+  if (pw !== EDIT_PASSWORD) {
+    document.getElementById('reset-all-pw-error').style.display = 'block';
+    document.getElementById('reset-all-pw-input').value = '';
+    document.getElementById('reset-all-pw-input').focus();
+    return;
+  }
+  closeResetAllModal();
+  showModal('reset-all-confirm2');
+}
+
+function closeResetAllConfirm2() { hideModal('reset-all-confirm2'); }
+let _resetCountdownTimer = null;
+
+function proceedToConfirm3() {
+  hideModal('reset-all-confirm2');
+  showModal('reset-all-confirm3');
+
+  const btn = document.getElementById('reset-all3-confirm-btn');
+  btn.disabled = true;
+  btn.style.background = '#ccc';
+  btn.style.cursor = 'not-allowed';
+  let remaining = 5;
+  btn.textContent = '전체 삭제 (' + remaining + '초)';
+  if (_resetCountdownTimer) clearInterval(_resetCountdownTimer);
+  _resetCountdownTimer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(_resetCountdownTimer);
+      _resetCountdownTimer = null;
+      btn.disabled = false;
+      btn.style.background = '#990000';
+      btn.style.cursor = 'pointer';
+      btn.textContent = '전체 삭제';
+    } else {
+      btn.textContent = '전체 삭제 (' + remaining + '초)';
+    }
+  }, 1000);
+}
+
+function closeResetAllConfirm3() {
+  if (_resetCountdownTimer) { clearInterval(_resetCountdownTimer); _resetCountdownTimer = null; }
+  hideModal('reset-all-confirm3');
+}
+async function finalResetAll() {
+  hideModal('reset-all-confirm3');
+  // 모든 층 메모리+서버 삭제
+  for (const f of [1,2,3,4]) {
+    // 메모리에 있는 데이터 삭제
+    await resetFloor(f);
+    // 서버에서 해당 층 파일 목록을 불러와서 삭제 (메모리에 없는 층 포함)
+    try {
+      const [rooms, lines, mrks, flrMrks] = await Promise.all([
+        fetch('/api/rooms/' + f).then(r=>r.json()),
+        fetch('/api/lines/' + f).then(r=>r.json()),
+        fetch('/api/markers/' + f).then(r=>r.json()),
+        fetch('/api/flr_markers/' + f).then(r=>r.json()),
+      ]);
+      await Promise.all([
+        ...rooms.map(id => fetch('/api/room/'+f+'/'+encodeURIComponent(id), {method:'DELETE'})),
+        ...lines.map(id => fetch('/api/line/'+f+'/'+encodeURIComponent(id), {method:'DELETE'})),
+        ...mrks.map(id => fetch('/api/marker/'+f+'/'+encodeURIComponent(id), {method:'DELETE'})),
+        ...flrMrks.map(id => fetch('/api/flr_marker/'+f+'/'+encodeURIComponent(id), {method:'DELETE'})),
+      ]);
+    } catch(e) { console.warn('reset floor', f, 'error:', e); }
+  }
+  showToast('✅ 전체 데이터가 초기화되었습니다.');
+}
+
+async function resetFloor(f) {
+  const zonesToRemove = zones.filter(z => z.floor === f);
+  for (const z of zonesToRemove) {
+    scene.remove(z.mesh); z.mesh.geometry.dispose(); z.mesh.material.dispose();
+    scene.remove(z.line); z.line.geometry.dispose(); z.line.material.dispose();
+    await fetch('/api/room/' + f + '/' + encodeURIComponent(z.id), { method: 'DELETE' });
+    zones.splice(zones.indexOf(z), 1);
+  }
+  const pathsToRemove = paths.filter(p => p.floor === f);
+  for (const p of pathsToRemove) {
+    p.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+    p.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+    await fetch('/api/line/' + f + '/' + encodeURIComponent(p.id), { method: 'DELETE' });
+    paths.splice(paths.indexOf(p), 1);
+  }
+  const markersToRemove = markers.filter(m => m.floor === f);
+  for (const m of markersToRemove) {
+    scene.remove(m.mesh); m.mesh.geometry.dispose(); m.mesh.material.dispose();
+    await fetch('/api/marker/' + f + '/' + encodeURIComponent(m.id), { method: 'DELETE' });
+    markers.splice(markers.indexOf(m), 1);
+  }
+  const flrMarkersToRemove = flrMarkers.filter(m => m.floor === f);
+  for (const m of flrMarkersToRemove) {
+    scene.remove(m.mesh); m.mesh.geometry.dispose(); m.mesh.material.dispose();
+    await fetch('/api/flr_marker/' + f + '/' + encodeURIComponent(m.id), { method: 'DELETE' });
+    flrMarkers.splice(flrMarkers.indexOf(m), 1);
+  }
+  selZ = null; selectedPath = null; deselectDot();
+}
+
+window.openResetModal      = openResetModal;
+window.closeResetModal     = closeResetModal;
+window.confirmReset        = confirmReset;
+window.openResetAllModal   = openResetAllModal;
+window.closeResetAllModal  = closeResetAllModal;
+window.confirmResetAllPw   = confirmResetAllPw;
+window.proceedToConfirm3   = proceedToConfirm3;
+window.closeResetAllConfirm2 = closeResetAllConfirm2;
+window.finalResetAll       = finalResetAll;
+window.closeResetAllConfirm3 = closeResetAllConfirm3;
+// ── 데이터 초기화 끝 ─────────────────────────────
 window.closeGuide    = closeGuide;
 window.openSearch    = openSearch;
 window.closeSearch   = closeSearch;
@@ -2836,7 +3205,6 @@ window.toggleDarkMode = toggleDarkMode;
 
 // 버튼 이벤트 등록 (onclick 대신 JS로)
 document.getElementById('menu-btn').addEventListener('click', () => {
-  console.log('menu-btn clicked, toggleMenu=', typeof toggleMenu);
   toggleMenu();
 });
 document.getElementById('mobile-menu-btn').addEventListener('click', toggleMenu);
@@ -2908,17 +3276,12 @@ function showPasswordPrompt() {
 
 function toggleEdit() {
   editMode = !editMode;
-  console.log('toggleEdit: editMode='+editMode+' zones='+zones.length+' paths='+paths.length+' markers='+markers.length);
   document.getElementById('hdr').classList.toggle('edit-mode', editMode);
   document.getElementById('edit-banner')?.classList.toggle('show', editMode);
   document.getElementById('edit-toolbar').classList.toggle('show', editMode);
   if (!editMode) { cancelDraw(); cancelPathDraw(); selZ = null; closePopup(); deselectPath(); }
   setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
-  console.log('toggleEdit done: toolbar.show='+document.getElementById('edit-toolbar').classList.contains('show'));
   renderer.domElement.style.cursor = editMode ? 'crosshair' : 'default';
-  orbit.mouseButtons = editMode
-    ? { LEFT: THREE.MOUSE.PAN,    MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }
-    : { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
 }
 
 window.setTool = function (t) {
@@ -3014,7 +3377,6 @@ function detectFace(z, e) {
   return dirs.reduce((b, f) => { const d = n.dot(f.v); return d > b.d ? { name: f.name, d } : b; }, { name: null, d: -2 }).name;
 }
 function startResize(z, face, e) {
-  pushUndo(`크기 조절 전 (${z.name || z.id})`);
   resizing = true; rZ = z; rFace = face;
   rMouse = { x: e.clientX, y: e.clientY };
   rBox = z.box.clone();
@@ -3036,19 +3398,26 @@ function startResize(z, face, e) {
 
 function moveResize(e) {
   if (!resizing) return;
-  rc.setFromCamera(ndc(e), camera);
-  const cur = new THREE.Vector3();
-  if (!rc.ray.intersectPlane(rResizePlane, cur)) return;
 
-  const delta = cur.clone().sub(rStartWorld); // 월드 공간 이동량
   const b = rBox.clone();
 
-  if      (rFace === 'px') b.max.x = Math.max(b.min.x + 0.05, rBox.max.x + delta.x);
-  else if (rFace === 'nx') b.min.x = Math.min(b.max.x - 0.05, rBox.min.x + delta.x);
-  else if (rFace === 'pz') b.max.z = Math.max(b.min.z + 0.05, rBox.max.z + delta.z);
-  else if (rFace === 'nz') b.min.z = Math.min(b.max.z - 0.05, rBox.min.z + delta.z);
-  else if (rFace === 'py') b.max.y = Math.max(b.min.y + 0.05, rBox.max.y - delta.z);
-  else if (rFace === 'ny') b.min.y = Math.min(b.max.y - 0.05, rBox.min.y - delta.z);
+  if (rFace === 'py' || rFace === 'ny') {
+    // 높이 조절: 화면 Y 드래그 → 위로 드래그=증가, 아래로=감소
+    const dyScreen = rMouse.y - e.clientY; // 위로 드래그하면 양수
+    const scale = 0.004; // 감도
+    const delta = dyScreen * scale;
+    if (rFace === 'py') b.max.y = Math.max(b.min.y + 0.05, rBox.max.y + delta);
+    else                b.min.y = Math.min(b.max.y - 0.05, rBox.min.y - delta);
+  } else {
+    rc.setFromCamera(ndc(e), camera);
+    const cur = new THREE.Vector3();
+    if (!rc.ray.intersectPlane(rResizePlane, cur)) return;
+    const delta = cur.clone().sub(rStartWorld);
+    if      (rFace === 'px') b.max.x = Math.max(b.min.x + 0.05, rBox.max.x + delta.x);
+    else if (rFace === 'nx') b.min.x = Math.min(b.max.x - 0.05, rBox.min.x + delta.x);
+    else if (rFace === 'pz') b.max.z = Math.max(b.min.z + 0.05, rBox.max.z + delta.z);
+    else if (rFace === 'nz') b.min.z = Math.min(b.max.z - 0.05, rBox.min.z + delta.z);
+  }
 
   rZ.box = b; rebuildZone(rZ); rZ.mesh.material = zoneSelMat();
 }
@@ -3158,6 +3527,10 @@ function hitZone(e) {
    POPUP
 ════════════════════════════ */
 function showPopup(z, sx, sy) {
+  // 이전에 열린 팝업의 레이블 복원
+  zones.forEach(oz => { if (oz.label) oz.label.visible = !!oz.name && oz.mesh.visible; });
+  // 현재 방 레이블 숨기기
+  if (z.label) { z.label.visible = false; }
   document.getElementById('pp-id').textContent   = z.id;
   document.getElementById('pp-name').textContent = z.name || '(이름 없음)';
   const dEl = document.getElementById('pp-desc');
@@ -3206,18 +3579,24 @@ window.__stopBlink = stopBlink;
    MODAL
 ════════════════════════════ */
 function openModal(z) {
-  console.log('openModal: z='+z.id+' edit-modal exists='+(!!document.getElementById('edit-modal')));
   modalZ = z;
   document.getElementById('m-mid').textContent   = '(' + z.id + ')';
   document.getElementById('m-name').value  = z.name  || '';
   document.getElementById('m-desc').value  = z.desc  || '';
   document.getElementById('m-tags').value  = z.tags  || '';
+  document.getElementById('m-centertext').value = z.centerText || '';
   document.getElementById('m-color').value = z.color || '#0077cc';
+  // 이미지
+  const imgName = z.centerImage || '';
+  document.getElementById('m-centerimage-name').textContent = imgName || '없음';
+  const prev = document.getElementById('m-centerimage-preview');
+  if (imgName) { prev.src = 'image/' + imgName; prev.style.display = 'block'; }
+  else { prev.src = ''; prev.style.display = 'none'; }
+  document.getElementById('m-centerimage-upload').value = '';
   document.getElementById('m-cprev').style.background = z.color || '#0077cc';
   document.getElementById('btn-save-room').textContent = z.isNew ? '만들기' : '수정';
   z.isNew = false;
   document.getElementById('edit-modal').classList.add('show');
-  console.log('openModal done: show='+document.getElementById('edit-modal').classList.contains('show'));
 }
 window.closeModal = function () {
   document.getElementById('edit-modal').classList.remove('show'); modalZ = null;
@@ -3237,6 +3616,65 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-move').addEventListener('click',       () => setTool('move'));
   document.getElementById('btn-flrmarker').addEventListener('click',  () => setTool('flrmarker'));
   document.getElementById('btn-connect').addEventListener('click', () => setTool('connect'));
+  // 이미지 업로드
+  document.getElementById('m-centerimage-upload').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const res = await fetch('/api/upload-image', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById('m-centerimage-name').textContent = data.filename;
+        const prev = document.getElementById('m-centerimage-preview');
+        prev.src = 'image/' + data.filename + '?t=' + Date.now();
+        prev.style.display = 'block';
+        showToast(data.exists ? '✅ 기존 이미지 사용: ' + data.filename : '✅ 이미지 업로드 완료: ' + data.filename);
+      }
+    } catch(e) { showToast('❌ 이미지 업로드 실패'); }
+  });
+  document.getElementById('m-centerimage-clear').addEventListener('click', () => {
+    document.getElementById('m-centerimage-name').textContent = '없음';
+    const prev = document.getElementById('m-centerimage-preview');
+    prev.src = ''; prev.style.display = 'none';
+    document.getElementById('m-centerimage-upload').value = '';
+  });
+  document.getElementById('btn-snapshot').addEventListener('click', saveSnapshot);
+  document.getElementById('snapshot-name-confirm').addEventListener('click', () => {
+    doSaveSnapshot(document.getElementById('snapshot-name-input').value);
+  });
+  document.getElementById('snapshot-name-cancel').addEventListener('click', () => {
+    const modal = document.getElementById('snapshot-name-modal');
+    modal.style.opacity = '0';
+    setTimeout(() => { modal.style.display = 'none'; }, 180);
+  });
+  document.getElementById('snapshot-name-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSaveSnapshot(e.target.value);
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('snapshot-name-modal');
+      modal.style.opacity = '0';
+      setTimeout(() => { modal.style.display = 'none'; }, 180);
+    }
+  });
+  document.getElementById('btn-reset-floor').addEventListener('click', openResetModal);
+  document.getElementById('btn-reset-all').addEventListener('click', openResetAllModal);
+  document.getElementById('reset-cancel-btn').addEventListener('click', closeResetModal);
+  document.getElementById('reset-confirm-btn').addEventListener('click', confirmReset);
+  document.getElementById('reset-pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmReset();
+    if (e.key === 'Escape') closeResetModal();
+  });
+  document.getElementById('reset-all-cancel-btn').addEventListener('click', closeResetAllModal);
+  document.getElementById('reset-all-confirm-btn').addEventListener('click', confirmResetAllPw);
+  document.getElementById('reset-all-pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmResetAllPw();
+    if (e.key === 'Escape') closeResetAllModal();
+  });
+  document.getElementById('reset-all2-cancel-btn').addEventListener('click', closeResetAllConfirm2);
+  document.getElementById('reset-all2-next-btn').addEventListener('click', proceedToConfirm3);
+  document.getElementById('reset-all3-cancel-btn').addEventListener('click', closeResetAllConfirm3);
+  document.getElementById('reset-all3-confirm-btn').addEventListener('click', finalResetAll);
 
   // 마커 모달 버튼
   document.getElementById('fm-cancel').addEventListener('click', () => closeFlrMarkerModal());
@@ -3281,12 +3719,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-cancel-modal').addEventListener('click',() => window.closeModal());
   document.getElementById('btn-save-room').addEventListener('click', async () => {
     if (!modalZ) return;
-    const isNew = document.getElementById('btn-save-room').textContent === '만들기';
-    await pushUndo(isNew ? `방 만들기 (${modalZ.id})` : `정보 수정 (${modalZ.name || modalZ.id})`);
-    modalZ.name  = document.getElementById('m-name').value.trim();
-    modalZ.desc  = document.getElementById('m-desc').value.trim();
-    modalZ.tags  = document.getElementById('m-tags').value.trim();
-    modalZ.color = document.getElementById('m-color').value;
+    modalZ.name       = document.getElementById('m-name').value.trim();
+    modalZ.desc       = document.getElementById('m-desc').value.trim();
+    modalZ.tags       = document.getElementById('m-tags').value.trim();
+    modalZ.centerText = document.getElementById('m-centertext').value.trim();
+    modalZ.centerImage = document.getElementById('m-centerimage-name').textContent === '없음' ? '' : document.getElementById('m-centerimage-name').textContent;
+    modalZ.color      = document.getElementById('m-color').value;
     rebuildZone(modalZ);
     await apiSaveZone(modalZ);
     closeModal();
@@ -3305,7 +3743,6 @@ window.saveRoom = async function () {
 };
 window.deleteRoom = async function () {
   if (!modalZ) return;
-  await pushUndo(`영역 삭제 (${modalZ.name || modalZ.id})`);
   await apiDeleteZone(modalZ);
   if (selZ === modalZ) selZ = null;
   removeZone(modalZ); modalZ = null;
@@ -3328,7 +3765,7 @@ el.addEventListener('pointerdown', e => {
     const hit = hitZone(e);
     if (hit) {
       moveZone = hit;
-      const pt = groundPt(e);
+          const pt = groundPt(e);
       moveZoneDragStart = pt ? pt.clone() : null;
       moveZoneOrigin    = hit.box.getCenter(new THREE.Vector3()).clone();
       orbit.enabled = false;
@@ -3452,7 +3889,6 @@ el.addEventListener('pointermove', e => {
 
 el.addEventListener('pointerup', async e => {
   if (e.button !== 0) { orbit.enabled = true; return; }
-  console.log('pointerup: editMode='+editMode+' tool='+tool+' pMoved='+pMoved+' drawing='+drawing+' resizing='+resizing+' moveZone='+(!!moveZone)+' markerDrag='+(!!markerDrag));
   if (drawing)  { endDraw();   return; }
   if (resizing) { endResize(); return; }
 
@@ -3460,7 +3896,6 @@ el.addEventListener('pointerup', async e => {
   if (moveZone) {
     orbit.enabled = true;
     if (pMoved) {
-      pushUndo(`방 이동 (${moveZone.name || moveZone.id})`);
       await apiSaveZone(moveZone);
       showToast('✅ 방 위치 저장');
     }
@@ -3535,62 +3970,38 @@ el.addEventListener('pointerup', async e => {
     if (editMode && tool === 'path' && !pMoved) {
       // 기존 선의 점 클릭 → 그 점에서 합치기
       const existingDot = findDotAtPointer(e);
-      if (existingDot && pathDrawing) {
+      if (existingDot && pathDrawing && pathPoints.length >= 1) {
         const targetPath = existingDot.path;
         const targetIdx  = existingDot.dotIdx;
         const dotPos = targetPath.dotMeshes[targetIdx].position;
         const mergePt = new THREE.Vector3(dotPos.x, dotPos.y - PATH_HEIGHT_OFFSET, dotPos.z);
 
-        // 현재 그리던 선 마지막에 합칠 점까지 선분 추가
-        const last = pathPoints[pathPoints.length - 1];
-        if (mergePt.distanceTo(last) > PATH_DOT_R * 2) {
-          pathLines.push(makeLineSeg(last, mergePt, false));
-          pathPoints.push(mergePt.clone());
-          pathDotMeshes.push(makeDotMesh(mergePt));
+        // 현재 그리던 점들 (시작점 제외, 끝점 포함하지 않음 - 이미 targetPath에 있는 점이므로)
+        const newPts = pathPoints.slice(1).map(p => [p.x, p.y, p.z]);
+        const insertPts = [...newPts].reverse();
+
+        // targetPath의 targetIdx+1 위치에 새 점들을 역순으로 삽입
+        targetPath.points.splice(targetIdx + 1, 0, ...insertPts);
+
+        // targetPath 메시 재생성 (ID는 유지 → 마커 연결 유지)
+        targetPath.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+        targetPath.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+        const tPts = targetPath.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+        targetPath.dotMeshes = tPts.map(p => { const m = makeDotMesh(p); m.visible = editMode; return m; });
+        targetPath.lines = [];
+        for (let i = 1; i < tPts.length; i++) {
+          const s = makeLineSeg(tPts[i-1], tPts[i], false);
+          s.visible = editMode; targetPath.lines.push(s);
         }
 
-        // 새 선 저장
-        if (pathPoints.length >= 2) {
-          const newId = 'path_' + pathId++;
-          const newPath = { id: newId, floor: currentFloor,
-            points: pathPoints.map(p => p.toArray()),
-            dotMeshes: [...pathDotMeshes], lines: [...pathLines] };
-          paths.push(newPath);
-          setPathVis();
-          await savePathToServer(newPath);
-
-          // 기존 선과 새 선 합치기
-          const mergedPoints = [
-            ...targetPath.points.slice(0, targetIdx + 1),
-            ...newPath.points.slice(0, -1).reverse(), // 새 선을 뒤집어서 앞에 붙이기
-          ].concat(targetPath.points.slice(targetIdx + 1));
-
-          // 실제로는 targetPath에 새 점들을 삽입
-          const insertPts = newPath.points.slice(1, -1).reverse(); // 연결점 제외한 중간 점들
-          targetPath.points.splice(targetIdx + 1, 0, ...insertPts);
-
-          // targetPath 메시 재생성
-          targetPath.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
-          targetPath.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
-          const tPts = targetPath.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
-          targetPath.dotMeshes = tPts.map(p => { const m = makeDotMesh(p); m.visible = editMode; return m; });
-          targetPath.lines = [];
-          for (let i = 1; i < tPts.length; i++) {
-            const s = makeLineSeg(tPts[i-1], tPts[i], false);
-            s.visible = editMode; targetPath.lines.push(s);
-          }
-
-          // 새로 만든 임시 선 제거
-          paths.splice(paths.indexOf(newPath), 1);
-          newPath.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
-          newPath.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
-
-          await savePathToServer(targetPath);
-          showToast('✅ 선이 합쳐졌습니다.');
-        }
-
-        pathDrawing = false; pathPoints = []; pathDotMeshes = []; pathLines = [];
+        // 임시 그리던 메시 제거
+        pathDotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
+        pathLines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
         if (pathPreviewLine) { scene.remove(pathPreviewLine); pathPreviewLine.geometry.dispose(); pathPreviewLine = null; }
+        pathDrawing = false; pathPoints = []; pathDotMeshes = []; pathLines = [];
+
+        await savePathToServer(targetPath);
+        showToast('✅ 선이 합쳐졌습니다.');
         if (_branchFromDotEdit) { _branchFromDotEdit = false; setTool('dot-edit'); }
         document.getElementById('edit-hint').textContent = '바닥을 클릭&드래그해 영역을 만드세요';
         return;
@@ -3612,9 +4023,13 @@ el.addEventListener('pointerup', async e => {
       const mFound = findMarkerAtPointer(e);
       if (mFound) { openMarkerModal(mFound); return; }
 
-      // 1. 영역 클릭 우선
+      // 1. 영역 클릭 (select 도구에서만 정보수정 가능)
       const hit = hitZone(e);
-      if (hit) { selZ = hit; setVis(); startBlink(selZ); openModal(selZ); return; }
+      if (hit) {
+        if (tool === 'select') { selZ = hit; setVis(); startBlink(selZ); openModal(selZ); return; }
+        selZ = hit; setVis(); // resize/move는 선택만
+        return;
+      }
       selZ = null; setVis();
 
       // 2. 선 클릭
@@ -3702,8 +4117,7 @@ window.addEventListener('keydown', e => {
     if (selectedDot) { deleteDotFromPath(selectedDot.path, selectedDot.dotIdx); return; }
     if (selectedPath) { deleteSelectedPath(); return; }
     if (selZ) {
-      pushUndo(`영역 삭제 (${selZ.name || selZ.id})`);
-      apiDeleteZone(selZ); removeZone(selZ); selZ = null;
+          apiDeleteZone(selZ); removeZone(selZ); selZ = null;
     }
   }
 });
@@ -3930,8 +4344,7 @@ async function _doInstantSwitch(floor) {
 }
 
 function switchFloor(floor) {
-  console.log('switchFloor:', floor, 'navRouteLines:', navRouteLines.length, 'currentFloor:', currentFloor);
-  if (navRouteLines.length > 0) { console.log('  blocked: route active'); return; }
+  if (navRouteLines.length > 0) { return; }
   if (floor === currentFloor && currentModel && !_instantSwitch) return;
   if (isLoading || slideAnim) return;
 
@@ -4061,6 +4474,7 @@ function switchFloor(floor) {
                 const n = parseInt(data.id.replace('z',''));
                 if (!isNaN(n) && n >= zid) zid = n + 1;
                 const z = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+                z.centerText = data.centerText || ''; z.centerImage = data.centerImage || ''; updateZoneLabel(z);
                 // newM과 같은 시작 위치 (반대 방향 SLIDE_DIST 밖)에 배치
                 const offsetY = (-dir) * SLIDE_DIST;
                 z.mesh.position.y = z.mesh.position.y + offsetY;
@@ -4082,9 +4496,8 @@ function switchFloor(floor) {
             grid.position.y = nb.min.y;
             gPlane.constant = -nb.min.y;
             modelTopY = nb.max.y;
-            undoStack.length = 0;
+            snapshots.length = 0; updateUndoBtn();
             updateUndoBtn();
-            await clearBackups(floor);
             await apiLoadAll();
             await loadPathsForFloor(floor);
             await loadMarkersForFloor(floor);
@@ -4114,8 +4527,7 @@ function switchFloor(floor) {
         document.getElementById('hdr').classList.add('edit-mode');
       }
       if (!oldModel) {
-        await clearBackups(floor);
-        undoStack.length = 0;
+        snapshots.length = 0; updateUndoBtn();
         updateUndoBtn();
         miniLoader.classList.remove('show');
         await apiLoadAll();
