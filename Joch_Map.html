@@ -1629,42 +1629,33 @@ async function apiDeleteZone(z) {
 const _dataCache = {}; // { floor: { rooms, paths, markers, flrMarkers } }
 
 async function preloadAllData() {
-  for (const f of [1, 2, 3, 4]) {
-    _dataCache[f] = { rooms: [], paths: [], markers: [], flrMarkers: [] };
-    try {
-      // 방
-      const roomFiles = await fetch('/api/rooms/' + f).then(r => r.json()).catch(() => []);
-      for (const fname of roomFiles) {
-        try {
-          const text = await fetch('/api/room/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
-          _dataCache[f].rooms.push({ id: fname, text });
-        } catch(e) {}
-      }
-      // 선
-      const lineFiles = await fetch('/api/lines/' + f).then(r => r.json()).catch(() => []);
-      for (const fname of lineFiles) {
-        try {
-          const text = await fetch('/api/line/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
-          _dataCache[f].paths.push({ id: fname, text });
-        } catch(e) {}
-      }
-      // 마커
-      const markerFiles = await fetch('/api/markers/' + f).then(r => r.json()).catch(() => []);
-      for (const fname of markerFiles) {
-        try {
-          const text = await fetch('/api/marker/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
-          _dataCache[f].markers.push({ id: fname, text });
-        } catch(e) {}
-      }
-      // 층이동 마커
-      const flrFiles = await fetch('/api/flr_markers/' + f).then(r => r.json()).catch(() => []);
-      for (const fname of flrFiles) {
-        try {
-          const text = await fetch('/api/flr_marker/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
-          _dataCache[f].flrMarkers.push({ id: fname, text });
-        } catch(e) {}
-      }
-    } catch(e) {}
+  // 모든 층의 모든 파일 목록을 한번에 병렬로 가져오기
+  const [roomLists, lineLists, markerLists, flrLists] = await Promise.all([
+    Promise.all([1,2,3,4].map(f => fetch('/api/rooms/'+f).then(r=>r.json()).catch(()=>[]))),
+    Promise.all([1,2,3,4].map(f => fetch('/api/lines/'+f).then(r=>r.json()).catch(()=>[]))),
+    Promise.all([1,2,3,4].map(f => fetch('/api/markers/'+f).then(r=>r.json()).catch(()=>[]))),
+    Promise.all([1,2,3,4].map(f => fetch('/api/flr_markers/'+f).then(r=>r.json()).catch(()=>[]))),
+  ]);
+
+  // 모든 파일 내용 병렬로 가져오기
+  const fetchAll = (type, floor, files) =>
+    Promise.all(files.map(fname =>
+      fetch(`/api/${type}/${floor}/${encodeURIComponent(fname)}`)
+        .then(r => r.text())
+        .then(text => ({ id: fname, text }))
+        .catch(() => null)
+    )).then(r => r.filter(Boolean));
+
+  const results = await Promise.all([1,2,3,4].map(async (f, i) => ({
+    floor: f,
+    rooms:      await fetchAll('room',       f, roomLists[i]),
+    paths:      await fetchAll('line',       f, lineLists[i]),
+    markers:    await fetchAll('marker',     f, markerLists[i]),
+    flrMarkers: await fetchAll('flr_marker', f, flrLists[i]),
+  })));
+
+  for (const { floor, rooms, paths, markers, flrMarkers } of results) {
+    _dataCache[floor] = { rooms, paths, markers, flrMarkers };
   }
 }
 
@@ -4665,23 +4656,25 @@ function switchFloor(floor) {
 
 window.switchFloor = switchFloor;
 
-// 모든 층 미리 로드 (백그라운드)
+// 모든 층 데이터+모델 병렬 로드
 (async () => {
-  // 데이터와 모델 동시 병렬 로드
-  await Promise.all([
+  // 데이터 전체 + 모든 모델 동시 병렬 로드
+  const [_, ...otherModels] = await Promise.all([
     preloadAllData(),
-    switchFloor(1),
+    ...([2, 3, 4].map(f => loadModel(f).catch(() => null))),
   ]);
 
-  // 나머지 층 모델 백그라운드 로드
-  for (const f of [2, 3, 4]) {
-    try {
-      const m = await loadModel(f);
-      m.visible = false;
-      m.traverse(n => { if (n.isMesh) n.material.opacity = 0.88; });
-      _preloadedModels[f] = m;
-    } catch(e) { console.warn('preload floor', f, 'failed:', e); }
-  }
+  // 2~4층 모델 캐시에 저장
+  [2, 3, 4].forEach((f, i) => {
+    const m = otherModels[i];
+    if (!m) return;
+    m.visible = false;
+    m.traverse(n => { if (n.isMesh) n.material.opacity = 0.88; });
+    _preloadedModels[f] = m;
+  });
+
+  // 1층 로드 (데이터 캐시 준비된 상태에서)
+  await switchFloor(1);
 })();
 
 /* ── resize ── */
