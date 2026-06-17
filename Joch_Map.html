@@ -106,7 +106,8 @@ header.edit-mode{background:rgba(255,245,237,.97);border-bottom:2px solid var(--
 .logo-link:hover{opacity:.7}
 .logo-img{height:36px;width:auto;object-fit:contain;border-radius:6px}
 .logo-label{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;letter-spacing:.12em;color:var(--accent)}
-.floor-selector{display:flex;gap:6px}
+.floor-selector{display:flex;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px}
+body.dark .floor-selector{background:rgba(255,255,255,.08)}
 .menu-item{display:block;width:100%;text-align:left;background:none;border:none;padding:10px 14px;border-radius:8px;font-size:.92rem;cursor:pointer;color:#1a2233;transition:background .12s}
 .menu-item:hover{background:rgba(0,119,204,.08)}
 .menu-item.active{color:#0077cc;font-weight:700}
@@ -114,10 +115,11 @@ header.edit-mode{background:rgba(255,245,237,.97);border-bottom:2px solid var(--
 body.lowspec *{animation:none!important}
 body.lowspec *:not(.theme-transitioning){transition:none!important}
 body.lowspec canvas{image-rendering:pixelated}
-.floor-btn{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.08em;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:5px 14px;background:transparent;cursor:pointer;transition:all .2s}
-.floor-btn:hover{background:rgba(0,119,204,.12)}
-.floor-btn.active{background:var(--accent);color:#fff}
+.floor-btn{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.08em;color:var(--dim);border:none;border-radius:50px;padding:5px 14px;background:transparent;cursor:pointer;transition:color .22s;position:relative;z-index:1}
+.floor-btn:hover{color:var(--accent)}
+.floor-btn.active{color:#fff}
 .floor-btn:disabled{opacity:.4;cursor:not-allowed}
+.seg-indicator{position:absolute;top:3px;height:calc(100% - 6px);border-radius:50px;background:var(--accent);transition:left .22s cubic-bezier(.4,0,.2,1),width .22s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0}
 .floor-badge{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 12px;background:rgba(0,119,204,.07)}
 #edit-banner{display:none;position:fixed;top:65px;left:50%;transform:translateX(-50%);z-index:20;background:var(--edit);color:#fff;font-size:.78rem;font-weight:500;padding:7px 20px;border-radius:0 0 10px 10px;box-shadow:0 4px 16px rgba(224,92,0,.25);align-items:center;gap:10px}
 #edit-banner.show{display:flex}
@@ -334,15 +336,17 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
   </button>
   <!-- 데스크톱 오른쪽 그룹 -->
   <div id="header-right" style="display:flex;align-items:center;gap:8px">
-    <div class="floor-selector">
+    <div class="floor-selector" id="floor-selector">
+      <div class="seg-indicator" id="floor-indicator"></div>
       <button class="floor-btn active" id="fbtn-1" onclick="switchFloor(1)">1F</button>
       <button class="floor-btn" id="fbtn-2" onclick="switchFloor(2)">2F</button>
       <button class="floor-btn" id="fbtn-3" onclick="switchFloor(3)">3F</button>
       <button class="floor-btn" id="fbtn-4" onclick="switchFloor(4)">4F</button>
     </div>
-    <div id="theme-toggle" title="테마 전환" style="display:flex;align-items:center;background:var(--border);border-radius:50px;padding:3px;gap:2px;cursor:pointer;border:1.5px solid var(--border)">
-      <button id="theme-light-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .3s,color .3s;background:#ffffff;color:#1a2340">☀️ 화이트</button>
-      <button id="theme-dark-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .3s,color .3s;background:transparent;color:#6b7a9f">🌙 다크</button>
+    <div id="theme-toggle" title="테마 전환" style="display:flex;align-items:center;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px;cursor:pointer">
+      <div class="seg-indicator" id="theme-indicator" style="background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15)"></div>
+      <button id="theme-light-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:transparent;color:var(--text);position:relative;z-index:1;transition:color .22s">☀️ 화이트</button>
+      <button id="theme-dark-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:transparent;color:var(--dim);position:relative;z-index:1;transition:color .22s">🌙 다크</button>
     </div>
     <button id="menu-btn" title="메뉴" style="background:none;border:none;cursor:pointer;padding:6px 10px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;border-radius:8px;transition:background .15s" onmouseenter="this.style.background='rgba(0,119,204,.08)'" onmouseleave="this.style.background='none'">
       <span style="display:block;width:18px;height:2px;background:var(--accent);border-radius:2px"></span>
@@ -704,6 +708,8 @@ let   zid   = 1;
 let navStart = null; // { marker, zoneId }
 let navEnd   = null;
 let navRouteLines = []; // 경로 표시 선들
+let _savedCameraPos    = null;
+let _savedCameraTarget = null;
 
 const NAV_COLOR  = 0x1a6b9e;
 const NAV_WIDTH  = 3;
@@ -952,20 +958,79 @@ function showNavPanel(startZone, endZone, startFloor, endFloor) {
     </div>
   `;
   panel.classList.add('show');
+
+  // 경로 전체가 보이는 카메라 위치로 이동
+  fitCameraToNavRoute();
+}
+
+function fitCameraToNavRoute() {
+  // 현재 카메라 상태 저장
+  _savedCameraPos    = camera.position.clone();
+  _savedCameraTarget = orbit.target.clone();
+
+  // 경로 라인의 모든 점 수집
+  const pts = [];
+  navRouteLines.forEach(line => {
+    const pos = line.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      pts.push(new THREE.Vector3(pos.getX(i), pos.getY(i), pos.getZ(i)));
+    }
+  });
+  if (pts.length === 0) return;
+
+  // bounding box 계산
+  const box = new THREE.Box3().setFromPoints(pts);
+  const center = box.getCenter(new THREE.Vector3());
+  const size   = box.getSize(new THREE.Vector3());
+
+  // 카메라가 전체를 볼 수 있는 거리 계산
+  const maxDim = Math.max(size.x, size.z);
+  const fov    = camera.fov * (Math.PI / 180);
+  let dist     = (maxDim / 2) / Math.tan(fov / 2);
+  dist = Math.max(dist * 1.8, 5); // 여유 1.8배, 최소 5
+
+  // orbit target을 경로 중심으로, 카메라를 비스듬히 위에서
+  const camPos = new THREE.Vector3(
+    center.x + dist * 0.4,
+    center.y + dist * 0.9,
+    center.z + dist * 0.7,
+  );
+
+  // 부드럽게 이동 (0.5초)
+  const startPos    = camera.position.clone();
+  const startTarget = orbit.target.clone();
+  const endTarget   = new THREE.Vector3(center.x, center.y, center.z);
+  let t = 0;
+  const dur = 500;
+  const t0  = performance.now();
+
+  function animCam(now) {
+    t = Math.min((now - t0) / dur, 1);
+    const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // easeInOut
+    camera.position.lerpVectors(startPos, camPos, e);
+    orbit.target.lerpVectors(startTarget, endTarget, e);
+    orbit.update();
+    if (t < 1) requestAnimationFrame(animCam);
+  }
+  requestAnimationFrame(animCam);
 }
 
 // 다층 경로: 두 층 그래프를 합치고 층이동 마커를 포털 엣지로 연결
 async function findMultiFloorRoute(startMarker, endMarker, startFloor, endFloor) {
-  // 출발층과 도착층만 로드 (중간층 불필요)
   const floorsNeeded = [...new Set([startFloor, endFloor])];
 
-  // 필요한 층 데이터 로드
+  // 필요한 층 데이터가 메모리에 없을 때만 로드
   const savedFloor = currentFloor;
   for (const f of floorsNeeded) {
-    currentFloor = f;
-    await loadMarkersForFloor(f);
-    await loadPathsForFloor(f);
-    await loadFlrMarkersForFloor(f);
+    const hasMarkers = markers.some(m => m.floor === f);
+    const hasPaths   = paths.some(p => p.floor === f);
+    const hasFmks    = flrMarkers.some(m => m.floor === f);
+    if (!hasMarkers || !hasPaths || !hasFmks) {
+      currentFloor = f;
+      if (!hasMarkers) await loadMarkersForFloor(f);
+      if (!hasPaths)   await loadPathsForFloor(f);
+      if (!hasFmks)    await loadFlrMarkersForFloor(f);
+    }
   }
   currentFloor = savedFloor;
 
@@ -1262,10 +1327,7 @@ function findAndDrawRoute() {
       const btnE = document.getElementById('nav-end-btn');
       if (btnS) btnS.disabled = false;
       if (btnE) btnE.disabled = false;
-      // 층 복원
-      [...zones].filter(z => z.floor !== currentFloor).forEach(z => removeZone(z));
-      [...paths].filter(p => p.floor !== currentFloor).forEach(p => removePath(p));
-      [...markers].filter(m => m.floor !== currentFloor).forEach(m => removeMarker(m));
+      // 층 복원 - 삭제하지 않고 숨기기만
       hideSecondaryFloor();
       _doInstantSwitch(currentFloor);
       return;
@@ -1302,18 +1364,30 @@ function findAndDrawRoute() {
 }
 
 function resetNav() {
-
   navStart = null; navEnd = null;
   clearNavRoute(); stopNavBlink();
-
-  if (secondaryFloor !== null) {
-    const toRemove = zones.filter(z => z.floor !== currentFloor);
-    toRemove.forEach(z => removeZone(z));
-    [...paths].filter(p => p.floor !== currentFloor).forEach(p => removePath(p));
-    [...markers].filter(m => m.floor !== currentFloor).forEach(m => removeMarker(m));
-  }
-
   hideSecondaryFloor();
+
+  // 저장된 카메라 위치 복원
+  if (_savedCameraPos && _savedCameraTarget) {
+    const startPos    = camera.position.clone();
+    const startTarget = orbit.target.clone();
+    const endPos      = _savedCameraPos.clone();
+    const endTarget   = _savedCameraTarget.clone();
+    _savedCameraPos = null; _savedCameraTarget = null;
+    let t = 0;
+    const dur = 500;
+    const t0  = performance.now();
+    function animBack(now) {
+      t = Math.min((now - t0) / dur, 1);
+      const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      camera.position.lerpVectors(startPos, endPos, e);
+      orbit.target.lerpVectors(startTarget, endTarget, e);
+      orbit.update();
+      if (t < 1) requestAnimationFrame(animBack);
+    }
+    requestAnimationFrame(animBack);
+  }
 
   zones.forEach(z => {
     const cy = z.box.getCenter(new THREE.Vector3()).y;
@@ -2207,7 +2281,7 @@ function addMarker(pos, id, name, desc, tags, roomId, pathId) {
   const mid  = id || ('m' + markerId++);
   const connected = !!roomId;
   const mesh = makeMarkerMesh(pos, connected);
-  mesh.visible = false; // setMarkerVis()에서 처리
+  mesh.visible = editMode && currentFloor === currentFloor; // 즉시 setMarkerVis
   const m = {
     id: mid, floor: currentFloor,
     pos: [pos.x, pos.y, pos.z],
@@ -2217,6 +2291,7 @@ function addMarker(pos, id, name, desc, tags, roomId, pathId) {
     mesh, isNew: false,
   };
   markers.push(m);
+  setMarkerVis(); // 추가 즉시 visibility 갱신
   return m;
 }
 
@@ -2505,11 +2580,11 @@ function makeFlrMarkerMesh(pos) {
 function addFlrMarker(pos, id, name, desc, pathId, targetFloor, pairId) {
   const fid = id || ('fm' + flrMarkerId++);
   const mesh = makeFlrMarkerMesh(pos);
-  mesh.visible = false; // setFlrMarkerVis()에서 처리
   const m = { id: fid, floor: currentFloor, pos: [pos.x, pos.y, pos.z],
     name: name||'', desc: desc||'', pathId: pathId||'',
     targetFloor: targetFloor||'', pairId: pairId||'', mesh };
   flrMarkers.push(m);
+  setFlrMarkerVis(); // 추가 즉시 visibility 갱신
   return m;
 }
 function removeFlrMarker(m) {
@@ -2685,8 +2760,18 @@ function makeZoneLabel(name, box) {
   const tex = new THREE.CanvasTexture(canvas);
   const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
   const sprite = new THREE.Sprite(mat);
-  // 크기: 아주 작게
-  sprite.scale.set(canvas.width / 300, canvas.height / 300, 1);
+
+  // 방 XZ 크기 안에 들어오도록 스케일 제한
+  const margin = 0.85; // 방 크기의 85%까지만
+  const maxSX = size.x * margin;
+  const maxSZ = size.z * margin;
+  let sw = canvas.width / 300;
+  let sh = canvas.height / 300;
+  // 가로 초과 시 축소
+  if (sw > maxSX) { const r = maxSX / sw; sw *= r; sh *= r; }
+  // 세로(Z) 초과 시 축소
+  if (sh > maxSZ) { const r = maxSZ / sh; sw *= r; sh *= r; }
+  sprite.scale.set(sw, sh, 1);
   sprite.renderOrder = 999;
   return sprite;
 }
@@ -2700,10 +2785,15 @@ function updateZoneLabel(z) {
     const tex = new THREE.TextureLoader().load('image/' + z.centerImage, (t) => {
       if (!z.label) return;
       const aspect = t.image.width / t.image.height;
-      const size = new THREE.Vector3(); z.box.getSize(size);
-      const maxS = Math.min(size.x, size.z) * 0.6;
-      if (aspect >= 1) z.label.scale.set(maxS, maxS / aspect, 1);
-      else             z.label.scale.set(maxS * aspect, maxS, 1);
+      const size2 = new THREE.Vector3(); z.box.getSize(size2);
+      const margin = 0.85;
+      const maxSX = size2.x * margin;
+      const maxSZ = size2.z * margin;
+      let sw = aspect >= 1 ? maxSX : maxSZ * aspect;
+      let sh = aspect >= 1 ? maxSX / aspect : maxSZ;
+      if (sw > maxSX) { const r = maxSX / sw; sw *= r; sh *= r; }
+      if (sh > maxSZ) { const r = maxSZ / sh; sw *= r; sh *= r; }
+      z.label.scale.set(sw, sh, 1);
       // 비동기 로드 완료 시 offset 적용
       if (z._newZoneOffsetY !== undefined) {
         z.label.position.y = center.y + 0.3 + z._newZoneOffsetY;
@@ -2836,13 +2926,12 @@ function toggleDarkMode() {
   const mLightBtn = document.getElementById('mobile-theme-light-btn');
   const mDarkBtn  = document.getElementById('mobile-theme-dark-btn');
   [lightBtn, mLightBtn].forEach(b => { if (!b) return;
-    b.style.background = _darkMode ? 'transparent' : '#ffffff';
-    b.style.color      = _darkMode ? '#8898bb'     : '#1a2340';
+    b.style.color = _darkMode ? 'var(--dim)' : 'var(--text)';
   });
   [darkBtn, mDarkBtn].forEach(b => { if (!b) return;
-    b.style.background = _darkMode ? '#1e2436'     : 'transparent';
-    b.style.color      = _darkMode ? '#e4eaf8'     : '#6b7a9f';
+    b.style.color = _darkMode ? 'var(--text)' : 'var(--dim)';
   });
+  requestAnimationFrame(updateThemeIndicator);
 
   // Three.js 배경색 부드럽게 전환
   const fromColor = new THREE.Color(scene.background);
@@ -3272,7 +3361,43 @@ window.closeResetAllConfirm2 = closeResetAllConfirm2;
 window.finalResetAll       = finalResetAll;
 window.closeResetAllConfirm3 = closeResetAllConfirm3;
 // ── 데이터 초기화 끝 ─────────────────────────────
-window.openGuide     = openGuide;
+// 세그먼트 인디케이터 업데이트
+function updateSegIndicator(indicatorId, activeEl) {
+  const indicator = document.getElementById(indicatorId);
+  if (!indicator || !activeEl) return;
+  const parent = indicator.parentElement;
+  const parentRect = parent.getBoundingClientRect();
+  const rect = activeEl.getBoundingClientRect();
+  indicator.style.left = (rect.left - parentRect.left) + 'px';
+  indicator.style.width = rect.width + 'px';
+}
+
+function updateFloorIndicator() {
+  const activeBtn = document.querySelector('.floor-btn.active');
+  updateSegIndicator('floor-indicator', activeBtn);
+}
+
+function updateThemeIndicator() {
+  const activeBtn = _darkMode
+    ? document.getElementById('theme-dark-btn')
+    : document.getElementById('theme-light-btn');
+  const indicator = document.getElementById('theme-indicator');
+  if (indicator) {
+    indicator.style.background = _darkMode ? 'rgba(255,255,255,.15)' : '#fff';
+  }
+  updateSegIndicator('theme-indicator', activeBtn);
+}
+
+window.updateFloorIndicator = updateFloorIndicator;
+window.updateThemeIndicator = updateThemeIndicator;
+
+// 초기 인디케이터 위치 설정
+window.addEventListener('load', () => {
+  requestAnimationFrame(() => {
+    updateFloorIndicator();
+    updateThemeIndicator();
+  });
+});
 window.closeGuide    = closeGuide;
 window.openSearch    = openSearch;
 window.closeSearch   = closeSearch;
@@ -3836,6 +3961,10 @@ window.deleteRoom = async function () {
 const el = renderer.domElement;
 
 el.addEventListener('pointerdown', e => {
+  // 길안내 중 직접 카메라 조작 시 복원 위치 초기화
+  if ((navStart || navEnd) && (e.button === 0 || e.button === 2)) {
+    _savedCameraPos = null; _savedCameraTarget = null;
+  }
   if (e.button !== 0) return;
   pDown = { x: e.clientX, y: e.clientY }; pMoved = false;
   if (!editMode) return;
@@ -4049,45 +4178,6 @@ el.addEventListener('pointerup', async e => {
       return;
     }
     if (editMode && tool === 'path' && !pMoved) {
-      // 기존 선의 점 클릭 → 그 점에서 합치기
-      const existingDot = findDotAtPointer(e);
-      if (existingDot && pathDrawing && pathPoints.length >= 1) {
-        const targetPath = existingDot.path;
-        const targetIdx  = existingDot.dotIdx;
-        const dotPos = targetPath.dotMeshes[targetIdx].position;
-        const mergePt = new THREE.Vector3(dotPos.x, dotPos.y - PATH_HEIGHT_OFFSET, dotPos.z);
-
-        // 현재 그리던 점들 (시작점 제외, 끝점 포함하지 않음 - 이미 targetPath에 있는 점이므로)
-        const newPts = pathPoints.slice(1).map(p => [p.x, p.y, p.z]);
-        const insertPts = [...newPts].reverse();
-
-        // targetPath의 targetIdx+1 위치에 새 점들을 역순으로 삽입
-        targetPath.points.splice(targetIdx + 1, 0, ...insertPts);
-
-        // targetPath 메시 재생성 (ID는 유지 → 마커 연결 유지)
-        targetPath.dotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
-        targetPath.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
-        const tPts = targetPath.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
-        targetPath.dotMeshes = tPts.map(p => { const m = makeDotMesh(p); m.visible = editMode; return m; });
-        targetPath.lines = [];
-        for (let i = 1; i < tPts.length; i++) {
-          const s = makeLineSeg(tPts[i-1], tPts[i], false);
-          s.visible = editMode; targetPath.lines.push(s);
-        }
-
-        // 임시 그리던 메시 제거
-        pathDotMeshes.forEach(m => { scene.remove(m); m.geometry.dispose(); m.material.dispose(); });
-        pathLines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
-        if (pathPreviewLine) { scene.remove(pathPreviewLine); pathPreviewLine.geometry.dispose(); pathPreviewLine = null; }
-        pathDrawing = false; pathPoints = []; pathDotMeshes = []; pathLines = [];
-
-        await savePathToServer(targetPath);
-        showToast('✅ 선이 합쳐졌습니다.');
-        if (_branchFromDotEdit) { _branchFromDotEdit = false; setTool('dot-edit'); }
-        document.getElementById('edit-hint').textContent = '바닥을 클릭&드래그해 영역을 만드세요';
-        return;
-      }
-
       const pt = pathGroundPt(e);
       if (pt) {
         if (!pathDrawing) startPathDraw();
@@ -4436,6 +4526,7 @@ async function _doInstantSwitch(floor) {
     b.disabled = false;
     b.classList.toggle('active', parseInt(b.id.replace('fbtn-','').replace('mfbtn-','')) === floor);
   });
+  requestAnimationFrame(updateFloorIndicator);
 }
 
 function switchFloor(floor) {
@@ -4619,6 +4710,7 @@ function switchFloor(floor) {
         b.classList.toggle('active', parseInt(b.id.replace('fbtn-','').replace('mfbtn-','')) === floor);
         b.disabled = false;
       });
+      requestAnimationFrame(updateFloorIndicator);
       document.getElementById('ip-floor').textContent = FLOORS[floor].label;
       document.getElementById('ip-file').textContent  = FLOORS[floor].file.replace('model/','');
       isLoading = false;
