@@ -10,11 +10,11 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 /* Liquid Glass 변수 */
 :root{
-  --glass-bg: rgba(255,255,255,.04);
+  --glass-bg: rgba(255,255,255,.72);
   --glass-border: rgba(255,255,255,.4);
   --glass-shadow: 0 8px 40px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.3);
-  --glass-blur: blur(32px) saturate(220%) brightness(1.05);
-  --glass-dark-bg: rgba(14,18,32,.15);
+  --glass-blur: blur(5px) saturate(140%);
+  --glass-dark-bg: rgba(14,18,32,.72);
   --glass-dark-border: rgba(255,255,255,.18);
   --glass-dark-shadow: 0 8px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(0,0,0,.3);
 }
@@ -54,7 +54,8 @@ body.dark #room-popup{background:var(--glass-dark-bg)!important;border-color:var
 body.dark #app-menu{background:var(--glass-dark-bg)!important;border-color:var(--glass-dark-border)!important;box-shadow:var(--glass-dark-shadow)!important}
 body.dark #nav-panel{background:var(--glass-dark-bg)!important;border-color:var(--glass-dark-border)!important}
 body.dark .modal-box,body.dark .pw-box,body.dark .appinfo-box,body.dark .guide-box,body.dark .search-box{background:var(--glass-dark-bg)!important;border:1px solid var(--glass-dark-border)!important;box-shadow:var(--glass-dark-shadow)!important}
-body.dark .appinfo-box,body.dark .guide-box{backdrop-filter:blur(8px) saturate(150%)!important;-webkit-backdrop-filter:blur(8px) saturate(150%)!important}
+body.dark .modal-box,body.dark .pw-box,body.dark .appinfo-box,body.dark .guide-box,body.dark .search-box,body.dark #app-menu,body.dark #room-popup,body.dark #nav-panel,body.dark #controls,body.dark header{backdrop-filter:blur(5px) saturate(140%)!important;-webkit-backdrop-filter:blur(5px) saturate(140%)!important}
+.modal-box,.pw-box,.appinfo-box,.guide-box,.search-box,#app-menu,#room-popup,#nav-panel,#controls,header,#edit-toolbar,#edit-banner,#nav-panel{backdrop-filter:blur(5px) saturate(140%);-webkit-backdrop-filter:blur(5px) saturate(140%)}
 body.dark #edit-toolbar{background:rgba(40,20,10,.55)!important;border-color:rgba(224,92,0,.3)!important}
 body.dark .popup-name{color:var(--text)}
 body.dark .popup-tag{color:var(--dim)}
@@ -189,6 +190,7 @@ body.dark .modal-box{background:rgba(20,24,38,.82)!important}
 .btn{padding:8px 20px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:500;font-family:'Noto Sans KR',sans-serif;transition:all .15s}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
 .btn-danger{background:#ffeeee;color:#cc2222;border:1px solid #ffcccc}.btn-danger:hover{background:#ffdddd}
+body.dark .btn-danger{background:rgba(204,34,34,.15);color:#ff6666;border-color:rgba(204,34,34,.3)}.dark .btn-danger:hover{background:rgba(204,34,34,.25)}
 .btn-cancel{background:#f0f2f5;color:var(--dim)}.btn-cancel:hover{background:#e4e8ef}
 body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-cancel:hover{background:rgba(255,255,255,.08)}
 /* 미니 로딩바 */
@@ -547,12 +549,12 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 <!-- 방 검색 모달 -->
 <div id="search-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;align-items:flex-start;justify-content:center;padding-top:80px;opacity:0;transition:opacity .18s" onclick="if(event.target===this)closeSearch()">
   <div class="search-box" style="background:rgba(255,255,255,.9);border-radius:16px;width:480px;max-width:92vw;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.18);transform:translateY(-12px) scale(.97);transition:transform .22s cubic-bezier(.4,0,.2,1);overflow:hidden">
-    <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #eee">
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--border)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0077cc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
         <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
       </svg>
       <input id="search-input" type="text" placeholder="방 이름, 태그로 검색..." autocomplete="off"
-        style="flex:1;border:none;outline:none;font-size:.95rem;color:#1a2233"
+        style="flex:1;border:none;outline:none;font-size:.95rem;color:var(--text);background:transparent"
         oninput="renderSearchResults()"/>
       <button onclick="closeSearch()" style="background:none;border:none;cursor:pointer;color:#999;font-size:1.2rem;line-height:1;padding:2px">✕</button>
     </div>
@@ -1586,7 +1588,7 @@ function zoneToText(z) {
   const mn = z.box.min, mx = z.box.max;
   const coords = [mn.x, mn.y, mn.z, mx.x, mx.y, mx.z].map(v => v.toFixed(6)).join(' ');
   const rgb    = hexToRgbStr(z.color || '#0077cc');
-  return coords + ' ' + rgb + '\n' + (z.name || '') + '\n' + (z.desc || '') + '\n' + (z.tags || '') + '\n' + (z.centerText || '') + '\n' + (z.centerImage || '');
+  return coords + ' ' + rgb + '\n' + (z.name || '') + '\n' + (z.desc || '') + '\n' + (z.tags || '') + '\n' + (z.centerText || '').replace(/\n/g, '/enter/') + '\n' + (z.centerImage || '');
 }
 function textToZone(text, filename) {
   const lines = text.split('\n');
@@ -1600,7 +1602,7 @@ function textToZone(text, filename) {
     name:        (lines[1] || '').trim(),
     desc:        (lines[2] || '').trim(),
     tags:        (lines[3] || '').trim(),
-    centerText:  (lines[4] || '').trim(),
+    centerText:  (lines[4] || '').trim().replace(/\/enter\//g, '\n'),
     centerImage: (lines[5] || '').trim(),
   };
 }
@@ -2575,7 +2577,7 @@ function makeZoneLabel(name, box) {
   const maxLineWidth = Math.min(220, Math.max(80, size.x * 40));
 
   // 줄넘김 처리: \n으로 명시 분리 후 자동 줄바꿈 적용
-  const inputLines = (name || '').split('\n');
+  const inputLines = (name || '').replace(/\/enter\//g, '\n').split('\n');
   const lines = [];
   for (const inputLine of inputLines) {
     if (!inputLine) { lines.push(''); continue; }
@@ -2628,6 +2630,10 @@ function updateZoneLabel(z) {
       const maxS = Math.min(size.x, size.z) * 0.6;
       if (aspect >= 1) z.label.scale.set(maxS, maxS / aspect, 1);
       else             z.label.scale.set(maxS * aspect, maxS, 1);
+      // 비동기 로드 완료 시 offset 적용
+      if (z._newZoneOffsetY !== undefined) {
+        z.label.position.y = center.y + 0.3 + z._newZoneOffsetY;
+      }
       z.label.material.needsUpdate = true;
     });
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false, color: 0xffffff });
@@ -2998,11 +3004,11 @@ function renderSearchResults() {
   }
   el.innerHTML = list.map(r => `
     <div onclick="goToRoom('${r.id}',${r.floor})" style="padding:12px 16px;border-radius:10px;cursor:pointer;transition:background .12s;display:flex;align-items:center;gap:12px"
-      onmouseenter="this.style.background='rgba(0,119,204,.06)'" onmouseleave="this.style.background='none'">
-      <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,119,204,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;font-weight:700;color:var(--accent)">${r.floor}F</div>
+      onmouseenter="this.style.background='rgba(0,119,204,.1)'" onmouseleave="this.style.background='none'">
+      <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,119,204,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;font-weight:700;color:var(--accent)">${r.floor}F</div>
       <div>
-        <div style="font-weight:600;color:#1a2233;font-size:.92rem">${r.name || r.id}</div>
-        ${r.tags ? `<div style="font-size:.75rem;color:#888;margin-top:2px">${r.tags}</div>` : ''}
+        <div style="font-weight:600;color:var(--text);font-size:.92rem">${r.name || r.id}</div>
+        ${r.tags ? `<div style="font-size:.75rem;color:var(--dim);margin-top:2px">${r.tags}</div>` : ''}
       </div>
     </div>
   `).join('');
@@ -3192,6 +3198,7 @@ window.closeResetAllConfirm2 = closeResetAllConfirm2;
 window.finalResetAll       = finalResetAll;
 window.closeResetAllConfirm3 = closeResetAllConfirm3;
 // ── 데이터 초기화 끝 ─────────────────────────────
+window.openGuide     = openGuide;
 window.closeGuide    = closeGuide;
 window.openSearch    = openSearch;
 window.closeSearch   = closeSearch;
@@ -3584,13 +3591,13 @@ function openModal(z) {
   document.getElementById('m-name').value  = z.name  || '';
   document.getElementById('m-desc').value  = z.desc  || '';
   document.getElementById('m-tags').value  = z.tags  || '';
-  document.getElementById('m-centertext').value = z.centerText || '';
+  document.getElementById('m-centertext').value = (z.centerText || '').replace(/\/enter\//g, '\n');
   document.getElementById('m-color').value = z.color || '#0077cc';
   // 이미지
   const imgName = z.centerImage || '';
   document.getElementById('m-centerimage-name').textContent = imgName || '없음';
   const prev = document.getElementById('m-centerimage-preview');
-  if (imgName) { prev.src = 'image/' + imgName; prev.style.display = 'block'; }
+  if (imgName) { prev.src = 'image/' + encodeURIComponent(imgName); prev.style.display = 'block'; }
   else { prev.src = ''; prev.style.display = 'none'; }
   document.getElementById('m-centerimage-upload').value = '';
   document.getElementById('m-cprev').style.background = z.color || '#0077cc';
@@ -3628,7 +3635,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.ok) {
         document.getElementById('m-centerimage-name').textContent = data.filename;
         const prev = document.getElementById('m-centerimage-preview');
-        prev.src = 'image/' + data.filename + '?t=' + Date.now();
+        prev.src = 'image/' + encodeURIComponent(data.filename) + '?t=' + Date.now();
         prev.style.display = 'block';
         showToast(data.exists ? '✅ 기존 이미지 사용: ' + data.filename : '✅ 이미지 업로드 완료: ' + data.filename);
       }
@@ -3722,7 +3729,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modalZ.name       = document.getElementById('m-name').value.trim();
     modalZ.desc       = document.getElementById('m-desc').value.trim();
     modalZ.tags       = document.getElementById('m-tags').value.trim();
-    modalZ.centerText = document.getElementById('m-centertext').value.trim();
+    modalZ.centerText = document.getElementById('m-centertext').value.replace(/\n/g, '/enter/');
     modalZ.centerImage = document.getElementById('m-centerimage-name').textContent === '없음' ? '' : document.getElementById('m-centerimage-name').textContent;
     modalZ.color      = document.getElementById('m-color').value;
     rebuildZone(modalZ);
@@ -4186,6 +4193,9 @@ function tickSlide(dt) {
         oldZones.forEach(z => {
           z.mesh.position.y = z._slideBaseY + dy;
           z.line.position.y = z._slideBaseY + dy;
+          if (z._slideLabel) {
+            z._slideLabel.position.y = z._slideLabelBaseY + dy;
+          }
           const op = 0.07 * Math.max(0, 1 - p * 2);
           z.mesh.material.opacity = op;
         });
@@ -4197,6 +4207,7 @@ function tickSlide(dt) {
         if (oldZones) oldZones.forEach(z => {
           scene.remove(z.mesh); z.mesh.geometry.dispose(); z.mesh.material.dispose();
           scene.remove(z.line); z.line.geometry.dispose(); z.line.material.dispose();
+          if (z._slideLabel) { scene.remove(z._slideLabel); z._slideLabel.material.map?.dispose(); z._slideLabel.material.dispose(); z._slideLabel = null; }
         });
       }
 
@@ -4222,6 +4233,7 @@ function tickSlide(dt) {
         z.mesh.visible = false;
         z.mesh.position.y = z._newZoneBaseY + dy;
         z.line.position.y = z._newZoneBaseY + dy;
+        if (z.label) z.label.position.y = (z._newLabelBaseY || z._newZoneBaseY + 0.3) + dy;
       });
 
       if (p >= 1) {
@@ -4231,6 +4243,7 @@ function tickSlide(dt) {
         newZones.forEach(z => {
           z.mesh.position.y = z._newZoneBaseY;
           z.line.position.y = z._newZoneBaseY;
+          if (z.label) z.label.position.y = z._newLabelBaseY || z._newZoneBaseY + 0.3;
           z.mesh.material.opacity = 0.07;
         });
         const cb = slideAnim.onComplete;
@@ -4377,6 +4390,8 @@ function switchFloor(floor) {
   const oldZones = [...zones];
   oldZones.forEach(z => {
     z._slideBaseY = z.mesh.position.y;
+    z._slideLabel = z.label; // removeZone이 label=null로 지우기 전에 보존
+    z._slideLabelBaseY = z.label ? z.label.position.y : z.mesh.position.y + 0.3;
     z.mesh.visible = true;
     z.line.visible = false;
   });
@@ -4384,7 +4399,10 @@ function switchFloor(floor) {
   // removeZone이 씬에서 제거하므로 다시 추가
   oldZones.forEach(z => {
     scene.add(z.mesh);
-    // line은 안 보여도 되므로 추가 안 함
+    if (z._slideLabel) {
+      scene.add(z._slideLabel);
+      console.log('label re-added:', z.id, 'labelPos:', z._slideLabelBaseY);
+    }
   });
 
   // 로드할 층: 중간층 + 목적층
@@ -4479,10 +4497,13 @@ function switchFloor(floor) {
                 const offsetY = (-dir) * SLIDE_DIST;
                 z.mesh.position.y = z.mesh.position.y + offsetY;
                 z.line.position.y = z.line.position.y + offsetY;
+                if (z.label) z.label.position.y = z.label.position.y + offsetY;
                 z._newZoneBaseY = z.mesh.position.y - offsetY; // 최종 목표 Y
+                z._newLabelBaseY = z.label ? z.label.position.y - offsetY : z._newZoneBaseY + 0.3;
                 z._newZoneOffsetY = offsetY;
                 z.mesh.visible = false;
                 z.line.visible = false;
+                console.log('newZone:', z.id, 'label:', !!z.label, 'centerImage:', z.centerImage, 'offsetY:', offsetY);
                 newZones.push(z);
               } catch(e) { console.warn('newZone load error:', fname, e); }
             }
