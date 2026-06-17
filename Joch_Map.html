@@ -4255,6 +4255,8 @@ function tickSlide(dt) {
 }
 
 // ── 모델 로드 헬퍼 ──
+const _preloadedModels = {};
+
 function getModelColor() {
   return _darkMode ? 0x2a3040 : 0xddeeff;
 }
@@ -4269,6 +4271,12 @@ function applyDarkModeToModel(model) {
 }
 
 function loadModel(floor) {
+  // 프리로드된 모델이 있으면 재사용
+  if (_preloadedModels && _preloadedModels[floor]) {
+    const m = _preloadedModels[floor];
+    delete _preloadedModels[floor];
+    return Promise.resolve(m);
+  }
   return new Promise((resolve, reject) => {
     const wMat = new THREE.MeshStandardMaterial({
       color: getModelColor(), transparent: true, opacity: 0,
@@ -4573,7 +4581,22 @@ function switchFloor(floor) {
 }
 
 window.switchFloor = switchFloor;
-switchFloor(1);
+
+// 모든 층 미리 로드 (백그라운드)
+(async () => {
+  // 1층 먼저 로드해서 바로 보여줌
+  await switchFloor(1);
+
+  // 나머지 층 백그라운드 로드
+  for (const f of [2, 3, 4]) {
+    try {
+      const m = await loadModel(f);
+      m.visible = false;
+      m.traverse(n => { if (n.isMesh) n.material.opacity = 0.88; });
+      _preloadedModels[f] = m;
+    } catch(e) { console.warn('preload floor', f, 'failed:', e); }
+  }
+})();
 
 /* ── resize ── */
 window.addEventListener('resize', () => {
