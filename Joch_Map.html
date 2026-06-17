@@ -1625,25 +1625,85 @@ async function apiDeleteZone(z) {
     await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(z.id), { method: 'DELETE' });
   } catch (e) { console.warn('delete error:', e); }
 }
+// ── 전체 데이터 프리로드 캐시 ──
+const _dataCache = {}; // { floor: { rooms, paths, markers, flrMarkers } }
+
+async function preloadAllData() {
+  for (const f of [1, 2, 3, 4]) {
+    _dataCache[f] = { rooms: [], paths: [], markers: [], flrMarkers: [] };
+    try {
+      // 방
+      const roomFiles = await fetch('/api/rooms/' + f).then(r => r.json()).catch(() => []);
+      for (const fname of roomFiles) {
+        try {
+          const text = await fetch('/api/room/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
+          _dataCache[f].rooms.push({ id: fname, text });
+        } catch(e) {}
+      }
+      // 선
+      const lineFiles = await fetch('/api/lines/' + f).then(r => r.json()).catch(() => []);
+      for (const fname of lineFiles) {
+        try {
+          const text = await fetch('/api/line/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
+          _dataCache[f].paths.push({ id: fname, text });
+        } catch(e) {}
+      }
+      // 마커
+      const markerFiles = await fetch('/api/markers/' + f).then(r => r.json()).catch(() => []);
+      for (const fname of markerFiles) {
+        try {
+          const text = await fetch('/api/marker/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
+          _dataCache[f].markers.push({ id: fname, text });
+        } catch(e) {}
+      }
+      // 층이동 마커
+      const flrFiles = await fetch('/api/flr_markers/' + f).then(r => r.json()).catch(() => []);
+      for (const fname of flrFiles) {
+        try {
+          const text = await fetch('/api/flr_marker/' + f + '/' + encodeURIComponent(fname)).then(r => r.text());
+          _dataCache[f].flrMarkers.push({ id: fname, text });
+        } catch(e) {}
+      }
+    } catch(e) {}
+  }
+}
+
 async function apiLoadAll() {
-  try {
-    const res = await fetch('/api/rooms/' + currentFloor);
-    if (!res.ok) return;
-    const files = await res.json();
-    [...zones].forEach(z => removeZone(z));
-    for (const fname of files) {
-      try {
-        const r = await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(fname));
-        if (!r.ok) continue;
-        const data = textToZone(await r.text(), fname);
-        if (!data) continue;
-        const n = parseInt(data.id.replace('z', ''));
-        if (!isNaN(n) && n >= zid) zid = n + 1;
-        const zz2 = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
-        zz2.centerText = data.centerText || ''; zz2.centerImage = data.centerImage || ''; updateZoneLabel(zz2);
-      } catch (e) { console.warn('load error:', fname, e); }
-    }
-  } catch (e) { console.warn('room API unavailable, skipping'); }
+  const cache = _dataCache[currentFloor];
+  const items = cache ? cache.rooms : [];
+  if (!cache) {
+    // 캐시 없으면 기존 방식
+    try {
+      const res = await fetch('/api/rooms/' + currentFloor);
+      if (!res.ok) return;
+      const files = await res.json();
+      [...zones].forEach(z => removeZone(z));
+      for (const fname of files) {
+        try {
+          const r = await fetch('/api/room/' + currentFloor + '/' + encodeURIComponent(fname));
+          if (!r.ok) continue;
+          const data = textToZone(await r.text(), fname);
+          if (!data) continue;
+          const n = parseInt(data.id.replace('z', ''));
+          if (!isNaN(n) && n >= zid) zid = n + 1;
+          const zz2 = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+          zz2.centerText = data.centerText || ''; zz2.centerImage = data.centerImage || ''; updateZoneLabel(zz2);
+        } catch(e) {}
+      }
+    } catch(e) {}
+    return;
+  }
+  [...zones].forEach(z => removeZone(z));
+  for (const { id: fname, text } of items) {
+    try {
+      const data = textToZone(text, fname);
+      if (!data) continue;
+      const n = parseInt(data.id.replace('z', ''));
+      if (!isNaN(n) && n >= zid) zid = n + 1;
+      const zz2 = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
+      zz2.centerText = data.centerText || ''; zz2.centerImage = data.centerImage || ''; updateZoneLabel(zz2);
+    } catch(e) {}
+  }
 }
 
 let _toastTimer = null;
@@ -2038,29 +2098,38 @@ async function savePathToServer(path) {
 }
 async function loadPathsForFloor(floor) {
   [...paths].filter(p => p.floor === floor).forEach(p => removePath(p));
-  try {
-    const res = await fetch('/api/lines/' + floor);
-    if (!res.ok) return; // 404 등 에러면 조용히 스킵
-    const files = await res.json();
-    for (const fname of files) {
-      try {
-        const r = await fetch('/api/line/' + floor + '/' + encodeURIComponent(fname));
-        if (!r.ok) continue;
-        const data = textToPath(await r.text(), fname);
-        if (!data) continue;
-        const pts  = data.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
-        const dots = pts.map(p => { const m = makeDotMesh(p); m.visible = false; return m; });
-        const segs = [];
-        for (let i = 1; i < pts.length; i++) {
-          const seg = makeLineSeg(pts[i-1], pts[i], false);
-          seg.visible = false;
-          segs.push(seg);
-        }
-        paths.push({ id: data.id, floor, points: data.points, dotMeshes: dots, lines: segs });
-      } catch(e) { /* 개별 파일 에러 무시 */ }
-    }
-    setPathVis();
-  } catch(e) { /* line API 없으면 무시 */ }
+  const items = _dataCache[floor]?.paths || null;
+  const loadItems = items || await (async () => {
+    try {
+      const res = await fetch('/api/lines/' + floor);
+      if (!res.ok) return [];
+      const files = await res.json();
+      const out = [];
+      for (const fname of files) {
+        try {
+          const text = await fetch('/api/line/' + floor + '/' + encodeURIComponent(fname)).then(r => r.text());
+          out.push({ id: fname, text });
+        } catch(e) {}
+      }
+      return out;
+    } catch(e) { return []; }
+  })();
+
+  for (const { id: fname, text } of loadItems) {
+    try {
+      const data = textToPath(text, fname);
+      if (!data) continue;
+      const pts = data.points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+      const dots = pts.map(p => { const m = makeDotMesh(p); m.visible = false; return m; });
+      const segs = [];
+      for (let i = 1; i < pts.length; i++) {
+        const seg = makeLineSeg(pts[i-1], pts[i], false);
+        seg.visible = false; segs.push(seg);
+      }
+      paths.push({ id: data.id, floor, points: data.points, dotMeshes: dots, lines: segs });
+    } catch(e) {}
+  }
+  setPathVis();
 }
 
 // 방 이동 드래그
@@ -2206,27 +2275,33 @@ async function deleteMarkerFromServer(m) {
 }
 async function loadMarkersForFloor(floor) {
   [...markers].filter(m => m.floor === floor).forEach(m => removeMarker(m));
-  try {
-    const res = await fetch('/api/markers/' + floor);
-    if (!res.ok) return;
-    const files = await res.json();
-    for (const fname of files) {
-      try {
-        const r = await fetch('/api/marker/' + floor + '/' + encodeURIComponent(fname));
-        if (!r.ok) continue;
-        const data = textToMarker(await r.text(), fname);
-        if (!data) continue;
-        const n = parseInt(data.id.replace('m',''));
-        if (!isNaN(n) && n >= markerId) markerId = n + 1;
-        const pos = new THREE.Vector3(...data.pos);
-        const savedFloor = currentFloor;
-        currentFloor = floor; // 임시로 층 설정
-        const mk = addMarker(pos, data.id, data.name, data.desc, data.tags, data.roomId, data.pathId || '');
-        currentFloor = savedFloor;
-      } catch(e) { console.warn('marker load error:', fname, e); }
-    }
-    setMarkerVis();
-  } catch(e) { /* marker API 없으면 무시 */ }
+  const items = _dataCache[floor]?.markers || null;
+  const loadItems = items || await (async () => {
+    try {
+      const res = await fetch('/api/markers/' + floor);
+      if (!res.ok) return [];
+      const files = await res.json();
+      const out = [];
+      for (const fname of files) {
+        try { out.push({ id: fname, text: await fetch('/api/marker/' + floor + '/' + encodeURIComponent(fname)).then(r=>r.text()) }); } catch(e) {}
+      }
+      return out;
+    } catch(e) { return []; }
+  })();
+  for (const { id: fname, text } of loadItems) {
+    try {
+      const data = textToMarker(text, fname);
+      if (!data) continue;
+      const n = parseInt(data.id.replace('m',''));
+      if (!isNaN(n) && n >= markerId) markerId = n + 1;
+      const pos = new THREE.Vector3(...data.pos);
+      const savedFloor = currentFloor;
+      currentFloor = floor;
+      addMarker(pos, data.id, data.name, data.desc, data.tags, data.roomId, data.pathId || '');
+      currentFloor = savedFloor;
+    } catch(e) {}
+  }
+  setMarkerVis();
 }
 
 // 마커 모달 열기
@@ -2478,14 +2553,22 @@ async function deleteFlrMarkerFromServer(m) {
 }
 async function loadFlrMarkersForFloor(floor) {
   [...flrMarkers].filter(m=>m.floor===floor).forEach(m=>removeFlrMarker(m));
-  try {
-    const res = await fetch('/api/flr_markers/'+floor);
-    if (!res.ok) return;
-    const files = await res.json();
-    for (const fname of files) {
-      const r = await fetch('/api/flr_marker/'+floor+'/'+encodeURIComponent(fname));
-      if (!r.ok) continue;
-      const data = textToFlrMarker(await r.text(), fname);
+  const items = _dataCache[floor]?.flrMarkers || null;
+  const loadItems = items || await (async () => {
+    try {
+      const res = await fetch('/api/flr_markers/'+floor);
+      if (!res.ok) return [];
+      const files = await res.json();
+      const out = [];
+      for (const fname of files) {
+        try { out.push({ id: fname, text: await fetch('/api/flr_marker/'+floor+'/'+encodeURIComponent(fname)).then(r=>r.text()) }); } catch(e) {}
+      }
+      return out;
+    } catch(e) { return []; }
+  })();
+  for (const { id: fname, text } of loadItems) {
+    try {
+      const data = textToFlrMarker(text, fname);
       if (!data) continue;
       const n = parseInt(data.id.replace('fm',''));
       if (!isNaN(n)&&n>=flrMarkerId) flrMarkerId=n+1;
@@ -2493,9 +2576,9 @@ async function loadFlrMarkersForFloor(floor) {
       currentFloor = floor;
       addFlrMarker(new THREE.Vector3(...data.pos), data.id, data.name, data.desc, data.pathId, data.targetFloor, data.pairId);
       currentFloor = savedFloor;
-    }
-    setFlrMarkerVis();
-  } catch(e) {}
+    } catch(e) {}
+  }
+  setFlrMarkerVis();
 }
 
 function findFlrMarkerAtPointer(e) {
@@ -4584,10 +4667,13 @@ window.switchFloor = switchFloor;
 
 // 모든 층 미리 로드 (백그라운드)
 (async () => {
-  // 1층 먼저 로드해서 바로 보여줌
-  await switchFloor(1);
+  // 데이터와 모델 동시 병렬 로드
+  await Promise.all([
+    preloadAllData(),
+    switchFloor(1),
+  ]);
 
-  // 나머지 층 백그라운드 로드
+  // 나머지 층 모델 백그라운드 로드
   for (const f of [2, 3, 4]) {
     try {
       const m = await loadModel(f);
