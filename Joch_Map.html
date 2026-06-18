@@ -42,6 +42,9 @@ body.dark .tool-btn{color:rgba(255,160,80,.9)}
 body.dark .tool-btn.active{color:#fff}
 #theme-indicator, #mobile-theme-indicator{background:rgba(0,0,0,.15)}
 body.dark #theme-indicator, body.dark #mobile-theme-indicator{background:rgba(255,255,255,.2)}
+#mobile-floor-selector{position:relative}
+#mobile-floor-selector .floor-btn{flex:1;text-align:center}
+#mobile-floor-selector .floor-btn.active{color:#fff}
 body.dark #edit-toolbar{background:rgba(40,20,5,.2)!important;border-color:rgba(224,92,0,.25)!important}
 body.dark .modal-box,body.dark .pw-box,body.dark .appinfo-box,body.dark .guide-box,body.dark .search-box{background:var(--card)!important;color:var(--text)!important}
 body.dark input,body.dark textarea,body.dark select{background:var(--input-bg)!important;color:var(--text)!important;border-color:var(--border)!important}
@@ -3412,6 +3415,15 @@ function updateFloorIndicator() {
   const activeBtn = document.querySelector('#floor-selector .floor-btn.active');
   updateSegIndicator('floor-indicator', activeBtn);
   const mActiveBtn = document.querySelector('#mobile-floor-selector .floor-btn.active');
+  if (mActiveBtn) {
+    const indicator = document.getElementById('mobile-floor-indicator');
+    if (indicator) {
+      indicator.style.display = 'block';
+      indicator.style.left = mActiveBtn.offsetLeft + 'px';
+      indicator.style.width = mActiveBtn.offsetWidth + 'px';
+      indicator.classList.add('ready');
+    }
+  }
   updateSegIndicator('mobile-floor-indicator', mActiveBtn);
 }
 
