@@ -2820,7 +2820,7 @@ function updateZoneLabel(z) {
       sprite.visible = dir.dot(toSprite) > 0;
     };
     sprite.position.set(center.x, center.y + 0.3, center.z);
-    sprite.visible = z.mesh.visible;
+    sprite.visible = z.mesh.visible && z.mesh.position.y > HIDDEN_Y + 1;
     scene.add(sprite);
     z.label = sprite;
     return;
@@ -2830,7 +2830,7 @@ function updateZoneLabel(z) {
   if (!displayText) return;
   const sprite = makeZoneLabel(displayText, z.box);
   sprite.position.set(center.x, center.y + 0.3, center.z);
-  sprite.visible = z.mesh.visible;
+  sprite.visible = z.mesh.visible && z.mesh.position.y > HIDDEN_Y + 1;
   scene.add(sprite);
   z.label = sprite;
 }
@@ -2887,7 +2887,7 @@ function setVis() {
 
     z.mesh.visible = show;
     z.line.visible = show && editMode;
-    if (z.label) z.label.visible = show && !!z.name;
+    if (z.label) z.label.visible = show && !!z.name && z.mesh.position.y > HIDDEN_Y + 1;
 
     if (!show) return;
 
@@ -4654,22 +4654,13 @@ function switchFloor(floor) {
   stopBlink(); closePopup();
 
   // zones는 즉시 제거하지 않고 슬라이드 중 oldModel과 함께 이동
-  const oldZones = [...zones];
+  const oldZones = zones.filter(z => z.floor === fromFloor);
   oldZones.forEach(z => {
     z._slideBaseY = z.mesh.position.y;
-    z._slideLabel = z.label; // removeZone이 label=null로 지우기 전에 보존
+    z._slideLabel = z.label;
     z._slideLabelBaseY = z.label ? z.label.position.y : z.mesh.position.y + 0.3;
     z.mesh.visible = true;
     z.line.visible = false;
-  });
-  [...zones].forEach(z => removeZone(z));
-  // removeZone이 씬에서 제거하므로 다시 추가
-  oldZones.forEach(z => {
-    scene.add(z.mesh);
-    if (z._slideLabel) {
-      scene.add(z._slideLabel);
-      console.log('label re-added:', z.id, 'labelPos:', z._slideLabelBaseY);
-    }
   });
 
   // 로드할 층: 중간층 + 목적층
@@ -4746,36 +4737,52 @@ function switchFloor(floor) {
 
         // 목적층 zones 미리 로드
         let newZones = [];
-        try {
-          const res = await fetch('/api/rooms/' + floor);
-          if (res.ok) {
-            const files = await res.json();
-            for (const fname of files) {
+        // 이미 로드된 층 데이터 사용
+        const preloadedZones = zones.filter(z => z.floor === floor);
+        if (preloadedZones.length > 0) {
+          const offsetY = (-dir) * SLIDE_DIST;
+          preloadedZones.forEach(z => {
+            const center = z.box.getCenter(new THREE.Vector3());
+            z.mesh.position.y = center.y + offsetY;
+            z.line.position.y = center.y + offsetY;
+            if (z.label) z.label.position.y = center.y + 0.3 + offsetY;
+            z._newZoneBaseY = center.y;
+            z._newLabelBaseY = center.y + 0.3;
+            z._newZoneOffsetY = offsetY;
+            z.mesh.visible = false;
+            z.line.visible = false;
+            newZones.push(z);
+          });
+        } else {
+          // 없으면 fetch (초기 프리로드 미완료 시 fallback)
+          try {
+            const cached = _dataCache[floor]?.rooms || [];
+            for (const { id: fname, text } of cached) {
               try {
-                const r = await fetch('/api/room/' + floor + '/' + encodeURIComponent(fname));
-                if (!r.ok) continue;
-                const data = textToZone(await r.text(), fname);
+                const data = textToZone(text, fname);
                 if (!data) continue;
                 const n = parseInt(data.id.replace('z',''));
                 if (!isNaN(n) && n >= zid) zid = n + 1;
                 const z = addZone(data.box, data.id, data.name, data.desc, data.tags, data.color);
                 z.centerText = data.centerText || ''; z.centerImage = data.centerImage || ''; updateZoneLabel(z);
-                // newM과 같은 시작 위치 (반대 방향 SLIDE_DIST 밖)에 배치
                 const offsetY = (-dir) * SLIDE_DIST;
                 z.mesh.position.y = z.mesh.position.y + offsetY;
                 z.line.position.y = z.line.position.y + offsetY;
                 if (z.label) z.label.position.y = z.label.position.y + offsetY;
-                z._newZoneBaseY = z.mesh.position.y - offsetY; // 최종 목표 Y
+                z._newZoneBaseY = z.mesh.position.y - offsetY;
                 z._newLabelBaseY = z.label ? z.label.position.y - offsetY : z._newZoneBaseY + 0.3;
                 z._newZoneOffsetY = offsetY;
                 z.mesh.visible = false;
                 z.line.visible = false;
-                console.log('newZone:', z.id, 'label:', !!z.label, 'centerImage:', z.centerImage, 'offsetY:', offsetY);
                 newZones.push(z);
-              } catch(e) { console.warn('newZone load error:', fname, e); }
+              } catch(e) {}
             }
-          }
-        } catch(e) { console.warn('newZones fetch error:', e); }
+          } catch(e) {}
+        }
+
+        // 슬라이드 중 레이블 숨기기
+        newZones.forEach(z => { if (z.label) z.label.visible = false; });
+        oldZones.forEach(z => { if (z._slideLabel) z._slideLabel.visible = false; });
 
         slideAnim = { dir, t: 0, models, baseYs, startTs, oldZones, newZones,
           onComplete: async () => {
@@ -4785,7 +4792,15 @@ function switchFloor(floor) {
             modelTopY = nb.max.y;
             snapshots.length = 0; updateUndoBtn();
 
-            // 데이터가 없으면 로드, 있으면 위치만 복원
+            // 이전 층 숨기기 (구석으로)
+            zones.filter(z => z.floor === fromFloor).forEach(z => {
+              z.mesh.position.y = HIDDEN_Y;
+              z.line.position.y = HIDDEN_Y;
+              if (z.label) z.label.position.y = HIDDEN_Y;
+              z.mesh.visible = false;
+            });
+
+            // 새 층 데이터 없으면 로드
             const hasData = zones.some(z => z.floor === floor);
             if (!hasData) {
               await apiLoadAll();
@@ -4793,6 +4808,7 @@ function switchFloor(floor) {
               await loadMarkersForFloor(floor);
               await loadFlrMarkersForFloor(floor);
             } else {
+              // 있으면 위치만 복원
               zones.filter(z => z.floor === floor).forEach(z => {
                 const center = z.box.getCenter(new THREE.Vector3());
                 z.mesh.position.y = center.y;
