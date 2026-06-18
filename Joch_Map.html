@@ -124,7 +124,7 @@ body.lowspec canvas{image-rendering:pixelated}
 .floor-btn:hover{color:var(--accent)}
 .floor-btn.active{color:#fff}
 .floor-btn:disabled{opacity:.4;cursor:not-allowed}
-.seg-indicator{position:absolute;top:3px;left:0;height:calc(100% - 6px);border-radius:50px;background:var(--accent);transition:left .22s cubic-bezier(.4,0,.2,1),width .22s cubic-bezier(.4,0,.2,1),opacity .15s;pointer-events:none;z-index:0;opacity:0;width:0}
+.seg-indicator{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:50px;background:var(--accent);transition:left .22s cubic-bezier(.4,0,.2,1),width .22s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0;width:0}
 .floor-badge{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 12px;background:rgba(0,119,204,.07)}
 #edit-banner{display:none;position:fixed;top:65px;left:50%;transform:translateX(-50%);z-index:20;background:var(--edit);color:#fff;font-size:.78rem;font-weight:500;padding:7px 20px;border-radius:0 0 10px 10px;box-shadow:0 4px 16px rgba(224,92,0,.25);align-items:center;gap:10px}
 #edit-banner.show{display:flex}
@@ -3019,7 +3019,19 @@ function toggleMenu() {
         updateThemeIndicator();
       });
     }));
-    setTimeout(() => { updateFloorIndicator(); updateThemeIndicator(); }, 300);
+    setTimeout(() => {
+      // 메뉴 열린 후 실제 픽셀값으로 인디케이터 설정
+      const mfBtn = document.querySelector('#mobile-floor-selector .floor-btn.active');
+      const mtBtn = document.getElementById(_darkMode ? 'mobile-theme-dark-btn' : 'mobile-theme-light-btn');
+      if (mfBtn && mfBtn.offsetWidth > 0) {
+        const fi = document.getElementById('mobile-floor-indicator');
+        if (fi) { fi.style.left = mfBtn.offsetLeft + 'px'; fi.style.width = mfBtn.offsetWidth + 'px'; }
+      }
+      if (mtBtn && mtBtn.offsetWidth > 0) {
+        const ti = document.getElementById('mobile-theme-indicator');
+        if (ti) { ti.style.left = mtBtn.offsetLeft + 'px'; ti.style.width = mtBtn.offsetWidth + 'px'; }
+      }
+    }, 300);
     _menuOpen = true;
   }
 }
@@ -3392,10 +3404,14 @@ function updateSegIndicator(indicatorId, activeEl) {
   if (!indicator || !activeEl) return;
   const leftPx  = activeEl.offsetLeft;
   const widthPx = activeEl.offsetWidth;
-  if (widthPx === 0) return; // 숨겨진 상태면 포기
-  indicator.style.left    = leftPx + 'px';
-  indicator.style.width   = widthPx + 'px';
-  indicator.style.opacity = '1';
+  if (widthPx === 0) {
+    // 숨겨진 상태 - 나중에 열릴 때를 위해 저장
+    indicator.dataset.pendingLeft = leftPx;
+    indicator.dataset.pendingWidth = widthPx;
+    return;
+  }
+  indicator.style.left  = leftPx + 'px';
+  indicator.style.width = widthPx + 'px';
 }
 
 function updateFloorIndicator() {
