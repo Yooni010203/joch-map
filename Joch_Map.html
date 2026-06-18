@@ -139,7 +139,8 @@ body.lowspec canvas{image-rendering:pixelated}
 .key{background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:4px;padding:2px 8px;font-family:'Orbitron',monospace;font-size:.65rem;color:var(--accent);flex-shrink:0}
 .divider{width:1px;height:20px;background:var(--border);margin:0 4px;flex-shrink:0}
 @media(max-width:600px){
-  #controls{bottom:16px;padding:8px 16px;gap:6px;border-radius:20px}
+  #controls{bottom:16px;padding:6px 12px;gap:6px;border-radius:20px}
+  #controls button{width:32px;height:32px}
   .desktop-only{display:none!important}
   #header-right{display:none!important}
   #mobile-menu-btn{display:flex!important}
@@ -451,7 +452,7 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 </div>
 
 <div id="edit-toolbar">
-  <div id="toolbar-indicator" style="position:absolute;top:4px;height:calc(100% - 8px);border-radius:50px;background:var(--edit);transition:left .2s cubic-bezier(.4,0,.2,1),width .2s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0;opacity:0"></div>
+  <div id="toolbar-indicator" style="position:absolute;top:4px;height:calc(100% - 8px);border-radius:50px;background:var(--edit);transition:left .2s cubic-bezier(.4,0,.2,1),width .2s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0;opacity:0;display:none"></div>
   <span id="edit-badge" style="display:flex;align-items:center;gap:5px;padding:4px 10px;font-size:.72rem;font-weight:700;flex-shrink:0;white-space:nowrap;color:var(--edit)">
     <span class="blink" style="font-size:.55rem">●</span> 편집 모드
   </span>
@@ -3538,6 +3539,7 @@ window.setTool = function (t) {
   if (toolbarIndicator && activeToolBtn) {
     const tbRect = document.getElementById('edit-toolbar').getBoundingClientRect();
     const btnRect = activeToolBtn.getBoundingClientRect();
+    toolbarIndicator.style.display = 'block';
     toolbarIndicator.style.opacity = '1';
     toolbarIndicator.style.left = (btnRect.left - tbRect.left) + 'px';
     toolbarIndicator.style.width = btnRect.width + 'px';
