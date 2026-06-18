@@ -2766,6 +2766,13 @@ function makeZoneLabel(name, box) {
   const tex = new THREE.CanvasTexture(canvas);
   const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true, depthWrite: false });
   const sprite = new THREE.Sprite(mat);
+  // 카메라 뒤에 있으면 숨기기
+  sprite.onBeforeRender = (renderer, scene, cam) => {
+    const dir = new THREE.Vector3();
+    cam.getWorldDirection(dir);
+    const toSprite = sprite.position.clone().sub(cam.position);
+    sprite.visible = dir.dot(toSprite) > 0;
+  };
 
   // 방 XZ 크기 안에 들어오도록 스케일 제한
   const margin = 0.85; // 방 크기의 85%까지만
@@ -2809,6 +2816,12 @@ function updateZoneLabel(z) {
     const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true, depthWrite: false, color: 0xffffff });
     const sprite = new THREE.Sprite(mat);
     sprite.renderOrder = 3;
+    sprite.onBeforeRender = (renderer, scene, cam) => {
+      const dir = new THREE.Vector3();
+      cam.getWorldDirection(dir);
+      const toSprite = sprite.position.clone().sub(cam.position);
+      sprite.visible = dir.dot(toSprite) > 0;
+    };
     sprite.position.set(center.x, center.y + 0.3, center.z);
     sprite.visible = z.mesh.visible;
     scene.add(sprite);
