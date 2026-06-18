@@ -3385,12 +3385,23 @@ function updateSegIndicator(indicatorId, activeEl) {
   const indicator = document.getElementById(indicatorId);
   if (!indicator || !activeEl) return;
   const parent = indicator.parentElement;
-  const parentRect = parent.getBoundingClientRect();
-  const btnRect = activeEl.getBoundingClientRect();
-  if (btnRect.width === 0) return; // 아직 레이아웃 안 됨
+
+  // 부모가 숨겨져 있으면 offsetLeft 방식으로 계산
+  let leftPx, widthPx;
+  if (parent.offsetWidth === 0) {
+    // 메뉴가 숨겨진 상태: offsetLeft 사용
+    leftPx  = activeEl.offsetLeft;
+    widthPx = activeEl.offsetWidth;
+  } else {
+    const parentRect = parent.getBoundingClientRect();
+    const btnRect    = activeEl.getBoundingClientRect();
+    leftPx  = btnRect.left - parentRect.left;
+    widthPx = btnRect.width;
+  }
+  if (widthPx === 0) return;
   indicator.style.display = 'block';
-  indicator.style.left = (btnRect.left - parentRect.left) + 'px';
-  indicator.style.width = btnRect.width + 'px';
+  indicator.style.left  = leftPx + 'px';
+  indicator.style.width = widthPx + 'px';
   indicator.classList.add('ready');
 }
 
