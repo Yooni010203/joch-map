@@ -3389,6 +3389,7 @@ window.closeResetAllConfirm3 = closeResetAllConfirm3;
 // 세그먼트 인디케이터 업데이트
 function updateSegIndicator(indicatorId, activeEl) {
   const indicator = document.getElementById(indicatorId);
+  console.log(`updateSegIndicator ${indicatorId}: activeEl=${activeEl?.id} offsetLeft=${activeEl?.offsetLeft} offsetWidth=${activeEl?.offsetWidth} indicator=${!!indicator}`);
   if (!indicator || !activeEl) return;
   const leftPx  = activeEl.offsetLeft;
   const widthPx = activeEl.offsetWidth;
@@ -3399,6 +3400,7 @@ function updateSegIndicator(indicatorId, activeEl) {
   indicator.style.left    = leftPx + 'px';
   indicator.style.width   = widthPx + 'px';
   indicator.style.opacity = '1';
+  console.log(`  → left=${leftPx} width=${widthPx} opacity set to 1`);
 }
 
 function updateFloorIndicator() {
