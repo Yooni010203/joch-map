@@ -3399,6 +3399,24 @@ function updateThemeIndicator() {
   updateSegIndicator('mobile-theme-indicator', mActiveBtn);
 }
 
+// 모바일 디버그 오버레이
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const dbg = document.createElement('div');
+    dbg.style.cssText = 'position:fixed;top:80px;left:0;right:0;z-index:99999;background:rgba(0,0,0,.85);color:#fff;font-size:11px;padding:10px;max-height:50vh;overflow-y:auto;word-break:break-all;user-select:text;-webkit-user-select:text';
+    const lines = [];
+    document.querySelectorAll('*').forEach(el => {
+      const s = window.getComputedStyle(el);
+      const r = el.getBoundingClientRect();
+      if ((s.position === 'fixed' || s.position === 'absolute') && s.display !== 'none' && s.opacity !== '0' && r.width > 0 && r.height > 0 && r.width < 80 && r.height < 80) {
+        lines.push(`${s.position} [${el.id||el.className.toString().slice(0,25)||el.tagName}] x:${r.left.toFixed(0)} y:${r.top.toFixed(0)} w:${r.width.toFixed(0)} h:${r.height.toFixed(0)}`);
+      }
+    });
+    dbg.innerHTML = '<b>작은 요소:</b><br>' + (lines.join('<br>') || '없음') + '<br><br><b>tap to close</b>';
+    dbg.addEventListener('click', () => dbg.remove());
+    document.body.appendChild(dbg);
+  }, 3000);
+});
 window.updateThemeIndicator = updateThemeIndicator;
 
 // 초기 인디케이터 위치 설정
