@@ -3416,16 +3416,20 @@ function updateThemeIndicator() {
 window._debugScene = function() {
   const items = [];
   scene.traverse(obj => {
-    if (obj.isMesh && obj.visible) {
+    if ((obj.isMesh || obj.isSprite) && obj.visible) {
       const p = obj.position;
       const s = obj.scale;
-      const geo = obj.geometry?.type || '?';
-      items.push(`${obj.name||obj.uuid.slice(0,6)} geo:${geo} pos:(${p.x.toFixed(1)},${p.y.toFixed(1)},${p.z.toFixed(1)}) scale:(${s.x.toFixed(2)},${s.y.toFixed(2)}) ro:${obj.renderOrder}`);
+      const geo = obj.geometry?.type || (obj.isSprite ? 'Sprite' : '?');
+      const matColor = obj.material?.color ? `#${obj.material.color.getHexString()}` : '';
+      const opacity = obj.material?.opacity ?? 1;
+      if (obj.isSprite || geo === 'SphereGeometry') {
+        items.push(`${obj.isSprite?'SPRITE':'MESH'} [${obj.name||obj.uuid.slice(0,6)}] geo:${geo} pos:(${p.x.toFixed(1)},${p.y.toFixed(1)},${p.z.toFixed(1)}) scale:(${s.x.toFixed(2)},${s.y.toFixed(2)}) op:${opacity.toFixed(2)} ro:${obj.renderOrder}`);
+      }
     }
   });
-  console.log('=== SCENE MESHES ===');
+  console.log('=== SPRITES & SPHERES ===');
   items.forEach(i => console.log(i));
-  showToast('콘솔 확인 (mesh: ' + items.length + '개)', 3000);
+  showToast('스프라이트: ' + items.length + '개 (콘솔 확인)', 3000);
 };
 setTimeout(() => window._debugScene(), 4000);
 
