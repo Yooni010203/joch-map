@@ -120,7 +120,7 @@ body.lowspec canvas{image-rendering:pixelated}
 .floor-btn:hover{color:var(--accent)}
 .floor-btn.active{color:#fff}
 .floor-btn:disabled{opacity:.4;cursor:not-allowed}
-.seg-indicator{position:absolute;top:3px;height:calc(100% - 6px);border-radius:50px;background:var(--accent);transition:left .22s cubic-bezier(.4,0,.2,1),width .22s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0}
+.seg-indicator{position:absolute;top:3px;left:0;height:calc(100% - 6px);border-radius:50px;background:var(--accent);transition:left .22s cubic-bezier(.4,0,.2,1),width .22s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0;width:0}
 .floor-badge{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 12px;background:rgba(0,119,204,.07)}
 #edit-banner{display:none;position:fixed;top:65px;left:50%;transform:translateX(-50%);z-index:20;background:var(--edit);color:#fff;font-size:.78rem;font-weight:500;padding:7px 20px;border-radius:0 0 10px 10px;box-shadow:0 4px 16px rgba(224,92,0,.25);align-items:center;gap:10px}
 #edit-banner.show{display:flex}
@@ -368,12 +368,12 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
       <button id="mobile-menu-close" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--dim);line-height:1;padding:2px 4px">✕</button>
     </div>
     <div style="font-size:.72rem;font-weight:600;color:var(--dim);margin-bottom:8px;letter-spacing:.05em">FLOOR</div>
-    <div class="floor-selector" id="mobile-floor-selector" style="margin-bottom:14px">
+    <div class="floor-selector" id="mobile-floor-selector" style="margin-bottom:14px;width:100%">
       <div class="seg-indicator" id="mobile-floor-indicator"></div>
-      <button class="floor-btn active" id="mfbtn-1" onclick="switchFloor(1);toggleMenu()">1F</button>
-      <button class="floor-btn" id="mfbtn-2" onclick="switchFloor(2);toggleMenu()">2F</button>
-      <button class="floor-btn" id="mfbtn-3" onclick="switchFloor(3);toggleMenu()">3F</button>
-      <button class="floor-btn" id="mfbtn-4" onclick="switchFloor(4);toggleMenu()">4F</button>
+      <button class="floor-btn active" id="mfbtn-1" onclick="switchFloor(1);toggleMenu()" style="flex:1;text-align:center">1F</button>
+      <button class="floor-btn" id="mfbtn-2" onclick="switchFloor(2);toggleMenu()" style="flex:1;text-align:center">2F</button>
+      <button class="floor-btn" id="mfbtn-3" onclick="switchFloor(3);toggleMenu()" style="flex:1;text-align:center">3F</button>
+      <button class="floor-btn" id="mfbtn-4" onclick="switchFloor(4);toggleMenu()" style="flex:1;text-align:center">4F</button>
     </div>
     <div style="font-size:.72rem;font-weight:600;color:var(--dim);margin-bottom:8px;letter-spacing:.05em">THEME</div>
     <div id="mobile-theme-toggle" style="display:flex;align-items:center;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px;width:fit-content;margin-bottom:14px">
@@ -3000,6 +3000,9 @@ function toggleMenu() {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       menu.style.opacity = '1';
       menu.style.transform = 'translateY(0) scale(1)';
+      // 메뉴 열릴 때 인디케이터 위치 갱신
+      updateFloorIndicator();
+      updateThemeIndicator();
     }));
     _menuOpen = true;
   }
@@ -3109,26 +3112,26 @@ function closeGuide() {
 // ── 방 검색 ──────────────────────────────────────
 let _allRooms = []; // { id, name, desc, tags, floor }
 
-async function openSearch() {
-  // 모든 층의 방 로드
+function openSearch() {
+  // 캐시에서 즉시 로드 (fetch 없음)
   _allRooms = [];
   for (const f of [1,2,3,4]) {
-    try {
-      const res = await fetch('/api/rooms/' + f);
-      if (!res.ok) continue;
-      const files = await res.json();
-      for (const fname of files) {
-        const r = await fetch('/api/room/' + f + '/' + encodeURIComponent(fname));
-        if (!r.ok) continue;
-        const lines = (await r.text()).split('\n');
-        _allRooms.push({
-          id: fname, floor: f,
-          name: lines[1] || fname,
-          desc: lines[2] || '',
-          tags: lines[3] || '',
-        });
-      }
-    } catch(e) {}
+    const cached = _dataCache[f]?.rooms || [];
+    for (const { id: fname, text } of cached) {
+      const lines = text.split('\n');
+      _allRooms.push({
+        id: fname, floor: f,
+        name: lines[1] || fname,
+        desc: lines[2] || '',
+        tags: lines[3] || '',
+      });
+    }
+    // 캐시에 없으면 메모리의 zones에서
+    if (!cached.length) {
+      zones.filter(z => z.floor === f).forEach(z => {
+        _allRooms.push({ id: z.id, floor: f, name: z.name, desc: z.desc, tags: z.tags });
+      });
+    }
   }
 
   const modal = document.getElementById('search-modal');
@@ -3372,10 +3375,19 @@ function updateSegIndicator(indicatorId, activeEl) {
   const indicator = document.getElementById(indicatorId);
   if (!indicator || !activeEl) return;
   const parent = indicator.parentElement;
+  // offsetLeft는 부모 기준 상대 위치라 정확함
+  let el = activeEl;
+  let left = 0;
+  while (el && el !== parent) {
+    left += el.offsetLeft;
+    el = el.offsetParent;
+    if (el === parent) break;
+  }
+  // 간단하게 getBoundingClientRect 차이로 계산
   const parentRect = parent.getBoundingClientRect();
-  const rect = activeEl.getBoundingClientRect();
-  indicator.style.left = (rect.left - parentRect.left) + 'px';
-  indicator.style.width = rect.width + 'px';
+  const btnRect = activeEl.getBoundingClientRect();
+  indicator.style.left = (btnRect.left - parentRect.left) + 'px';
+  indicator.style.width = btnRect.width + 'px';
 }
 
 function updateFloorIndicator() {
