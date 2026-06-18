@@ -3010,10 +3010,13 @@ function toggleMenu() {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       menu.style.opacity = '1';
       menu.style.transform = 'translateY(0) scale(1)';
-      // 메뉴 열릴 때 인디케이터 위치 갱신
-      updateFloorIndicator();
-      updateThemeIndicator();
+      // 메뉴 열릴 때 인디케이터 위치 갱신 (레이아웃 완료 후)
+      requestAnimationFrame(() => {
+        updateFloorIndicator();
+        updateThemeIndicator();
+      });
     }));
+    setTimeout(() => { updateFloorIndicator(); updateThemeIndicator(); }, 250);
     _menuOpen = true;
   }
 }
