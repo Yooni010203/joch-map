@@ -2778,7 +2778,7 @@ function makeZoneLabel(name, box) {
   // 세로(Z) 초과 시 축소
   if (sh > maxSZ) { const r = maxSZ / sh; sw *= r; sh *= r; }
   sprite.scale.set(sw, sh, 1);
-  sprite.renderOrder = 999;
+  sprite.renderOrder = 3;
   return sprite;
 }
 
@@ -2806,9 +2806,9 @@ function updateZoneLabel(z) {
       }
       z.label.material.needsUpdate = true;
     });
-    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false, color: 0xffffff });
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true, depthWrite: false, color: 0xffffff });
     const sprite = new THREE.Sprite(mat);
-    sprite.renderOrder = 15;
+    sprite.renderOrder = 3;
     sprite.position.set(center.x, center.y + 0.3, center.z);
     sprite.visible = z.mesh.visible;
     scene.add(sprite);
@@ -3412,26 +3412,7 @@ function updateThemeIndicator() {
   updateSegIndicator('mobile-theme-indicator', mActiveBtn);
 }
 
-// Three.js 씬 mesh 디버그
-window._debugScene = function() {
-  const items = [];
-  scene.traverse(obj => {
-    if ((obj.isMesh || obj.isSprite) && obj.visible) {
-      const p = obj.position;
-      const s = obj.scale;
-      const geo = obj.geometry?.type || (obj.isSprite ? 'Sprite' : '?');
-      const matColor = obj.material?.color ? `#${obj.material.color.getHexString()}` : '';
-      const opacity = obj.material?.opacity ?? 1;
-      if (obj.isSprite || geo === 'SphereGeometry') {
-        items.push(`${obj.isSprite?'SPRITE':'MESH'} [${obj.name||obj.uuid.slice(0,6)}] geo:${geo} pos:(${p.x.toFixed(1)},${p.y.toFixed(1)},${p.z.toFixed(1)}) scale:(${s.x.toFixed(2)},${s.y.toFixed(2)}) op:${opacity.toFixed(2)} ro:${obj.renderOrder}`);
-      }
-    }
-  });
-  console.log('=== SPRITES & SPHERES ===');
-  items.forEach(i => console.log(i));
-  showToast('스프라이트: ' + items.length + '개 (콘솔 확인)', 3000);
-};
-setTimeout(() => window._debugScene(), 4000);
+
 
 // 초기 인디케이터 위치 설정
 window.addEventListener('load', () => {
