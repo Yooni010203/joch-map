@@ -3412,7 +3412,22 @@ function updateThemeIndicator() {
   updateSegIndicator('mobile-theme-indicator', mActiveBtn);
 }
 
-window.updateThemeIndicator = updateThemeIndicator;
+// Three.js 씬 mesh 디버그
+window._debugScene = function() {
+  const items = [];
+  scene.traverse(obj => {
+    if (obj.isMesh && obj.visible) {
+      const p = obj.position;
+      const s = obj.scale;
+      const geo = obj.geometry?.type || '?';
+      items.push(`${obj.name||obj.uuid.slice(0,6)} geo:${geo} pos:(${p.x.toFixed(1)},${p.y.toFixed(1)},${p.z.toFixed(1)}) scale:(${s.x.toFixed(2)},${s.y.toFixed(2)}) ro:${obj.renderOrder}`);
+    }
+  });
+  console.log('=== SCENE MESHES ===');
+  items.forEach(i => console.log(i));
+  showToast('콘솔 확인 (mesh: ' + items.length + '개)', 3000);
+};
+setTimeout(() => window._debugScene(), 4000);
 
 // 초기 인디케이터 위치 설정
 window.addEventListener('load', () => {
