@@ -3020,6 +3020,15 @@ function toggleMenu() {
       });
     }));
     setTimeout(() => { updateFloorIndicator(); updateThemeIndicator(); }, 250);
+    // 디버그 버튼
+    if (!document.getElementById('seg-debug-btn')) {
+      const btn = document.createElement('button');
+      btn.id = 'seg-debug-btn';
+      btn.textContent = '🔍 세그먼트 로그 보기';
+      btn.style.cssText = 'display:block;width:100%;padding:8px;margin-top:8px;background:rgba(0,0,0,.1);border:none;border-radius:8px;font-size:.75rem;cursor:pointer';
+      btn.onclick = () => window._showSegLog?.();
+      document.getElementById('app-menu').appendChild(btn);
+    }
     _menuOpen = true;
   }
 }
@@ -3389,19 +3398,34 @@ window.closeResetAllConfirm3 = closeResetAllConfirm3;
 // 세그먼트 인디케이터 업데이트
 function updateSegIndicator(indicatorId, activeEl) {
   const indicator = document.getElementById(indicatorId);
-  console.log(`updateSegIndicator ${indicatorId}: activeEl=${activeEl?.id} offsetLeft=${activeEl?.offsetLeft} offsetWidth=${activeEl?.offsetWidth} indicator=${!!indicator}`);
-  if (!indicator || !activeEl) return;
+  const msg = `${indicatorId}: el=${activeEl?.id} left=${activeEl?.offsetLeft} w=${activeEl?.offsetWidth} ind=${!!indicator} indOpacity=${indicator?.style.opacity}`;
+  if (!indicator || !activeEl) {
+    window._segLog = (window._segLog||[]);
+    window._segLog.push('FAIL ' + msg);
+    return;
+  }
   const leftPx  = activeEl.offsetLeft;
   const widthPx = activeEl.offsetWidth;
+  window._segLog = (window._segLog||[]);
+  window._segLog.push('OK ' + msg);
   if (widthPx === 0) {
+    window._segLog.push('  → width=0 retrying...');
     requestAnimationFrame(() => updateSegIndicator(indicatorId, activeEl));
     return;
   }
   indicator.style.left    = leftPx + 'px';
   indicator.style.width   = widthPx + 'px';
   indicator.style.opacity = '1';
-  console.log(`  → left=${leftPx} width=${widthPx} opacity set to 1`);
+  window._segLog.push(`  → SET left=${leftPx} w=${widthPx}`);
 }
+
+window._showSegLog = function() {
+  const dbg = document.createElement('div');
+  dbg.style.cssText = 'position:fixed;top:80px;left:0;right:0;z-index:99999;background:rgba(0,0,0,.9);color:#0f0;font-size:11px;padding:10px;max-height:60vh;overflow-y:auto;word-break:break-all;user-select:text;-webkit-user-select:text;font-family:monospace';
+  dbg.innerHTML = (window._segLog||['없음']).join('<br>');
+  dbg.onclick = () => dbg.remove();
+  document.body.appendChild(dbg);
+};
 
 function updateFloorIndicator() {
   const activeBtn = document.querySelector('#floor-selector .floor-btn.active');
