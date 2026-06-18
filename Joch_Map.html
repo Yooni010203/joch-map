@@ -40,7 +40,8 @@ body.dark #edit-toolbar{background:rgba(25,16,10,.95);border-color:rgba(224,92,0
 body.dark #edit-banner{box-shadow:0 4px 16px rgba(224,92,0,.15)}
 body.dark .tool-btn{color:rgba(255,160,80,.9)}
 body.dark .tool-btn.active{color:#fff}
-body.dark #toolbar-indicator{background:var(--edit)}
+#theme-indicator, #mobile-theme-indicator{background:rgba(0,0,0,.15)}
+body.dark #theme-indicator, body.dark #mobile-theme-indicator{background:rgba(255,255,255,.2)}
 body.dark #edit-toolbar{background:rgba(40,20,5,.2)!important;border-color:rgba(224,92,0,.25)!important}
 body.dark .modal-box,body.dark .pw-box,body.dark .appinfo-box,body.dark .guide-box,body.dark .search-box{background:var(--card)!important;color:var(--text)!important}
 body.dark input,body.dark textarea,body.dark select{background:var(--input-bg)!important;color:var(--text)!important;border-color:var(--border)!important}
@@ -107,7 +108,7 @@ header.edit-mode{background:rgba(255,245,237,.97);border-bottom:2px solid var(--
 .logo-link:hover{opacity:.7}
 .logo-img{height:36px;width:auto;object-fit:contain;border-radius:6px}
 .logo-label{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;letter-spacing:.12em;color:var(--accent)}
-.floor-selector{display:flex;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px}
+.floor-selector{display:flex;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px;overflow:hidden}
 body.dark .floor-selector{background:rgba(255,255,255,.08)}
 .menu-item{display:block;width:100%;text-align:left;background:none;border:none;padding:10px 14px;border-radius:8px;font-size:.92rem;cursor:pointer;color:#1a2233;transition:background .12s}
 .menu-item:hover{background:rgba(0,119,204,.08)}
@@ -120,7 +121,7 @@ body.lowspec canvas{image-rendering:pixelated}
 .floor-btn:hover{color:var(--accent)}
 .floor-btn.active{color:#fff}
 .floor-btn:disabled{opacity:.4;cursor:not-allowed}
-.seg-indicator{position:absolute;top:3px;left:0;height:calc(100% - 6px);border-radius:50px;background:var(--accent);transition:left .22s cubic-bezier(.4,0,.2,1),width .22s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0;width:0}
+.seg-indicator{position:absolute;top:3px;left:0;height:calc(100% - 6px);border-radius:50px;background:var(--accent);transition:left .22s cubic-bezier(.4,0,.2,1),width .22s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:0;display:none}
 .floor-badge{font-family:'Orbitron',monospace;font-size:.73rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 12px;background:rgba(0,119,204,.07)}
 #edit-banner{display:none;position:fixed;top:65px;left:50%;transform:translateX(-50%);z-index:20;background:var(--edit);color:#fff;font-size:.78rem;font-weight:500;padding:7px 20px;border-radius:0 0 10px 10px;box-shadow:0 4px 16px rgba(224,92,0,.25);align-items:center;gap:10px}
 #edit-banner.show{display:flex}
@@ -340,14 +341,14 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
   <!-- 데스크톱 오른쪽 그룹 -->
   <div id="header-right" style="display:flex;align-items:center;gap:8px">
     <div class="floor-selector" id="floor-selector">
-      <div class="seg-indicator" id="floor-indicator"></div>
+      <div class="seg-indicator" id="floor-indicator" style="display:none"></div>
       <button class="floor-btn active" id="fbtn-1" onclick="switchFloor(1)">1F</button>
       <button class="floor-btn" id="fbtn-2" onclick="switchFloor(2)">2F</button>
       <button class="floor-btn" id="fbtn-3" onclick="switchFloor(3)">3F</button>
       <button class="floor-btn" id="fbtn-4" onclick="switchFloor(4)">4F</button>
     </div>
-    <div id="theme-toggle" title="테마 전환" style="display:flex;align-items:center;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px;cursor:pointer">
-      <div class="seg-indicator" id="theme-indicator" style="background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15)"></div>
+    <div id="theme-toggle" title="테마 전환" style="display:flex;align-items:center;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px;cursor:pointer;overflow:hidden">
+      <div class="seg-indicator" id="theme-indicator" style="display:none"></div>
       <button id="theme-light-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:transparent;color:var(--text);position:relative;z-index:1;transition:color .22s">☀️ 화이트</button>
       <button id="theme-dark-btn" style="display:flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;border:none;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:transparent;color:var(--dim);position:relative;z-index:1;transition:color .22s">🌙 다크</button>
     </div>
@@ -369,15 +370,15 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
     </div>
     <div style="font-size:.72rem;font-weight:600;color:var(--dim);margin-bottom:8px;letter-spacing:.05em">FLOOR</div>
     <div class="floor-selector" id="mobile-floor-selector" style="margin-bottom:14px;width:100%">
-      <div class="seg-indicator" id="mobile-floor-indicator"></div>
+      <div class="seg-indicator" id="mobile-floor-indicator" style="display:none"></div>
       <button class="floor-btn active" id="mfbtn-1" onclick="switchFloor(1);toggleMenu()" style="flex:1;text-align:center">1F</button>
       <button class="floor-btn" id="mfbtn-2" onclick="switchFloor(2);toggleMenu()" style="flex:1;text-align:center">2F</button>
       <button class="floor-btn" id="mfbtn-3" onclick="switchFloor(3);toggleMenu()" style="flex:1;text-align:center">3F</button>
       <button class="floor-btn" id="mfbtn-4" onclick="switchFloor(4);toggleMenu()" style="flex:1;text-align:center">4F</button>
     </div>
     <div style="font-size:.72rem;font-weight:600;color:var(--dim);margin-bottom:8px;letter-spacing:.05em">THEME</div>
-    <div id="mobile-theme-toggle" style="display:flex;align-items:center;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px;width:fit-content;margin-bottom:14px">
-      <div class="seg-indicator" id="mobile-theme-indicator" style="background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15)"></div>
+    <div id="mobile-theme-toggle" style="display:flex;align-items:center;position:relative;background:rgba(0,0,0,.08);border-radius:50px;padding:3px;width:fit-content;margin-bottom:14px;overflow:hidden">
+      <div class="seg-indicator" id="mobile-theme-indicator" style="display:none"></div>
       <button id="mobile-theme-light-btn" style="display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:50px;border:none;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:transparent;color:var(--text);position:relative;z-index:1;transition:color .22s">☀️ 화이트</button>
       <button id="mobile-theme-dark-btn" style="display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:50px;border:none;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:transparent;color:var(--dim);position:relative;z-index:1;transition:color .22s">🌙 다크</button>
     </div>
@@ -446,10 +447,6 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
       <button class="btn btn-cancel" onclick="closeAppInfo()">닫기</button>
     </div>
   </div>
-</div>
-
-  <span class="blink">●</span> 편집 모드 &nbsp;|&nbsp;
-  <kbd style="background:rgba(255,255,255,.2);border-radius:3px;padding:1px 6px;font-size:.7rem;">E+D</kbd> 로 종료
 </div>
 
 <div id="edit-toolbar">
@@ -3388,19 +3385,13 @@ function updateSegIndicator(indicatorId, activeEl) {
   const indicator = document.getElementById(indicatorId);
   if (!indicator || !activeEl) return;
   const parent = indicator.parentElement;
-  // offsetLeft는 부모 기준 상대 위치라 정확함
-  let el = activeEl;
-  let left = 0;
-  while (el && el !== parent) {
-    left += el.offsetLeft;
-    el = el.offsetParent;
-    if (el === parent) break;
-  }
-  // 간단하게 getBoundingClientRect 차이로 계산
   const parentRect = parent.getBoundingClientRect();
   const btnRect = activeEl.getBoundingClientRect();
+  if (btnRect.width === 0) return; // 아직 레이아웃 안 됨
+  indicator.style.display = 'block';
   indicator.style.left = (btnRect.left - parentRect.left) + 'px';
   indicator.style.width = btnRect.width + 'px';
+  indicator.classList.add('ready');
 }
 
 function updateFloorIndicator() {
@@ -3414,13 +3405,11 @@ function updateThemeIndicator() {
   const activeBtn = _darkMode
     ? document.getElementById('theme-dark-btn')
     : document.getElementById('theme-light-btn');
-  const indicator = document.getElementById('theme-indicator');
-  const mIndicator = document.getElementById('mobile-theme-indicator');
   const mActiveBtn = _darkMode
     ? document.getElementById('mobile-theme-dark-btn')
     : document.getElementById('mobile-theme-light-btn');
-  if (indicator) indicator.style.background = _darkMode ? 'rgba(255,255,255,.15)' : '#fff';
-  if (mIndicator) mIndicator.style.background = _darkMode ? 'rgba(255,255,255,.15)' : '#fff';
+  [document.getElementById('theme-light-btn'), document.getElementById('mobile-theme-light-btn')].forEach(b => { if (b) b.style.color = _darkMode ? 'var(--dim)' : 'var(--text)'; });
+  [document.getElementById('theme-dark-btn'), document.getElementById('mobile-theme-dark-btn')].forEach(b => { if (b) b.style.color = _darkMode ? 'var(--text)' : 'var(--dim)'; });
   updateSegIndicator('theme-indicator', activeBtn);
   updateSegIndicator('mobile-theme-indicator', mActiveBtn);
 }
@@ -4553,12 +4542,67 @@ let currentModel = null;
 let currentModelFloor = 1;
 let isLoading    = false;
 
+const HIDDEN_Y = -9999; // 숨길 때 이동할 Y 위치
+
+// 특정 층 데이터를 씬에 로드 (위치는 숨김 상태)
+async function preloadFloorData(f) {
+  const savedFloor = currentFloor;
+  currentFloor = f;
+  await apiLoadAll();
+  await loadPathsForFloor(f);
+  await loadMarkersForFloor(f);
+  await loadFlrMarkersForFloor(f);
+  currentFloor = savedFloor;
+  // 현재 층 아니면 구석에 숨기기
+  if (f !== currentFloor) {
+    zones.filter(z => z.floor === f).forEach(z => {
+      z.mesh.position.y = HIDDEN_Y;
+      z.line.position.y = HIDDEN_Y;
+      if (z.label) z.label.position.y = HIDDEN_Y;
+      z.mesh.visible = false;
+    });
+    paths.filter(p => p.floor === f).forEach(p => {
+      p.dotMeshes.forEach(m => { m.visible = false; });
+      p.lines.forEach(l => { l.visible = false; });
+    });
+    markers.filter(m => m.floor === f).forEach(m => { m.mesh.visible = false; });
+    flrMarkers.filter(m => m.floor === f).forEach(m => { m.mesh.visible = false; });
+  }
+}
 async function _doInstantSwitch(floor) {
   if (isLoading || slideAnim) return;
   isLoading = true;
   currentFloor = floor;
   document.querySelectorAll('.floor-btn').forEach(b => b.disabled = true);
-  [...zones].forEach(z => removeZone(z));
+
+  // 모든 층 데이터가 없으면 로드
+  const hasData = zones.some(z => z.floor === floor);
+  if (!hasData) {
+    const savedFloor = currentFloor;
+    currentFloor = floor;
+    await apiLoadAll();
+    await loadPathsForFloor(floor);
+    await loadMarkersForFloor(floor);
+    await loadFlrMarkersForFloor(floor);
+    currentFloor = savedFloor;
+  }
+
+  // 모든 층 zone/path/marker 위치 및 visibility 갱신
+  zones.forEach(z => {
+    const show = z.floor === floor;
+    if (show) {
+      const center = z.box.getCenter(new THREE.Vector3());
+      z.mesh.position.y = center.y;
+      z.line.position.y = center.y;
+      if (z.label) z.label.position.y = center.y + 0.3;
+    } else {
+      z.mesh.position.y = HIDDEN_Y;
+      z.line.position.y = HIDDEN_Y;
+      if (z.label) z.label.position.y = HIDDEN_Y;
+    }
+    z.mesh.visible = show;
+  });
+
   try {
     const newM = await loadModel(floor);
     if (currentModel && currentModel !== newM) scene.remove(currentModel);
@@ -4568,10 +4612,6 @@ async function _doInstantSwitch(floor) {
     const b2 = safeBbox(newM);
     gPlane.constant = -b2.min.y;
     modelTopY = b2.max.y;
-    await apiLoadAll();
-    await loadPathsForFloor(floor);
-    await loadMarkersForFloor(floor);
-    await loadFlrMarkersForFloor(floor);
     newM.traverse(n => { if (n.isMesh) n.material.opacity = 0.88; });
     setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
   } catch(e) { console.error('instant switch error:', e); }
@@ -4739,18 +4779,28 @@ function switchFloor(floor) {
 
         slideAnim = { dir, t: 0, models, baseYs, startTs, oldZones, newZones,
           onComplete: async () => {
-            // 새 모델 바닥 Y로 gPlane 업데이트
             const nb = safeBbox(newM);
             grid.position.y = nb.min.y;
             gPlane.constant = -nb.min.y;
             modelTopY = nb.max.y;
             snapshots.length = 0; updateUndoBtn();
-            updateUndoBtn();
-            await apiLoadAll();
-            await loadPathsForFloor(floor);
-            await loadMarkersForFloor(floor);
-            await loadFlrMarkersForFloor(floor);
-            setVis();
+
+            // 데이터가 없으면 로드, 있으면 위치만 복원
+            const hasData = zones.some(z => z.floor === floor);
+            if (!hasData) {
+              await apiLoadAll();
+              await loadPathsForFloor(floor);
+              await loadMarkersForFloor(floor);
+              await loadFlrMarkersForFloor(floor);
+            } else {
+              zones.filter(z => z.floor === floor).forEach(z => {
+                const center = z.box.getCenter(new THREE.Vector3());
+                z.mesh.position.y = center.y;
+                z.line.position.y = center.y;
+                if (z.label) z.label.position.y = center.y + 0.3;
+              });
+            }
+            setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
           }
         };
         miniLoader.classList.remove('show');
@@ -4777,12 +4827,12 @@ function switchFloor(floor) {
       }
       if (!oldModel) {
         snapshots.length = 0; updateUndoBtn();
-        updateUndoBtn();
         miniLoader.classList.remove('show');
         await apiLoadAll();
         await loadPathsForFloor(floor);
         await loadMarkersForFloor(floor);
         await loadFlrMarkersForFloor(floor);
+        setVis(); setPathVis(); setMarkerVis(); setFlrMarkerVis();
         const loadEl = document.getElementById('loading');
         loadEl.classList.add('hidden');
         setTimeout(() => { loadEl.style.display = 'none'; }, 600);
@@ -4821,6 +4871,11 @@ window.switchFloor = switchFloor;
 
   // 1층 로드 (데이터 캐시 준비된 상태에서)
   await switchFloor(1);
+
+  // 2~4층 데이터도 씬에 미리 로드 (숨김 상태)
+  for (const f of [2, 3, 4]) {
+    await preloadFloorData(f);
+  }
 })();
 
 /* ── resize ── */
