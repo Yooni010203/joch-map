@@ -216,7 +216,8 @@ body.dark .btn-cancel{background:var(--input-bg);color:var(--dim)}.dark .btn-can
 /* 길 안내 패널 */
 #nav-panel{position:fixed;top:60px;right:0;width:320px;max-width:90vw;bottom:0;z-index:30;background:var(--glass-bg);border-left:2px solid var(--glass-border);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:-8px 0 32px rgba(0,0,0,.15);display:flex;flex-direction:column;padding:24px 20px;gap:0;overflow-y:auto;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;opacity:0;pointer-events:none}
 #nav-panel.show{transform:translateX(0);opacity:1;pointer-events:all}
-#nav-panel-close{position:absolute;top:14px;right:14px;border:none;background:none;font-size:1.1rem;cursor:pointer;color:var(--dim)}
+#nav-panel-close{position:absolute;top:14px;right:14px;border:none;background:none;font-size:1.1rem;cursor:pointer;color:var(--dim);display:none}
+#nav-panel.show #nav-panel-close{display:block}
 @media(max-width:600px){
   #nav-panel{
     top:auto!important;right:0!important;left:0!important;width:100%!important;max-width:100%!important;
@@ -3399,24 +3400,6 @@ function updateThemeIndicator() {
   updateSegIndicator('mobile-theme-indicator', mActiveBtn);
 }
 
-// 모바일 디버그 오버레이
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const dbg = document.createElement('div');
-    dbg.style.cssText = 'position:fixed;top:80px;left:0;right:0;z-index:99999;background:rgba(0,0,0,.85);color:#fff;font-size:11px;padding:10px;max-height:50vh;overflow-y:auto;word-break:break-all;user-select:text;-webkit-user-select:text';
-    const lines = [];
-    document.querySelectorAll('*').forEach(el => {
-      const s = window.getComputedStyle(el);
-      const r = el.getBoundingClientRect();
-      if ((s.position === 'fixed' || s.position === 'absolute') && s.display !== 'none' && s.opacity !== '0' && r.width > 0 && r.height > 0 && r.width < 80 && r.height < 80) {
-        lines.push(`${s.position} [${el.id||el.className.toString().slice(0,25)||el.tagName}] x:${r.left.toFixed(0)} y:${r.top.toFixed(0)} w:${r.width.toFixed(0)} h:${r.height.toFixed(0)}`);
-      }
-    });
-    dbg.innerHTML = '<b>작은 요소:</b><br>' + (lines.join('<br>') || '없음') + '<br><br><b>tap to close</b>';
-    dbg.addEventListener('click', () => dbg.remove());
-    document.body.appendChild(dbg);
-  }, 3000);
-});
 window.updateThemeIndicator = updateThemeIndicator;
 
 // 초기 인디케이터 위치 설정
