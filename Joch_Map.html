@@ -2763,7 +2763,7 @@ function makeZoneLabel(name, box) {
   });
 
   const tex = new THREE.CanvasTexture(canvas);
-  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true, depthWrite: false });
   const sprite = new THREE.Sprite(mat);
 
   // 방 XZ 크기 안에 들어오도록 스케일 제한
@@ -3399,23 +3399,6 @@ function updateThemeIndicator() {
   updateSegIndicator('mobile-theme-indicator', mActiveBtn);
 }
 
-// 모바일 디버그: 화면에 보이는 fixed 요소 로그
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const fixed = [];
-    document.querySelectorAll('*').forEach(el => {
-      const s = window.getComputedStyle(el);
-      if (s.position === 'fixed' && s.display !== 'none' && s.visibility !== 'hidden' && s.opacity !== '0') {
-        const r = el.getBoundingClientRect();
-        if (r.width > 0 && r.height > 0) {
-          fixed.push(`${el.id||el.className||el.tagName} x:${r.left.toFixed(0)} y:${r.top.toFixed(0)} w:${r.width.toFixed(0)} h:${r.height.toFixed(0)}`);
-        }
-      }
-    });
-    showToast('fixed: ' + fixed.join(' | '), 8000);
-    console.log('fixed elements:', fixed);
-  }, 3000);
-});
 window.updateThemeIndicator = updateThemeIndicator;
 
 // 초기 인디케이터 위치 설정
